@@ -1,3 +1,24 @@
-# This file should contain everything to configure the workflow on a global scale.
-# In case of sample based data, it should be complemented by a samples.tsv file that contains
-# one row per sample. It can be parsed easily via pandas.
+## Configuration file for MeBaPiNa
+
+## Analysis configuration
+
+experiment_directory:
+  ## path to directory containing main folders (00_rawdata, 01_basecalling, ...)
+  base: "/ag-halama/Microbiome/16S_Metabarcoding"
+  ## run folder structure generated bay MinKNOW
+  run: "20191001_HD-T980_RapidHMW/Lamda/Lambda/20191001_1411_MN31344_FAK77797_2a466f85"
+
+machine:
+  gpu: True
+  cpu: 12
+
+guppy:
+  ## run set-up
+  flowcell: "FLO-MIN106"
+  seq_kit: "SQK-RAB204"
+  bac_kit: "SQK-RAB204" ## deactivate demultiplexing by leaving it empty: ""
+  lam_DCS: True ## deactivate detection of Lambda calibration strands by setting it: False
+  ## basecalling
+  q_cut: "0" ## deactivate quality filtering by setting it to "0"
+
+## TODO: use shema and add from snakemake.utils import validate to Snakefile
