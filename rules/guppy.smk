@@ -10,7 +10,9 @@ rule guppy:
     log:
         "01_basecalling/{run}/MeBaPiNa.log"
     benchmark:
-        "01_basecalling/{run}/MeBaPiNa.benchmark.log"
+        "01_basecalling/{run}/MeBaPiNa.benchmark.tsv"
+    version:
+        subprocess.check_output("guppy_basecaller --version | awk '{print $NF}'", shell=True)
     threads:
         config["machine"]["cpu"]
     params: 
