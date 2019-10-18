@@ -15,7 +15,7 @@ workdir: format(config["experiment_directory"]["base"])
 ## target output rule (the default end/output of the pipeline)
 rule all:
     input:
-        [
+        list(filter(None,[
         ## evaluation of Lambda calibration strands only when specified
         (config["guppy"]["lam_DCS"] and 
         expand("01_basecalling/{run}/calibration_strands", 
@@ -23,7 +23,7 @@ rule all:
         ## 
         expand("01_basecalling/{run}/sequencing_summary.txt", 
         run=config["experiment_directory"]["run"])
-        ]
+        ]))
 
 ## include other rules        
 include: "rules/other.smk"
