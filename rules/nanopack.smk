@@ -1,4 +1,4 @@
-rule nanoplot:
+rule nanoplot_seqsum:
     input:
         "01_basecalling/{run}/sequencing_summary.txt"
     output:
@@ -13,8 +13,10 @@ rule nanoplot:
         config["machine"]["cpu"]
     params:
         ("--drop_outliers"),
-        ("--plots kde hex"), #("--plots kde hex dot"),
+        ("--plots kde hex dot"),
         ("--format svg"),
+        ("--colormap plasma"),
+        ("--color \"#9966ff\""),
         (lambda wildcards, threads: "--threads " + str(threads)), ## have to use function; function always has to have wildcards argument first
         ("--verbose"), ## or nothing to log
         ("--store"),
@@ -22,32 +24,9 @@ rule nanoplot:
     shell:
         "NanoPlot {params} --summary {input} 2> {log}"
 
-rule nanoplot_long:
+rule nanoplot_fastq:
     input:
-        "01_basecalling/{run}/sequencing_summary.txt"
-    output:
-        "02_analysis/{run}/nanopack/nanoplot_long/LogTransformed_HistogramReadlength.svg"
-    log:
-        "02_analysis/{run}/nanopack/nanoplot_long/MeBaPiNa.log"
-    benchmark:
-        "02_analysis/{run}/nanopack/nanoplot_long/MeBaPiNa.benchmark.tsv"
-    conda:
-        "../envs/nanopack.yml"
-    threads:
-        config["machine"]["cpu"]
-    params:
-        ("--plots kde hex"), #("--plots kde hex dot"),
-        ("--format svg"),
-        (lambda wildcards, threads: "--threads " + str(threads)), ## have to use function; function always has to have wildcards argument first
-        ("--verbose"), ## or nothing to log
-        ("--store"),
-        ("--outdir 02_analysis/{run}/nanopack/nanoplot_long")
-    shell:
-        "NanoPlot {params} --summary {input} 2> {log}"
-
-rule nanoplot_bac:
-    input:
-        "01_basecalling/{run}/sequencing_summary.txt"
+        "01_basecalling/{run}/pass"
     output:
         "02_analysis/{run}/nanopack/nanoplot/LengthvsQualityScatterPlot_kde.svg"
     log:
@@ -60,13 +39,15 @@ rule nanoplot_bac:
         config["machine"]["cpu"]
     params:
         ("--drop_outliers"),
-        ("--plots kde hex"), #("--plots kde hex dot"),
+        ("--plots kde hex dot"),
         ("--format svg"),
+        ("--colormap plasma"),
+        ("--color \"#9966ff\""),
         (lambda wildcards, threads: "--threads " + str(threads)), ## have to use function; function always has to have wildcards argument first
         ("--verbose"), ## or nothing to log
         ("--store"),
         ("--outdir 02_analysis/{run}/nanopack/nanoplot")
     shell:
-        "NanoPlot {params} --summary {input} 2> {log}"
+        "NanoPlot {params} --fastq_rich {input} 2> {log}"
 
-ruleorder: nanoplot > nanoplot_bac ## to solve disambiguities for now
+ruleorder: nanoplot_seqsum > nanoplot_fastq ## to solve disambiguities for now
