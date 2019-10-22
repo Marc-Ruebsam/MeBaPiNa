@@ -48,6 +48,6 @@ rule nanoplot_fastq:
         ("--store"),
         ("--outdir 02_analysis/{run}/nanopack/nanoplot")
     shell:
-        "NanoPlot {params} --fastq_rich {input} 2> {log}"
+        "NanoPlot {params} --fastq_rich {input}/* 2> {log}"
 
 ruleorder: nanoplot_seqsum > nanoplot_fastq ## to solve disambiguities for now
