@@ -2,13 +2,13 @@ rule guppy:
     input:
         "00_rawdata/{run}/fast5"
     output:
-        directory("01_basecalling/{run}/workspace"),
-        directory("01_basecalling/{run}/pass"),
-        "01_basecalling/{run}/sequencing_summary.txt"
+        directory("01_processeddata/{run}/workspace"),
+        "01_processeddata/{run}/pass/{reads}.fastq.gz",
+        "01_processeddata/{run}/sequencing_summary.txt"
     log:
-        "01_basecalling/{run}/MeBaPiNa.log"
+        "01_processeddata/{run}/MeBaPiNa_guppy.log"
     benchmark:
-        "01_basecalling/{run}/MeBaPiNa.benchmark.tsv"
+        "01_processeddata/{run}/MeBaPiNa_guppy.benchmark.tsv"
     version:
         subprocess.check_output("guppy_basecaller --version | awk '{print $NF}'", shell=True)
     threads:
@@ -22,7 +22,7 @@ rule guppy:
         "--device cuda:all:100%"),
         ("--compress_fastq"),
         ("--fast5_out"),
-        ("--save_path 01_basecalling/{run}")
+        ("--save_path 01_processeddata/{run}")
     shell:
         "guppy_basecaller --num_callers {threads} {params} --input_path {input} / 2> {log}"
 
@@ -30,14 +30,14 @@ rule guppy_lam:
     input:
         "00_rawdata/{run}/fast5"
     output:
-        directory("01_basecalling/{run}/workspace"),
-        directory("01_basecalling/{run}/pass"),
-        directory("01_basecalling/{run}/calibration_strands"),
-        "01_basecalling/{run}/sequencing_summary.txt"
+        directory("01_processeddata/{run}/workspace"),
+        "01_processeddata/{run}/pass/{reads}.fastq.gz",
+        directory("01_processeddata/{run}/calibration_strands"),
+        "01_processeddata/{run}/sequencing_summary.txt"
     log:
-        "01_basecalling/{run}/MeBaPiNa.log"
+        "01_processeddata/{run}/MeBaPiNa_guppy_lam.log"
     benchmark:
-        "01_basecalling/{run}/MeBaPiNa.benchmark.tsv"
+        "01_processeddata/{run}/MeBaPiNa_guppy_lam.benchmark.tsv"
     version:
         subprocess.check_output("guppy_basecaller --version | awk '{print $NF}'", shell=True)
     threads:
@@ -52,7 +52,7 @@ rule guppy_lam:
         "--device cuda:all:100%"),
         ("--compress_fastq"),
         ("--fast5_out"),
-        ("--save_path 01_basecalling/{run}")
+        ("--save_path 01_processeddata/{run}")
     shell:
         "guppy_basecaller --num_callers {threads} {params} --input_path {input} / 2> {log}"
 
@@ -60,13 +60,13 @@ rule guppy_bac:
     input:
         "00_rawdata/{run}/fast5"
     output:
-        directory("01_basecalling/{run}/workspace"),
-        directory("01_basecalling/{run}/pass"),
-        "01_basecalling/{run}/sequencing_summary.txt"
+        directory("01_processeddata/{run}/workspace"),
+        "01_processeddata/{run}/pass/{reads}.fastq.gz",
+        "01_processeddata/{run}/sequencing_summary.txt"
     log:
-        "01_basecalling/{run}/MeBaPiNa.log"
+        "01_processeddata/{run}/MeBaPiNa_guppy_bac.log"
     benchmark:
-        "01_basecalling/{run}/MeBaPiNa.benchmark.tsv"
+        "01_processeddata/{run}/MeBaPiNa_guppy_bac.benchmark.tsv"
     version:
         subprocess.check_output("guppy_basecaller --version | awk '{print $NF}'", shell=True)
     threads:
@@ -81,7 +81,7 @@ rule guppy_bac:
         "--device cuda:all:100%"),
         ("--compress_fastq"),
         ("--fast5_out"),
-        ("--save_path 01_basecalling/{run}")
+        ("--save_path 01_processeddata/{run}")
     shell:
         "guppy_basecaller --num_callers {threads} {params} --input_path {input} / 2> {log}"
 
@@ -89,14 +89,14 @@ rule guppy_lam_bac:
     input:
         "00_rawdata/{run}/fast5"
     output:
-        directory("01_basecalling/{run}/workspace"),
-        directory("01_basecalling/{run}/pass"),
-        directory("01_basecalling/{run}/calibration_strands"),
-        "01_basecalling/{run}/sequencing_summary.txt"
+        directory("01_processeddata/{run}/workspace"),
+        "01_processeddata/{run}/pass/{reads}.fastq.gz",
+        directory("01_processeddata/{run}/calibration_strands"),
+        "01_processeddata/{run}/sequencing_summary.txt"
     log:
-        "01_basecalling/{run}/MeBaPiNa.log"
+        "01_processeddata/{run}/MeBaPiNa_guppy_lam_bac.log"
     benchmark:
-        "01_basecalling/{run}/MeBaPiNa.benchmark.tsv"
+        "01_processeddata/{run}/MeBaPiNa_guppy_lam_bac.benchmark.tsv"
     version:
         subprocess.check_output("guppy_basecaller --version | awk '{print $NF}'", shell=True)
     threads:
@@ -112,7 +112,7 @@ rule guppy_lam_bac:
         "--device cuda:all:100%"),
         ("--compress_fastq"),
         ("--fast5_out"),
-        ("--save_path 01_basecalling/{run}")
+        ("--save_path 01_processeddata/{run}")
     shell:
         "guppy_basecaller --num_callers {threads} {params} --input_path {input} / 2> {log}"
 

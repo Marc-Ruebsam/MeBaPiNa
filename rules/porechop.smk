@@ -1,12 +1,12 @@
 rule porechop:
     input:
-        "01_basecalling/{run}/pass"
+        "01_processeddata/{run}/pass"
     output:
-        directory("01_basecalling/{run}/pass_demultiplexed")
+        "01_processeddata/{run}/pass_demultiplexed/{reads}.fastq.gz"
     log:
-        "01_basecalling/{run}/MeBaPiNa_demultiplexed.log" ##  > {log} 2>&1 (TLDR both to log) redirects stdout to file and stderr to stdout which is redirected to a file
+        "01_processeddata/{run}/pass_demultiplexed/MeBaPiNa_porechop.log" ##  > {log} 2>&1 (TLDR both to log) redirects stdout to file and stderr to stdout which is redirected to a file
     benchmark:
-        "01_basecalling/{run}/pass_demultiplexed/MeBaPiNa.benchmark.tsv"
+        "01_processeddata/{run}/pass_demultiplexed/MeBaPiNa_porechop.benchmark.tsv"
     conda:
         "../envs/porechop.yml"
     threads:

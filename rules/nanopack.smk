@@ -1,12 +1,12 @@
 rule nanoplot_seqsum:
     input:
-        "01_basecalling/{run}/sequencing_summary.txt"
+        "01_processeddata/{run}/sequencing_summary.txt"
     output:
         "02_analysis/{run}/nanopack/nanoplot/LengthvsQualityScatterPlot_kde.svg"
     log:
-        "02_analysis/{run}/nanopack/nanoplot/MeBaPiNa.log"
+        "02_analysis/{run}/nanopack/nanoplot/MeBaPiNa_nanoplot_seqsum.log"
     benchmark:
-        "02_analysis/{run}/nanopack/nanoplot/MeBaPiNa.benchmark.tsv"
+        "02_analysis/{run}/nanopack/nanoplot/MeBaPiNa_nanoplot_seqsum.benchmark.tsv"
     conda:
         "../envs/nanopack.yml"
     threads:
@@ -24,13 +24,13 @@ rule nanoplot_seqsum:
 
 rule nanoplot_fastq:
     input:
-        "01_basecalling/{run}/pass"
+        "01_processeddata/{run}/pass"
     output:
         "02_analysis/{run}/nanopack/nanoplot/LengthvsQualityScatterPlot_kde.svg"
     log:
-        "02_analysis/{run}/nanopack/nanoplot/MeBaPiNa.log"
+        "02_analysis/{run}/nanopack/nanoplot/MeBaPiNa_nanoplot_fastq.log"
     benchmark:
-        "02_analysis/{run}/nanopack/nanoplot/MeBaPiNa.benchmark.tsv"
+        "02_analysis/{run}/nanopack/nanoplot/MeBaPiNa_nanoplot_fastq.benchmark.tsv"
     conda:
         "../envs/nanopack.yml"
     threads:
