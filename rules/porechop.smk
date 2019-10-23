@@ -12,7 +12,6 @@ rule porechop:
     threads:
         config["machine"]["cpu"]
     params:
-        (lambda wildcards, threads: "--threads " + str(threads)), ## have to use function; function always has to have wildcards argument first
         ("--verbosity 2"), ## or nothing to log
     shell:
-        "porechop {params} --input {input} --barcode_dir {output} > {log} 2>&1" 
+        "porechop --threads {threads} {params} --input {input} --barcode_dir {output} > {log} 2>&1" 

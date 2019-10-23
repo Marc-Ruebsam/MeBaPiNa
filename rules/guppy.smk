@@ -20,12 +20,11 @@ rule guppy:
         ("--min_qscore " + config["guppy"]["q_cut"]),
         (config["machine"]["gpu"] and 
         "--device cuda:all:100%"),
-        (lambda wildcards, threads: "--num_callers " + str(threads)), ## have to use function; function always has to have wildcards argument first
         ("--compress_fastq"),
         ("--fast5_out"),
         ("--save_path 01_basecalling/{run}")
     shell:
-        "guppy_basecaller {params} --input_path {input} / 2> {log}"
+        "guppy_basecaller --num_callers {threads} {params} --input_path {input} / 2> {log}"
 
 rule guppy_lam:
     input:
@@ -51,12 +50,11 @@ rule guppy_lam:
         ("--min_qscore " + config["guppy"]["q_cut"]),
         (config["machine"]["gpu"] and 
         "--device cuda:all:100%"),
-        (lambda wildcards, threads: "--num_callers " + str(threads)), ## have to use function; function always has to have wildcards argument first
         ("--compress_fastq"),
         ("--fast5_out"),
         ("--save_path 01_basecalling/{run}")
     shell:
-        "guppy_basecaller {params} --input_path {input} / 2> {log}"
+        "guppy_basecaller --num_callers {threads} {params} --input_path {input} / 2> {log}"
 
 rule guppy_bac:
     input:
@@ -81,12 +79,11 @@ rule guppy_bac:
         ("--min_qscore " + config["guppy"]["q_cut"]),
         (config["machine"]["gpu"] and 
         "--device cuda:all:100%"),
-        (lambda wildcards, threads: "--num_callers " + str(threads)), ## have to use function; function always has to have wildcards argument first
         ("--compress_fastq"),
         ("--fast5_out"),
         ("--save_path 01_basecalling/{run}")
     shell:
-        "guppy_basecaller {params} --input_path {input} / 2> {log}"
+        "guppy_basecaller --num_callers {threads} {params} --input_path {input} / 2> {log}"
 
 rule guppy_lam_bac:
     input:
@@ -113,11 +110,10 @@ rule guppy_lam_bac:
         ("--min_qscore " + config["guppy"]["q_cut"]),
         (config["machine"]["gpu"] and 
         "--device cuda:all:100%"),
-        (lambda wildcards, threads: "--num_callers " + str(threads)), ## have to use function; function always has to have wildcards argument first
         ("--compress_fastq"),
         ("--fast5_out"),
         ("--save_path 01_basecalling/{run}")
     shell:
-        "guppy_basecaller {params} --input_path {input} / 2> {log}"
+        "guppy_basecaller --num_callers {threads} {params} --input_path {input} / 2> {log}"
 
 ruleorder: guppy > guppy_lam > guppy_bac > guppy_lam_bac
