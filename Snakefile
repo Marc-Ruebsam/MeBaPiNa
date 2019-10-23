@@ -18,11 +18,11 @@ rule all:
         list(filter(None,[
         ## evaluation of Lambda calibration strands only when specified
         (config["guppy"]["lam_DCS"] and
-        expand("01_basecalling/{run}/calibration_strands",
+        expand("01_processeddata/{run}/calibration_strands",
         run=config["experiment_directory"]["run"])),
         ## demultiplexing only when specified
         (config["guppy"]["bac_kit"] and
-        expand("01_basecalling/{run}/pass_demultiplexed",
+        expand("01_processeddata/{run}/pass_demultiplexed",
         run=config["experiment_directory"]["run"])),
         ## do NanoPlot of basecalled reads
         expand("02_analysis/{run}/nanopack/nanoplot/LengthvsQualityScatterPlot_kde.svg",
@@ -30,7 +30,7 @@ rule all:
         ]))
 
 ## include other rules
-include: "rules/other.smk"
 include: "rules/guppy.smk"
 include: "rules/nanopack.smk"
 include: "rules/porechop.smk"
+include: "rules/minimap2.smk"
