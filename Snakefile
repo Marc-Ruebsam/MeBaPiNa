@@ -24,6 +24,9 @@ rule all:
         (config["guppy"]["bac_kit"] and
         expand("01_processeddata/{run}/pass_demultiplexed",
         run=config["experiment_directory"]["run"])),
+        ## align reads to reference
+        expand("01_processeddata/{run}/alignment/alignment.sam",
+        run=config["experiment_directory"]["run"]),
         ## do NanoPlot of basecalled reads
         expand("02_analysis/{run}/nanopack/nanoplot/LengthvsQualityScatterPlot_kde.svg",
         run=config["experiment_directory"]["run"])
