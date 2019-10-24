@@ -3,33 +3,37 @@
 
 rule minimap2:
     input:
-        target="01_processeddata/reference_sequences/lambda/some.mmi", # can be either genome index or genome fasta
-        query="01_processeddata/{run}/pass/{reads}.fastq.gz"
+        target="00_rawdata/reference_sequences/lambda/NC_001416.1_13-AUG-2018.mmi", # can be either genome index or genome fasta
+        query="01_processeddata/{run}/pass"
     output:
-        "01_processeddata/{run}/alignment/lambda_reference.sam"
+        "01_processeddata/{run}/alignment/alignment.sam"
     log:
         "01_processeddata/{run}/alignment/MeBaPiNa_minimap2.log"
     benchmark:
         "01_processeddata/{run}/alignment/MeBaPiNa_minimap2.benchmark.tsv"
     params:
-        "-x map-ont" ## naopore specific
+        "-x map-ont", ## naopore specific
         "-a" ## possition accurate CIGAR alignment in SAM output; much slower <- maybe skip?
+    conda:
+        "../envs/minimap2.yml"
     threads:
         config["machine"]["cpu"]
     shell:
-        "minimap2 -t {threads} {params} -o {output} {input.target} {input.query} > {log} 2>&1"
+        "minimap2 -t {threads} {params} -o {output} {input.target} {input.query}/* > {log} 2>&1"
 
 rule minimap2_index:
     input:
-        "01_processeddata/reference_sequences/lambda/some.fa"
+        "00_rawdata/reference_sequences/lambda/NC_001416.1_13-AUG-2018.fa"
     output:
-        "01_processeddata/reference_sequences/lambda/some.mmi"
+        "00_rawdata/reference_sequences/lambda/NC_001416.1_13-AUG-2018.mmi"
     log:
-        "01_processeddata/reference_sequences/lambda/MeBaPiNa_minimap2_index.log"
+        "00_rawdata/reference_sequences/lambda/MeBaPiNa_minimap2_index.log"
     benchmark:
-        "01_processeddata/reference_sequences/lambda/MeBaPiNa_minimap2_index.benchmark.tsv"
+        "00_rawdata/reference_sequences/lambda/MeBaPiNa_minimap2_index.benchmark.tsv"
     params:
         "-x map-ont" ## naopore specific
+    conda:
+        "../envs/minimap2.yml"
     threads:
         config["machine"]["cpu"]
     shell:
