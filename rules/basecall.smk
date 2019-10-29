@@ -23,8 +23,8 @@ rule guppy:
         ("--min_qscore " + config["guppy"]["q_cut"]),
         ("--device cuda:all:100%" if config["machine"]["gpu"] else ""),
         "--compress_fastq",
-        "--fast5_out"
+        "--fast5_out",
+        "--save_path 01_processeddata/{run}/basecall"
     shell:
         "guppy_basecaller --num_callers {threads} {params} "
-        "--save_path 01_processeddata/{run}/basecall "
         "--input_path {input} > {log} 2>&1"
