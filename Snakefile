@@ -20,10 +20,6 @@ rule all:
         (config["guppy"]["lam_DCS"] and
         expand("01_processeddata/{run}/align_lam/alignment.sam",
         run=config["experiment_directory"]["run"])),
-        ## demultiplexing only when specified
-        (config["guppy"]["bac_kit"] and
-        expand("01_processeddata/{run}/basecall_demultiplex/barcoding_summary.txt",
-        run=config["experiment_directory"]["run"])),
         ## do NanoPlot of basecalled reads
         expand("02_analysis/{run}/basecall/nanoplot/NanoPlot-report.html",
         run=config["experiment_directory"]["run"]),
