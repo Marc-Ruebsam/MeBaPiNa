@@ -18,22 +18,26 @@ rule all:
         list(filter(None,[
         ## evaluation of Lambda calibration strands only when specified
         (config["guppy"]["lam_DCS"] and
-        expand("01_processeddata/{run}/calibration_strands",
+        expand("01_processeddata/{run}/align_lam/alignment.sam",
         run=config["experiment_directory"]["run"])),
         ## demultiplexing only when specified
         (config["guppy"]["bac_kit"] and
-        expand("01_processeddata/{run}/pass_demultiplexed",
+        expand("01_processeddata/{run}/basecall_demultiplex/barcoding_summary.txt",
         run=config["experiment_directory"]["run"])),
-        ## align reads to reference
-        expand("01_processeddata/{run}/alignment/alignment.sam",
-        run=config["experiment_directory"]["run"]),
         ## do NanoPlot of basecalled reads
-        expand("02_analysis/{run}/nanopack/nanoplot/LengthvsQualityScatterPlot_kde.svg",
+        expand("02_analysis/{run}/basecall/nanoplot/NanoPlot-report.html",
+        run=config["experiment_directory"]["run"]),
+        ## align reads to reference
+        expand("01_processeddata/{run}/align/alignment_sorted.bam", 
+        run=config["experiment_directory"]["run"]),
+        ## do NanoPlot of aligned reads reads
+        expand("02_analysis/{run}/align/nanoplot/NanoPlot-report.html",
         run=config["experiment_directory"]["run"])
         ]))
 
 ## include other rules
-include: "rules/guppy.smk"
-include: "rules/nanopack.smk"
-include: "rules/porechop.smk"
-include: "rules/minimap2.smk"
+include: "rules/basecall.smk"
+include: "rules/plot.smk"
+include: "rules/demultiplex.smk"
+include: "rules/align.smk"
+include: "rules/misc.smk"
