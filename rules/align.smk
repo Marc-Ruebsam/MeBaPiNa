@@ -1,13 +1,14 @@
 rule minimap2:
     input:
-        target="00_rawdata/reference_sequences/lambda/{reference}.fasta",
+        dummy_dependency="01_processeddata/{run}/sequencing_summary.txt",
+        target=expand("00_rawdata/reference_sequences/lambda/{reference}.mmi", reference=config["align"]["reference"]),
         query="01_processeddata/{run}/basecall/pass"
     output:
-        "01_processeddata/{run}/align/alignment_{reference}.sam"
+        "01_processeddata/{run}/align/alignment.sam"
     log:
-        "01_processeddata/{run}/align/alignment_{reference}_MeBaPiNa_minimap2.log"
+        "01_processeddata/{run}/align/MeBaPiNa_minimap2.log"
     benchmark:
-        "01_processeddata/{run}/align/alignment_{reference}_MeBaPiNa_minimap2.benchmark.tsv"
+        "01_processeddata/{run}/align/MeBaPiNa_minimap2.benchmark.tsv"
     params:
         "-x map-ont", ## naopore specific
         "-a" ## possition accurate CIGAR alignment in SAM output; much slower <- maybe skip?
@@ -38,6 +39,7 @@ rule minimap2_index:
 
 rule minimap2_lam:
     input:
+        dummy_dependency="01_processeddata/{run}/sequencing_summary.txt",
         target="00_rawdata/reference_sequences/lambda/lambda_3.6kb.fasta",
         query="01_processeddata/{run}/calibration_strands"
     output:
