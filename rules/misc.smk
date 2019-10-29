@@ -18,3 +18,12 @@ rule sam_bam:
     shell:
         "samtools view --threads {threads} {params} {input} | "
         "samtools sort --threads {threads} -o {output} > {log} 2>&1"   
+
+rule a:
+    input:
+        "01_processeddata/{run}/basecall/sequencing_summary.txt"
+    output:
+        pipe("02_analysis/{run}/basecall/nanoqc/pipe.fastq.gz")
+    shell:
+        "cat $(find 01_processeddata/{wildcards.run}/basecall/pass -type f -name \"*.fastq.gz\") "
+        ">> {output}"

@@ -51,13 +51,13 @@ rule nanoplot_seqsum:
 
 rule nanoplot_bam:
     input:
-        "01_processeddata/{run}/align/alignment_sorted.bam"
+        "01_processeddata/{run}/{align}/alignment_sorted.bam"
     output:
-        "02_analysis/{run}/align/nanoplot/NanoPlot-report.html"
+        "02_analysis/{run}/{align}/nanoplot/NanoPlot-report.html"
     log:
-        "02_analysis/{run}/align/nanoplot/MeBaPiNa_nanoplot_bam.log"
+        "02_analysis/{run}/{align}/nanoplot/MeBaPiNa_nanoplot_bam.log"
     benchmark:
-        "02_analysis/{run}/align/nanoplot/MeBaPiNa_nanoplot_bam.benchmark.tsv"
+        "02_analysis/{run}/{align}/nanoplot/MeBaPiNa_nanoplot_bam.benchmark.tsv"
     conda:
         "../envs/nanopack.yml"
     threads:
@@ -74,22 +74,21 @@ rule nanoplot_bam:
         "--outdir 02_analysis/{wildcards.run}/align/nanoplot "
         "--bam {input} 2> {log}"
 
-# rule nanoqc:
-#     input:
-#         # dummy_dependency="01_processeddata/{run}/basecall/sequencing_summary.txt",
-#         fastq="01_processeddata/{run}/basecall/pass"
-#     output:
-#         "02_analysis/{run}/basecall/nanoqc/nanoQC.html"
-#     log:
-#         "02_analysis/{run}/basecall/nanoqc/MeBaPiNa_nanoqc.log"
-#     benchmark:
-#         "02_analysis/{run}/basecall/nanoqc/MeBaPiNa_nanoqc.benchmark.tsv"
-#     conda:
-#         "../envs/nanopack.yml"
-#     params:
-#         "--outdir 02_analysis/{run}/basecall/nanoqc"
-#     shell:
-#         "nanoQC {params} "
-#         "{input.fastq}/* 2> {log}"
+rule nanoqc:
+    input:
+        "02_analysis/{run}/basecall/nanoqc/pipe.fastq.gz"
+    output:
+        "02_analysis/{run}/basecall/nanoqc/nanoQC.html"
+    log:
+        "02_analysis/{run}/basecall/nanoqc/MeBaPiNa_nanoqc.log"
+    benchmark:
+        "02_analysis/{run}/basecall/nanoqc/MeBaPiNa_nanoqc.benchmark.tsv"
+    conda:
+        "../envs/nanopack.yml"
+    params:
+        "--outdir 02_analysis/{run}/basecall/nanoqc"
+    shell:
+        "nanoQC {params} "
+        "{input.fastq}/* 2> {log}"
 
 # ruleorder: nanoplot_seqsum > nanoplot_fastq ## to solve disambiguities for now
