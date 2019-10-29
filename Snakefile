@@ -18,13 +18,12 @@ rule all:
         list(filter(None,[
         ## evaluation of Lambda calibration strands only when specified
         (config["guppy"]["lam_DCS"] and
-        expand("01_processeddata/{run}/align_lam/alignment.sam",
+        expand("02_analysis/{run}/align_lam/nanoplot/NanoPlot-report.html",
         run=config["experiment_directory"]["run"])),
         ## do NanoPlot of basecalled reads
         expand("02_analysis/{run}/basecall/nanoplot/NanoPlot-report.html",
         run=config["experiment_directory"]["run"]),
-        ## align reads to reference
-        expand("01_processeddata/{run}/align/alignment_sorted.bam", 
+        expand("02_analysis/{run}/basecall/nanoqc/nanoQC.html",
         run=config["experiment_directory"]["run"]),
         ## do NanoPlot of aligned reads reads
         expand("02_analysis/{run}/align/nanoplot/NanoPlot-report.html",
