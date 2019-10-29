@@ -1,8 +1,7 @@
 rule minimap2:
     input:
-        dummy_dependency="01_processeddata/{run}/sequencing_summary.txt",
-        target=expand("00_rawdata/reference_sequences/lambda/{reference}.mmi", reference=config["align"]["reference"]),
-        query="01_processeddata/{run}/basecall/pass"
+        dummy_dependency="01_processeddata/{run}/basecall/sequencing_summary.txt", ## used as dummy for the other folders
+        target=expand("00_rawdata/reference_sequences/lambda/{reference}.mmi", reference=config["align"]["reference"])
     output:
         "01_processeddata/{run}/align/alignment.sam"
     log:
@@ -17,7 +16,7 @@ rule minimap2:
     threads:
         config["machine"]["cpu"]
     shell:
-        "minimap2 -t {threads} {params} -o {output} {input.target} {input.query}/* > {log} 2>&1"
+        "minimap2 -t {threads} {params} -o {output} {input.target} 01_processeddata/{wildcards.run}/basecall/pass/* > {log} 2>&1"
 
 rule minimap2_index:
     input:
@@ -39,7 +38,7 @@ rule minimap2_index:
 
 rule minimap2_lam:
     input:
-        dummy_dependency="01_processeddata/{run}/sequencing_summary.txt",
+        dummy_dependency="01_processeddata/{run}/basecall/sequencing_summary.txt", ## used as dummy for the other folders
         target="00_rawdata/reference_sequences/lambda/lambda_3.6kb.fasta",
         query="01_processeddata/{run}/calibration_strands"
     output:
