@@ -16,4 +16,5 @@ rule sam_bam:
     threads:
         config["machine"]["cpu"]
     shell:
-        "samtools view --threads {threads} {params} {input} | samtools sort --threads {threads} -o {output} > {log} 2>&1"   
+        "samtools view --threads {threads} {params} {input} | "
+        "samtools sort --threads {threads} -o {output} > {log} 2>&1"   

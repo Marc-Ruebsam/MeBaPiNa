@@ -17,10 +17,10 @@ rule nanoplot_seqsum:
         "--format svg",
         "--colormap plasma",
         "--color black", ## use NanoPlot --listcolors to get list of valid colors
-        "--verbose", ## or nothing to log
-        "--outdir 02_analysis/{run}/basecall/nanoplot "
+        "--verbose" ## or nothing to log
     shell:
         "NanoPlot --threads {threads} {params} "
+        "--outdir 02_analysis/{wildcards.run}/basecall/nanoplot "
         "--summary {input} 2> {log}"
 
 # rule nanoplot_fastq:
@@ -68,10 +68,10 @@ rule nanoplot_bam:
         "--format svg",
         "--colormap plasma",
         "--color black", ## use NanoPlot --listcolors to get list of valid colors
-        "--verbose", ## or nothing to log
-        "--outdir 02_analysis/{run}/align/nanoplot "
+        "--verbose" ## or nothing to log
     shell:
         "NanoPlot --threads {threads} {params} "
+        "--outdir 02_analysis/{wildcards.run}/align/nanoplot "
         "--bam {input} 2> {log}"
 
 # rule nanoqc:
