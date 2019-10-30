@@ -2,13 +2,13 @@
 
 rule sam_bam:
     input:
-        "01_processeddata/{run}/align/alignment.sam"
+        "01_processeddata/{run}/{align}/alignment.sam"
     output:
-        "01_processeddata/{run}/align/alignment_sorted.bam"
+        "01_processeddata/{run}/{align}/alignment_sorted.bam"
     log:
-        "01_processeddata/{run}/align/MeBaPiNa_sam_bam.log"
+        "01_processeddata/{run}/{align}/MeBaPiNa_sam_bam.log"
     benchmark:
-        "01_processeddata/{run}/align/MeBaPiNa_sam_bam.benchmark.tsv"
+        "01_processeddata/{run}/{align}/MeBaPiNa_sam_bam.benchmark.tsv"
     params:
         "-u" ## uncompressed bam to pipe
     conda:
@@ -19,7 +19,7 @@ rule sam_bam:
         "samtools view --threads {threads} {params} {input} | "
         "samtools sort --threads {threads} -o {output} > {log} 2>&1"   
 
-rule a:
+rule fasq_pipe:
     input:
         "01_processeddata/{run}/basecall/sequencing_summary.txt"
     output:
