@@ -21,7 +21,8 @@ rule nanoplot_seqsum:
     shell:
         "NanoPlot --threads {threads} {params} "
         "--outdir 02_analysis/{wildcards.run}/basecall/nanoplot "
-        "--summary {input} 2> {log}"
+        "--summary {input} > {log} 2>&1"
+
 rule pycoqc_seqsum:
     input:
         "01_processeddata/{run}/{align}/alignment_sorted.bam"
@@ -68,7 +69,7 @@ rule pycoqc_seqsum:
 #     shell:
 #         "NanoPlot --threads {threads} {params} "
 #         "--outdir 02_analysis/{run}/nanopack/nanoplot "
-#         "--fastq_rich {input} 2> {log}"
+#         "--fastq_rich {input} > {log} 2>&1"
 
 ruleorder: pycoqc_seqsum > nanoplot_seqsum # > nanoplot_fastq ## to solve disambiguities for now
 
@@ -95,7 +96,7 @@ rule nanoplot_bam:
     shell:
         "NanoPlot --threads {threads} {params} "
         "--outdir 02_analysis/{wildcards.run}/align/nanoplot "
-        "--bam {input} 2> {log}"
+        "--bam {input} > {log} 2>&1"
 
 rule nanoqc:
     input:
@@ -108,8 +109,7 @@ rule nanoqc:
         "02_analysis/{run}/basecall/nanoqc/MeBaPiNa_nanoqc.benchmark.tsv"
     conda:
         "../envs/nanopack.yml"
-    params:
-        "--outdir 02_analysis/{run}/basecall/nanoqc"
     shell:
-        "nanoQC {params} "
-        "{input}/* 2> {log}"
+        "nanoQC "
+        "--outdir 02_analysis/{wildcards.run}/basecall/nanoqc "
+        "{input} > {log} 2>&1"
