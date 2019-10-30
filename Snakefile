@@ -13,7 +13,7 @@ workdir: config["experiment_directory"]["base"]
 # singularity: "docker://continuumio/miniconda3"
 
 ## target output rule (the default end/output of the pipeline)
-rule all:
+rule create_output:
     input:
         list(filter(None,[
         ## evaluation of Lambda calibration strands only when specified
