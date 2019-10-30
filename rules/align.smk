@@ -39,7 +39,7 @@ rule minimap2:
 rule minimap2_lam:
     input:
         dummy_dependency="01_processeddata/{run}/basecall/sequencing_summary.txt", ## used as dummy for the other folders
-        target="00_rawdata/reference_sequences/lambda/lambda_3.6kb.fasta"
+        target="00_rawdata/reference_sequences/lambda/lambda_3.6kb.mmi"
     output:
         "01_processeddata/{run}/align_lam/alignment.sam"
     log:
