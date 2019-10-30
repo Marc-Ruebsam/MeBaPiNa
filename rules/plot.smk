@@ -48,6 +48,8 @@ rule nanoplot_seqsum:
 #         "NanoPlot --threads {threads} {params} "
 #         "--outdir 02_analysis/{run}/nanopack/nanoplot "
 #         "--fastq_rich {input} 2> {log}"
+# 
+# ruleorder: nanoplot_seqsum > nanoplot_fastq ## to solve disambiguities for now
 
 rule nanoplot_bam:
     input:
@@ -89,6 +91,4 @@ rule nanoqc:
         "--outdir 02_analysis/{run}/basecall/nanoqc"
     shell:
         "nanoQC {params} "
-        "{input.fastq}/* 2> {log}"
-
-# ruleorder: nanoplot_seqsum > nanoplot_fastq ## to solve disambiguities for now
+        "{input}/* 2> {log}"
