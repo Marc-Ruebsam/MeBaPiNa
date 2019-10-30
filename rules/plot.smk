@@ -22,6 +22,27 @@ rule nanoplot_seqsum:
         "NanoPlot --threads {threads} {params} "
         "--outdir 02_analysis/{wildcards.run}/basecall/nanoplot "
         "--summary {input} 2> {log}"
+rule pycoqc_seqsum:
+    input:
+        "01_processeddata/{run}/{align}/alignment_sorted.bam"
+    output:
+        html="02_analysis/{run}/{align}/pycoqc/pycoQC_report.html"
+        json="02_analysis/{run}/{align}/pycoqc/pycoQC_report.json"
+    log:
+        "02_analysis/{run}/{align}/pycoqc/pycoQC_report.log"
+    benchmark:
+        "02_analysis/{run}/{align}/pycoqc/pycoQC_report.benchmark.tsv"
+    conda:
+        "../envs/pycoqc.yml"
+    params:
+        "--min_pass_qual 0",
+        "--sample 100000",
+        "--verbose"
+    shell:
+        "pycoQC {params} "
+        "--summary_file {input} "
+        "--html_outfile {output.html} "
+        "--json_outfile {output.json} > {log} 2>&1"
 
 # rule nanoplot_fastq:
 #     input:
@@ -48,8 +69,8 @@ rule nanoplot_seqsum:
 #         "NanoPlot --threads {threads} {params} "
 #         "--outdir 02_analysis/{run}/nanopack/nanoplot "
 #         "--fastq_rich {input} 2> {log}"
-# 
-# ruleorder: nanoplot_seqsum > nanoplot_fastq ## to solve disambiguities for now
+
+ruleorder: pycoqc_seqsum > nanoplot_seqsum # > nanoplot_fastq ## to solve disambiguities for now
 
 rule nanoplot_bam:
     input:
