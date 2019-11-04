@@ -1,6 +1,6 @@
 from snakemake.utils import min_version
 ## set minimum snakemake version
-min_version("5.2.0")
+min_version("5.4")
 
 ## location of configuration and report specifications
 configfile: "config.yaml"
@@ -18,7 +18,7 @@ rule create_output:
         list(filter(None,[
         ## evaluation of Lambda calibration strands only when specified
         (config["guppy"]["lam_DCS"] and
-        expand("02_analysis/{run}/align_lam/nanoplot/NanoStats.txt",
+        expand("02_analysis/{run}/align_calibration_strands/nanoplot/NanoStats.txt",
         run=config["experiment_directory"]["run"])),
         ## do NanoPlot of basecalled reads
         expand("02_analysis/{run}/basecall/nanoplot/NanoStats.txt",

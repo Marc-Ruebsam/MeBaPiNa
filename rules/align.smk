@@ -34,18 +34,21 @@ rule minimap2:
     threads:
         config["machine"]["cpu"]
     shell:
-        "minimap2 -t {threads} {params} -o {output} {input.target} 01_processeddata/{wildcards.run}/basecall/pass/* > {log} 2>&1"
+        "minimap2 -t {threads} {params} -o {output} "
+        "{input.target} "
+        "$(find {input} -type f -name \"*.fastq.gz\") "
+        "> {log} 2>&1"
 
-rule minimap2_lam:
+rule minimap2_calibration_strands:
     input:
         dummy_dependency="01_processeddata/{run}/basecall/sequencing_summary.txt", ## used as dummy for the other folders
         target="00_rawdata/reference_sequences/lambda/lambda_3.6kb.mmi"
     output:
-        "01_processeddata/{run}/align_lam/alignment.sam"
+        "01_processeddata/{run}/align_calibration_strands/alignment.sam"
     log:
-        "01_processeddata/{run}/align_lam/MeBaPiNa_minimap2.log"
+        "01_processeddata/{run}/align_calibration_strands/MeBaPiNa_minimap2.log"
     benchmark:
-        "01_processeddata/{run}/align_lam/MeBaPiNa_minimap2.benchmark.tsv"
+        "01_processeddata/{run}/align_calibration_strands/MeBaPiNa_minimap2.benchmark.tsv"
     params:
         "-x map-ont", ## naopore specific
         "-a" ## possition accurate CIGAR alignment in SAM output; much slower <- maybe skip?
@@ -54,4 +57,7 @@ rule minimap2_lam:
     threads:
         config["machine"]["cpu"]
     shell:
-        "minimap2 -t {threads} {params} -o {output} {input.target} 01_processeddata/{wildcards.run}/basecall/calibration_strands/* > {log} 2>&1"
+        "minimap2 -t {threads} {params} -o {output} "
+        "{input.target} "
+        "$(find 01_processeddata/{wildcards.run}/basecall/calibration_strands -type f -name \"*.fastq.gz\") "
+        "> {log} 2>&1"
