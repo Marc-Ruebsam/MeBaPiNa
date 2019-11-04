@@ -1,4 +1,4 @@
-rule guppy:
+checkpoint guppy:
     input:
         "00_rawdata/{run}/fast5"
     output:
