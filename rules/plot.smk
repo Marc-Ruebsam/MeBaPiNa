@@ -98,13 +98,13 @@ rule nanoqc:
 ###########
 rule nanoplot_bam:
     input:
-        "01_processeddata/{run}/{align}/alignment_sorted.bam"
+        "01_processeddata/{run}/{align}/{barc}_alignment_sorted.bam"
     output:
-        "02_analysis/{run}/{align}/nanoplot/NanoStats.txt"
+        "02_analysis/{run}/{align}/{barc}_nanoplot/NanoStats.txt"
     log:
-        "02_analysis/{run}/{align}/nanoplot/MeBaPiNa_nanoplot_bam.log"
+        "02_analysis/{run}/{align}/{barc}_nanoplot/MeBaPiNa_nanoplot_bam.log"
     benchmark:
-        "02_analysis/{run}/{align}/nanoplot/MeBaPiNa_nanoplot_bam.benchmark.tsv"
+        "02_analysis/{run}/{align}/{barc}_nanoplot/MeBaPiNa_nanoplot_bam.benchmark.tsv"
     conda:
         "../envs/nanopack.yml"
     threads:
@@ -118,5 +118,5 @@ rule nanoplot_bam:
         "--verbose" ## or nothing to log
     shell:
         "NanoPlot --threads {threads} {params} "
-        "--outdir 02_analysis/{wildcards.run}/{wildcards.align}/nanoplot "
+        "--outdir 02_analysis/{wildcards.run}/{wildcards.align}/{wildcards.barc}_nanoplot "
         "--bam {input} > {log} 2>&1"

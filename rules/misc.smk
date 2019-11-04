@@ -2,13 +2,13 @@
 
 rule sam_bam:
     input:
-        "01_processeddata/{run}/{align}/alignment.sam"
+        "01_processeddata/{run}/{align}/{barc}_alignment.sam"
     output:
-        "01_processeddata/{run}/{align}/alignment_sorted.bam"
+        "01_processeddata/{run}/{align}/{barc}_alignment_sorted.bam"
     log:
-        "01_processeddata/{run}/{align}/MeBaPiNa_sam_bam.log"
+        "01_processeddata/{run}/{align}/{barc}_MeBaPiNa_sam_bam.log"
     benchmark:
-        "01_processeddata/{run}/{align}/MeBaPiNa_sam_bam.benchmark.tsv"
+        "01_processeddata/{run}/{align}/{barc}_MeBaPiNa_sam_bam.benchmark.tsv"
     params:
         "-u" ## uncompressed bam to pipe
     conda:
