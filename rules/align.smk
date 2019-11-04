@@ -18,14 +18,14 @@ rule minimap2_index:
 
 rule minimap2:
     input:
-        dummy_dependency="01_processeddata/{run}/basecall/sequencing_summary.txt", ## used as dummy for the other folders
+        barc_dir="01_processeddata/{run}/basecall/pass/{barc}", 
         target=expand("00_rawdata/reference_sequences/lambda/{reference}.mmi", reference=config["align"]["reference"])
     output:
-        "01_processeddata/{run}/align/alignment.sam"
+        "01_processeddata/{run}/align/{barc}_alignment.sam"
     log:
-        "01_processeddata/{run}/align/MeBaPiNa_minimap2.log"
+        "01_processeddata/{run}/align/{barc}_MeBaPiNa_minimap2.log"
     benchmark:
-        "01_processeddata/{run}/align/MeBaPiNa_minimap2.benchmark.tsv"
+        "01_processeddata/{run}/align/{barc}_MeBaPiNa_minimap2.benchmark.tsv"
     params:
         "-x map-ont", ## naopore specific
         "-a" ## possition accurate CIGAR alignment in SAM output; much slower <- maybe skip?
@@ -36,12 +36,12 @@ rule minimap2:
     shell:
         "minimap2 -t {threads} {params} -o {output} "
         "{input.target} "
-        "$(find {input} -type f -name \"*.fastq.gz\") "
+        "$(find {input.barc_dir} -type f -name \"*.fastq.gz\") "
         "> {log} 2>&1"
 
 rule minimap2_calibration_strands:
     input:
-        dummy_dependency="01_processeddata/{run}/basecall/sequencing_summary.txt", ## used as dummy for the other folders
+        calib_dir="01_processeddata/{run}/basecall/calibration_strands", 
         target="00_rawdata/reference_sequences/lambda/lambda_3.6kb.mmi"
     output:
         "01_processeddata/{run}/align_calibration_strands/alignment.sam"
@@ -59,5 +59,5 @@ rule minimap2_calibration_strands:
     shell:
         "minimap2 -t {threads} {params} -o {output} "
         "{input.target} "
-        "$(find 01_processeddata/{wildcards.run}/basecall/calibration_strands -type f -name \"*.fastq.gz\") "
+        "$(find {input.calib_dir} -type f -name \"*.fastq.gz\") "
         "> {log} 2>&1"

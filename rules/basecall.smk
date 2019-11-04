@@ -2,6 +2,8 @@ checkpoint guppy:
     input:
         "00_rawdata/{run}/fast5"
     output:
+        directory("01_processeddata/{run}/basecall/pass"),
+        directory("01_processeddata/{run}/basecall/calibration_strands"),
         "01_processeddata/{run}/basecall/sequencing_summary.txt" ## used as dummy for the other folders
     log:
         "01_processeddata/{run}/basecall/MeBaPiNa_guppy.log"

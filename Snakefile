@@ -12,6 +12,10 @@ workdir: config["experiment_directory"]["base"]
 ## Allow users to fix the underlying OS via singularity.
 # singularity: "docker://continuumio/miniconda3"
 
+## prevent unwanted extension of wildcards
+wildcard_constraints:
+    barc="\w+" ## is equalt to [a-zA-Z0-9_]+
+
 ## target output rule (the default end/output of the pipeline)
 rule create_output:
     input:
