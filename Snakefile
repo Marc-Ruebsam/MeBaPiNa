@@ -18,15 +18,15 @@ rule create_output:
         list(filter(None,[
         ## evaluation of Lambda calibration strands only when specified
         (config["guppy"]["lam_DCS"] and
-        expand("02_analysis/{run}/align_lam/nanoplot/NanoPlot-report.html",
+        expand("02_analysis/{run}/align_lam/nanoplot/NanoStats.txt",
         run=config["experiment_directory"]["run"])),
         ## do NanoPlot of basecalled reads
-        expand("02_analysis/{run}/basecall/nanoplot/NanoPlot-report.html",
+        expand("02_analysis/{run}/basecall/nanoplot/NanoStats.txt",
         run=config["experiment_directory"]["run"]),
         expand("02_analysis/{run}/basecall/nanoqc/nanoQC.html",
         run=config["experiment_directory"]["run"]),
         ## do NanoPlot of aligned reads reads
-        expand("02_analysis/{run}/align/nanoplot/NanoPlot-report.html",
+        expand("02_analysis/{run}/align/nanoplot/NanoStats.txt",
         run=config["experiment_directory"]["run"])
         ]))
 

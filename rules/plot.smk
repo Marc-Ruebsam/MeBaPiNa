@@ -2,7 +2,7 @@ rule nanoplot_seqsum:
     input:
         "01_processeddata/{run}/basecall/sequencing_summary.txt"
     output:
-        "02_analysis/{run}/basecall/nanoplot/NanoPlot-report.html"
+        "02_analysis/{run}/basecall/nanoplot/NanoStats.txt"
     log:
         "02_analysis/{run}/basecall/nanoplot/MeBaPiNa_nanoplot_seqsum.log"
     benchmark:
@@ -27,7 +27,7 @@ rule pycoqc_seqsum:
     input:
         "01_processeddata/{run}/{align}/alignment_sorted.bam"
     output:
-        html="02_analysis/{run}/{align}/pycoqc/pycoQC_report.html"
+        html="02_analysis/{run}/{align}/pycoqc/pycoQC_report.html",
         json="02_analysis/{run}/{align}/pycoqc/pycoQC_report.json"
     log:
         "02_analysis/{run}/{align}/pycoqc/pycoQC_report.log"
@@ -77,7 +77,7 @@ rule nanoplot_bam:
     input:
         "01_processeddata/{run}/{align}/alignment_sorted.bam"
     output:
-        "02_analysis/{run}/{align}/nanoplot/NanoPlot-report.html"
+        "02_analysis/{run}/{align}/nanoplot/NanoStats.txt"
     log:
         "02_analysis/{run}/{align}/nanoplot/MeBaPiNa_nanoplot_bam.log"
     benchmark:
@@ -95,7 +95,7 @@ rule nanoplot_bam:
         "--verbose" ## or nothing to log
     shell:
         "NanoPlot --threads {threads} {params} "
-        "--outdir 02_analysis/{wildcards.run}/align/nanoplot "
+        "--outdir 02_analysis/{wildcards.run}/{wildcards.align}/nanoplot "
         "--bam {input} > {log} 2>&1"
 
 rule nanoqc:
