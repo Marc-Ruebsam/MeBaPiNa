@@ -16,15 +16,8 @@ rule minimap2_index:
     shell:
         "minimap2 -t {threads} {params} -d {output} {input} > {log} 2>&1"
 
-def input_minimap2(wildcards):
-    from os import listdir, path
-    basecall_dir = "01_processeddata/" + wildcards.run + "/basecall/pass"
-    barc_dirs = [path.join(basecall_dir, s) for s in listdir(basecall_dir)]
-    return barc_dirs
-
 rule minimap2:
     input:
-        input_minimap2,
         dummy_dependency="01_processeddata/{run}/basecall/sequencing_summary.txt", ## used as dummy for the other folders
         target=expand("00_rawdata/reference_sequences/lambda/{reference}.mmi", reference=config["align"]["reference"])
     output:
