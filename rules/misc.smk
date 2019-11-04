@@ -21,9 +21,9 @@ rule sam_bam:
 
 rule fasq_pipe:
     input:
-        "01_processeddata/{run}/basecall/sequencing_summary.txt"
+        "01_processeddata/{run}/basecall/sequencing_summary.txt" ## used as dummy for the other folders
     output:
-        pipe("02_analysis/{run}/basecall/nanoqc/pipe.fastq.gz")
+        temp("02_analysis/{run}/basecall/nanoqc/pipe.fastq.gz") ## pipe didn't work
     shell:
         "cat $(find 01_processeddata/{wildcards.run}/basecall/pass -type f -name \"*.fastq.gz\") "
         ">> {output}"
