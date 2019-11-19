@@ -1,12 +1,12 @@
 rule minimap2_index:
     input:
-        "00_rawdata/reference_sequences/lambda/{reference}.fasta"
+        "00_rawdata/reference_sequences/{reference}.fasta"
     output:
-        "00_rawdata/reference_sequences/lambda/{reference}.mmi"
+        "00_rawdata/reference_sequences/{reference}.mmi"
     log:
-        "00_rawdata/reference_sequences/lambda/{reference}_MeBaPiNa_minimap2_index.log"
+        "00_rawdata/reference_sequences/{reference}_MeBaPiNa_minimap2_index.log"
     benchmark:
-        "00_rawdata/reference_sequences/lambda/{reference}_MeBaPiNa_minimap2_index.benchmark.tsv"
+        "00_rawdata/reference_sequences/{reference}_MeBaPiNa_minimap2_index.benchmark.tsv"
     params:
         "-x map-ont" ## naopore specific
     conda:
@@ -19,7 +19,7 @@ rule minimap2_index:
 rule minimap2:
     input:
         barc_dir="01_processeddata/{run}/basecall/pass/{barc}", 
-        target=expand("00_rawdata/reference_sequences/lambda/{reference}.mmi", reference=config["align"]["reference"])
+        target=expand("00_rawdata/reference_sequences/{reference}.mmi", reference=config["align"]["reference"])
     output:
         "01_processeddata/{run}/align/{barc}_alignment.sam"
     log:
