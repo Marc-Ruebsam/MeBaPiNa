@@ -16,11 +16,12 @@ rule nanoplot_seqsum:
     threads:
         config["machine"]["cpu"]
     params:
-        "--drop_outliers",
+        "--drop_outliers", ## other functions use "--maxlength 10000",
         "--plots kde hex dot",
         "--format svg",
-        "--colormap plasma",
+        "--colormap viridis",
         "--color black", ## use NanoPlot --listcolors to get list of valid colors
+        "--downsample " + PLOT_SMPL, ## downlsampling
         "--verbose" ## or nothing to log
     shell:
         "NanoPlot --threads {threads} {params} "
@@ -67,7 +68,7 @@ rule pycoqc_seqsum:
         "../envs/pycoqc.yml"
     params:
         "--min_pass_qual 0",
-        "--sample 100000",
+        "--sample " + PLOT_SMPL, ## downsampling
         "--verbose"
     shell:
         "pycoQC {params} "

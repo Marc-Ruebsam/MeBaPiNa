@@ -11,6 +11,9 @@ workdir: config["experiment_directory"]["base"]
 
 ## define barcode and set default to "SQK-RAB204"
 BAC_KIT = ("SQK-RAB204" if config["guppy"]["bac_kit"] == "" else config["guppy"]["bac_kit"])
+## sample depth for plotiing
+PLOT_SMPL = "100000"
+
 ## Allow users to fix the underlying OS via singularity.
 # singularity: "docker://continuumio/miniconda3"
 
