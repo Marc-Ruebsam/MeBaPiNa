@@ -47,3 +47,17 @@ rule aggr_align_barc:
         "02_analysis/{run}/align/MeBaPiNa_barcode_aggregation.txt"
     shell:
         "echo {input} > {output}"
+
+rule find_reads_in_fastq:
+    input:
+        "01_processeddata/{run}/basecall/pass"
+    output:
+        "01_processeddata/{run}/basecall/find_reads_in_fastq.txt"
+    log:
+        "01_processeddata/{run}/basecall/MeBaPiNa_find_fastq_in_fast5.log"
+    benchmark:
+        "01_processeddata/{run}/basecall/MeBaPiNa_find_fastq_in_fast5.benchmark.tsv"
+    conda:
+        "../envs/find_fastq_in_fast5.yml"
+    script:
+        "../scripts/find_fastq_in_fast5.py"
