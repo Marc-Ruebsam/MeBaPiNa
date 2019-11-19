@@ -44,11 +44,11 @@ rule minimap2_calibration_strands:
         calib_dir="01_processeddata/{run}/basecall/calibration_strands", 
         target="00_rawdata/reference_sequences/lambda/lambda_3.6kb.mmi"
     output:
-        "01_processeddata/{run}/align_calibration_strands/alignment.sam"
+        "01_processeddata/{run}/align_calibration_strands/lambda_alignment.sam"
     log:
-        "01_processeddata/{run}/align_calibration_strands/MeBaPiNa_minimap2.log"
+        "01_processeddata/{run}/align_calibration_strands/lambda_MeBaPiNa_minimap2.log"
     benchmark:
-        "01_processeddata/{run}/align_calibration_strands/MeBaPiNa_minimap2.benchmark.tsv"
+        "01_processeddata/{run}/align_calibration_strands/lambda_MeBaPiNa_minimap2.benchmark.tsv"
     params:
         "-x map-ont", ## naopore specific
         "-a" ## possition accurate CIGAR alignment in SAM output; much slower <- maybe skip?
