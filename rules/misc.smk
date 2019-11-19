@@ -30,3 +30,20 @@ rule fasq_pipe:
     shell:
         "cat $(find 01_processeddata/{wildcards.run}/basecall/pass -type f -name \"*.fastq.gz\") "
         ">> {output}"
+
+def input_aggregate(wildcards):
+    from os import listdir
+    basecall_dir = checkpoints.guppy.get(run=wildcards.run).output[0]
+    barcs = listdir(basecall_dir)
+    barc_dirs = expand("02_analysis/{run}/align/{barc}_pycoqc/pycoQC_report.json",
+        run=wildcards.run,
+        barc=barcs)
+    return barc_dirs
+
+rule aggr_align_barc:
+    input:
+        input_aggregate
+    output:
+        "02_analysis/{run}/align/MeBaPiNa_barcode_aggregation.txt"
+    shell:
+        "echo {input} > {output}"
