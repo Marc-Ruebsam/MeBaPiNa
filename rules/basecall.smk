@@ -2,9 +2,13 @@ checkpoint guppy:
     input:
         "00_rawdata/{run}/fast5"
     output:
+        list(filter(None,[
         directory("01_processeddata/{run}/basecall/pass"),
-        directory("01_processeddata/{run}/basecall/calibration_strands"),
-        "01_processeddata/{run}/basecall/sequencing_summary.txt" ## used as dummy for the other folders
+        ## evaluation of Lambda calibration strands only when specified
+        (config["guppy"]["lam_DCS"] and
+        directory("01_processeddata/{run}/basecall/calibration_strands")),
+        "01_processeddata/{run}/basecall/sequencing_summary.txt"
+        ]))
     log:
         "01_processeddata/{run}/basecall/MeBaPiNa_guppy.log"
     benchmark:
