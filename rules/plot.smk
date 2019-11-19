@@ -28,32 +28,6 @@ rule nanoplot_seqsum:
         "--outdir 02_analysis/{wildcards.run}/basecall/nanoplot "
         "--summary {input} > {log} 2>&1"
 
-# rule nanoplot_fastq:
-#     input:
-#         "01_processeddata/{run}/basecall/pass"
-#         "01_processeddata/{run}/sequencing_summary.txt"
-#     output:
-#         "02_analysis/{run}/nanopack/nanoplot/LengthvsQualityScatterPlot_kde.svg"
-#     log:
-#         "02_analysis/{run}/nanopack/nanoplot/MeBaPiNa_nanoplot_fastq.log"
-#     benchmark:
-#         "02_analysis/{run}/nanopack/nanoplot/MeBaPiNa_nanoplot_fastq.benchmark.tsv"
-#     conda:
-#         "../envs/nanopack.yml"
-#     threads:
-#         config["machine"]["cpu"]
-#     params:
-#         "--drop_outliers",
-#         "--plots kde hex dot",
-#         "--format svg",
-#         "--colormap plasma",
-#         "--color black", ## use NanoPlot --listcolors to get list of valid colors
-#         "--verbose" ## or nothing to log
-#     shell:
-#         "NanoPlot --threads {threads} {params} "
-#         "--outdir 02_analysis/{run}/nanopack/nanoplot "
-#         "--fastq_rich {input} > {log} 2>&1"
-
 rule pycoqc_seqsum:
     input:
         "01_processeddata/{run}/{align}/alignment_sorted.bam"
