@@ -1,14 +1,16 @@
-## file conversions
 
-rule sam_bam:
+rule sam_to_bam:
     input:
         "01_processeddata/{run}/{align}/{barc}_alignment.sam"
     output:
-        "01_processeddata/{run}/{align}/{barc}_alignment_sorted.bam"
+        bam="01_processeddata/{run}/{align}/{barc}_alignment_sorted.bam",
+        bai="01_processeddata/{run}/{align}/{barc}_alignment_sorted.bam.bai"
     log:
         "01_processeddata/{run}/{align}/{barc}_MeBaPiNa_sam_bam.log"
     benchmark:
         "01_processeddata/{run}/{align}/{barc}_MeBaPiNa_sam_bam.benchmark.tsv"
+    version:
+        subprocess.check_output("samtools --version | awk 'NR==1{print $NF}'", shell=True)
     params:
         "-u" ## uncompressed bam to pipe
     conda:
@@ -17,7 +19,8 @@ rule sam_bam:
         config["machine"]["cpu"]
     shell:
         "samtools view --threads {threads} {params} {input} | "
-        "samtools sort --threads {threads} -o {output} > {log} 2>&1"   
+        "samtools sort --threads {threads} -o {output.bam} > {log} 2>&1; "
+        "samtools index -@ {threads} {output.bam} > {log} 2>&1"
 
 rule fasq_pipe:
     input:
