@@ -9,6 +9,8 @@ report: "report/workflow.rst"
 ## set working directory to specified data location
 workdir: config["experiment_directory"]["base"]
 
+## define barcode and set default to "SQK-RAB204"
+BAC_KIT = ("SQK-RAB204" if config["guppy"]["bac_kit"] == "" else config["guppy"]["bac_kit"])
 ## Allow users to fix the underlying OS via singularity.
 # singularity: "docker://continuumio/miniconda3"
 

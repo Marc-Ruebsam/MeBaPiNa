@@ -17,7 +17,7 @@ checkpoint guppy:
         ("--flowcell " + config["guppy"]["flowcell"]),
         ("--kit " + config["guppy"]["seq_kit"]),
         ("--calib_detect" if config["guppy"]["lam_DCS"] else ""), ## includes detection of lambda clibration strands
-        "--barcode_kits " + config["guppy"]["bac_kit"], ## always includes demultiplexing (all reads marked as unclassified if no barcodes were used)
+        "--barcode_kits " + BAC_KIT, ## always includes demultiplexing (all reads marked as unclassified if no barcodes were used)
         "--qscore_filtering",
         ("--min_qscore " + config["guppy"]["q_cut"]),
         ("--device cuda:all:100%" if config["machine"]["gpu"] else ""),
