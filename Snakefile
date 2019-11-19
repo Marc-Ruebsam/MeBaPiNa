@@ -22,21 +22,26 @@ wildcard_constraints:
     barc="\w+" ## is equalt to [a-zA-Z0-9_]+
 
 ## target output rule (the default end/output of the pipeline)
-rule create_output:
+rule all:
     input:
         list(filter(None,[
-        ## evaluation of Lambda calibration strands only when specified
-        (config["guppy"]["lam_DCS"] and
-        expand("02_analysis/{run}/align_calibration_strands/nanoplot/NanoStats.txt",
-        run=config["experiment_directory"]["run"])),
-        ## do NanoPlot of basecalled reads
+        ## BASECALL ##
+        ## comprehensive QC of all reads INcluding calibtation strands
         expand("02_analysis/{run}/basecall/nanoplot/NanoStats.txt",
         run=config["experiment_directory"]["run"]),
+        ## comprehensive QC of all reads EXcluding calibrations strands
+        expand("02_analysis/{run}/basecall/pycoqc/pycoQC_report.json",
+        run=config["experiment_directory"]["run"]),
+        ## comparison of the barcodes INcluding calibtation strands
+        expand("02_analysis/{run}/basecall/nanocomp/NanoStats.txt",
+        run=config["experiment_directory"]["run"]),
+        ## per base quality overview EXcluding calibtation strands
         expand("02_analysis/{run}/basecall/nanoqc/nanoQC.html",
         run=config["experiment_directory"]["run"]),
-        ## do NanoPlot of aligned reads reads
-        expand("02_analysis/{run}/align/nanoplot/NanoStats.txt",
-        run=config["experiment_directory"]["run"])
+        ## calibration strand specific comprehensive QC
+        (config["guppy"]["lam_DCS"] and
+        expand("02_analysis/{run}/basecall_calibration_strands/nanoplot/NanoStats.txt",
+        run=config["experiment_directory"]["run"]))
         ]))
 
 ## include other rules

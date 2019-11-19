@@ -30,18 +30,19 @@ rule nanoplot_seqsum:
 
 rule pycoqc_seqsum:
     input:
-        "01_processeddata/{run}/{align}/alignment_sorted.bam"
+        "01_processeddata/{run}/basecall/sequencing_summary.txt"
     output:
-        html="02_analysis/{run}/{align}/pycoqc/pycoQC_report.html",
-        json="02_analysis/{run}/{align}/pycoqc/pycoQC_report.json"
+        html="02_analysis/{run}/basecall/pycoqc/pycoQC_report.html",
+        json="02_analysis/{run}/basecall/pycoqc/pycoQC_report.json"
     log:
-        "02_analysis/{run}/{align}/pycoqc/pycoQC_report.log"
+        "02_analysis/{run}/basecall/pycoqc/pycoQC_report.log"
     benchmark:
-        "02_analysis/{run}/{align}/pycoqc/pycoQC_report.benchmark.tsv"
+        "02_analysis/{run}/basecall/pycoqc/pycoQC_report.benchmark.tsv"
     conda:
         "../envs/pycoqc.yml"
     params:
         "--min_pass_qual 0",
+        "--filter_calibration", ## leave out calibration_strands
         "--sample " + PLOT_SMPL, ## downsampling
         "--verbose"
     shell:
@@ -50,7 +51,29 @@ rule pycoqc_seqsum:
         "--html_outfile {output.html} "
         "--json_outfile {output.json} > {log} 2>&1"
 
-ruleorder: pycoqc_seqsum > nanoplot_seqsum # > nanoplot_fastq ## to solve disambiguities for now
+rule nanocomp_seqsum:
+    input:
+        "01_processeddata/{run}/basecall/sequencing_summary.txt"
+    output:
+        "02_analysis/{run}/basecall/nanocomp/NanoStats.txt"
+    log:
+        "02_analysis/{run}/basecall/nanocomp/MeBaPiNa_nanocomp_seqsum.log"
+    benchmark:
+        "02_analysis/{run}/basecall/nanocomp/MeBaPiNa_nanocomp_seqsum.benchmark.tsv"
+    conda:
+        "../envs/nanopack.yml"
+    threads:
+        config["machine"]["cpu"]
+    params:
+        "--maxlength 10000",
+        "--barcoded",
+        "--plot violin", ## violin,box,ridge
+        "--format svg",
+        "--verbose" ## or nothing to log
+    shell:
+        "NanoComp --threads {threads} {params} "
+        "--outdir 02_analysis/{wildcards.run}/basecall/nanocomp "
+        "--summary {input} > {log} 2>&1"
 
 rule nanoqc:
     input:
@@ -63,10 +86,38 @@ rule nanoqc:
         "02_analysis/{run}/basecall/nanoqc/MeBaPiNa_nanoqc.benchmark.tsv"
     conda:
         "../envs/nanopack.yml"
+    params:
+        "--minlen 240"
     shell:
-        "nanoQC "
+        "nanoQC {params} "
         "--outdir 02_analysis/{wildcards.run}/basecall/nanoqc "
         "{input} > {log} 2>&1"
+
+rule nanoplot_fastq_calib:
+    input:
+        "01_processeddata/{run}/basecall/calibration_strands"
+    output:
+        "02_analysis/{run}/basecall_calibration_strands/nanoplot/NanoStats.txt"
+    log:
+        "02_analysis/{run}/basecall_calibration_strands/nanoplot/MeBaPiNa_nanoplot_seqsum.log"
+    benchmark:
+        "02_analysis/{run}/basecall_calibration_strands/nanoplot/MeBaPiNa_nanoplot_seqsum.benchmark.tsv"
+    conda:
+        "../envs/nanopack.yml"
+    threads:
+        config["machine"]["cpu"]
+    params:
+        "--drop_outliers", ## other functions use "--maxlength 10000",
+        "--plots kde hex dot",
+        "--format svg",
+        "--colormap viridis",
+        "--color black", ## use NanoPlot --listcolors to get list of valid colors
+        "--downsample " + PLOT_SMPL, ## downlsampling
+        "--verbose" ## or nothing to log
+    shell:
+        "NanoPlot --threads {threads} {params} "
+        "--outdir 02_analysis/{wildcards.run}/basecall_calibration_strands/nanoplot "
+        "--fastq_rich {input}/* > {log} 2>&1"
 
 ###########
 ## ALIGN ##
