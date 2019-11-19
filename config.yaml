@@ -6,7 +6,7 @@ experiment_directory:
   ## path to directory containing main folders (00_rawdata, 01_processeddata, ...)
   base: "/ag-halama/Microbiome/16S_Metabarcoding"
   ## run folder structure generated bay MinKNOW
-  run: "dummy"
+  run: "dummy_pool"
 
 machine:
   gpu: False
@@ -22,6 +22,6 @@ guppy:
   q_cut: "0" ## deactivate quality filtering by setting it to "0"
 
 align:
-  reference: "lambda_full_NC_001416.1_13-AUG-2018"
+  reference: "silva_arb/SILVA_132_SSURef_Nr99_tax_silva" ## don't add fasta ending
 
 ## TODO: use shema and add from snakemake.utils import validate to Snakefile
