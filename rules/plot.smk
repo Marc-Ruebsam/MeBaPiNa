@@ -122,9 +122,11 @@ rule nanoplot_fastq_calib:
 ###########
 ## ALIGN ##
 ###########
+
 rule nanoplot_bam:
     input:
-        "01_processeddata/{run}/{align}/{barc}_alignment_sorted.bam"
+        bam="01_processeddata/{run}/{align}/{barc}_alignment_sorted.bam",
+        bai="01_processeddata/{run}/{align}/{barc}_alignment_sorted.bam.bai"
     output:
         "02_analysis/{run}/{align}/{barc}_nanoplot/NanoStats.txt"
     log:
@@ -136,13 +138,52 @@ rule nanoplot_bam:
     threads:
         config["machine"]["cpu"]
     params:
-        "--drop_outliers",
+        "--maxlength 10000", ## to keep it consistent with other plots"--drop_outliers",
+        "--alength", ## Use aligned read lengths rather than sequenced length (bam mode)
         "--plots kde hex dot",
         "--format svg",
         "--colormap plasma",
         "--color black", ## use NanoPlot --listcolors to get list of valid colors
+        "--downsample " + PLOT_SMPL, ## downlsampling
         "--verbose" ## or nothing to log
     shell:
         "NanoPlot --threads {threads} {params} "
         "--outdir 02_analysis/{wildcards.run}/{wildcards.align}/{wildcards.barc}_nanoplot "
-        "--bam {input} > {log} 2>&1"
+        "--bam {input.bam} > {log} 2>&1"
+
+rule pycoqc_bam:
+    input:
+        seqsum="01_processeddata/{run}/basecall/sequencing_summary.txt",
+        bam="01_processeddata/{run}/{align}/{barc}_alignment_sorted.bam"
+    output:
+        html="02_analysis/{run}/{align}/{barc}_pycoqc/pycoQC_report.html",
+        json="02_analysis/{run}/{align}/{barc}_pycoqc/pycoQC_report.json"
+    log:
+        "02_analysis/{run}/{align}/{barc}_pycoqc/pycoQC_report.log"
+    benchmark:
+        "02_analysis/{run}/{align}/{barc}_pycoqc/pycoQC_report.benchmark.tsv"
+    conda:
+        "../envs/pycoqc.yml"
+    params:
+        "--min_pass_qual 0",
+        "--sample 100000",
+        "--verbose"
+    shell:
+        "pycoQC {params} "
+        "--summary_file {input.seqsum} "
+        "--bam_file {input.bam} "
+        "--html_outfile {output.html} "
+        "--json_outfile {output.json} > {log} 2>&1"
+
+
+# wub:
+# "bam_accuracy.py -g bam_accuracy.tsv -l bam_accuracy_reads.tsv -r bam_accuracy.pdf -e ../../../01_processeddata/dummy_pool/align_calibration_strands/lambda_alignment_sorted.bam"
+# "bam_alignment_length.py -t bam_alignment_length.tsv ../../../01_processeddata/dummy_pool/align_calibration_strands/lambda_alignment_sorted.bam"
+# "bam_alignment_qc.py -f ../../../00_rawdata/reference_sequences/lambda/lambda_3.6kb.fasta -r bam_alignment_qc.pdf ../../../01_processeddata/dummy_pool/align_calibration_strands/lambda_alignment_sorted.bam"
+#     "-x	Do not plot per-reference information. Default: False"
+# "bam_count_reads.py -z ../../../00_rawdata/reference_sequences/lambda/lambda_3.6kb.fasta -g -t bam_count_reads.tsv ../../../01_processeddata/dummy_pool/align_calibration_strands/lambda_alignment_sorted.bam"
+# "bam_gc_vs_qual.py -f ../../../00_rawdata/reference_sequences/lambda/lambda_3.6kb.fasta -r bam_gc_vs_qual.pdf -t bam_gc_vs_qual.tsv ../../../01_processeddata/dummy_pool/align_calibration_strands/lambda_alignment_sorted.bam"
+# "bam_multi_qc -h"
+# "bam_ref_base_coverage.py -f ../../../00_rawdata/reference_sequences/lambda/lambda_3.6kb.fasta -t bam_ref_base_coverage.tsv ../../../01_processeddata/dummy_pool/align_calibration_strands/lambda_alignment_sorted.bam"
+# "bam_soft_clips_tab.py -t bam_soft_clips_tab.tsv ../../../01_processeddata/dummy_pool/align_calibration_strands/lambda_alignment_sorted.bam"
+# "bias_explorer.py -r bias_explorer.pdf bam_count_reads.tsv"
