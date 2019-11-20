@@ -154,7 +154,7 @@ rule nanoplot_bam:
 
 rule pycoqc_bam:
     input:
-        seqsum="01_processeddata/{run}/basecall/sequencing_summary.txt",
+        seqsum="01_processeddata/{run}/basecall/sequencing_summary_barc",
         bam="01_processeddata/{run}/{align}/{barc}_alignment_sorted.bam"
     output:
         html="02_analysis/{run}/{align}/{barc}_pycoqc/pycoQC_report.html",
@@ -167,11 +167,11 @@ rule pycoqc_bam:
         "../envs/pycoqc.yml"
     params:
         "--min_pass_qual 0",
-        "--sample 100000",
+        "--sample " + PLOT_SMPL, ## downsampling
         "--verbose"
     shell:
         "pycoQC {params} "
-        "--summary_file {input.seqsum} "
+        "--summary_file {input.seqsum}/sequencing_summary_{wildcards.barc}.txt "
         "--bam_file {input.bam} "
         "--html_outfile {output.html} "
         "--json_outfile {output.json} > {log} 2>&1"
