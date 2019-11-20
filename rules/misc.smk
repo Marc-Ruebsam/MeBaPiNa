@@ -45,6 +45,26 @@ rule find_reads_in_fastq:
     script:
         "../scripts/find_fastq_in_fast5.py"
 
+rule split_seqsum_barc:
+    input:
+        "01_processeddata/{run}/basecall/sequencing_summary.txt"
+    output:
+        directory("01_processeddata/{run}/basecall/sequencing_summary_barc")
+    log:
+        "01_processeddata/{run}/basecall/sequencing_summary_barc/MeBaPiNa_split_seqsum_barc.log"
+    benchmark:
+        "01_processeddata/{run}/basecall/sequencing_summary_barc/MeBaPiNa_split_seqsum_barc.benchmark.tsv"
+    conda:
+        "../envs/pycoqc.yml"
+    params:
+        "--output_unclassified", ## keep unclassified in sparate file
+        "--min_barcode_percent 0.001", ## barcodes below 0.001% of reads are removed (1 in 100'000)
+        "--verbose"
+    shell:
+        "Barcode_split {params} "
+        "--summary_file {input} "
+        "--output_dir {output} > {log} 2>&1"
+
 def input_aggregate(wildcards):
     from os import listdir
     basecall_dir = checkpoints.guppy.get(run=wildcards.run).output[0]
