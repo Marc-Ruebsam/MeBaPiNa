@@ -44,6 +44,7 @@ rule pycoqc_seqsum:
         "--min_pass_qual 0",
         "--filter_calibration", ## leave out calibration_strands
         "--sample " + PLOT_SMPL, ## downsampling
+        "--min_barcode_percent 0.001", ## barcodes below 0.001% of reads are removed (1 in 100'000)
         "--verbose"
     shell:
         "pycoQC {params} "
