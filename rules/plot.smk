@@ -68,7 +68,7 @@ rule nanocomp_seqsum:
     threads:
         config["machine"]["cpu"]
     params:
-        "--maxlength 10000",
+        "--maxlength " + PLOT_MAXLEN,
         "--barcoded",
         "--plot violin", ## violin,box,ridge
         "--format svg",

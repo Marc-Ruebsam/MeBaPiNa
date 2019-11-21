@@ -13,6 +13,8 @@ workdir: config["experiment_directory"]["base"]
 BAC_KIT = ("SQK-RAB204" if not config["guppy"]["bac_kit"] else config["guppy"]["bac_kit"]) ## sets default string if bac_kit is ""
 ## sample depth for plotiing
 PLOT_SMPL = "100000"
+## max read lengths in some plots
+PLOT_MAXLEN = "4000"
 
 ## Allow users to fix the underlying OS via singularity.
 # singularity: "docker://continuumio/miniconda3"
