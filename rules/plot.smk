@@ -16,7 +16,7 @@ rule nanoplot_seqsum:
     threads:
         config["machine"]["cpu"]
     params:
-        "--drop_outliers", ## other functions use "--maxlength 10000",
+        "--maxlength " + PLOT_MAXLEN, # "--drop_outliers", ## keep consistent with other plots
         "--plots kde hex dot",
         "--format svg",
         "--colormap viridis",
