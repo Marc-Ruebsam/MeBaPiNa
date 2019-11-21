@@ -28,7 +28,15 @@ rule fasq_pipe:
     output:
         temp("02_analysis/{run}/basecall/nanoqc/pipe.fastq.gz") ## pipe didn't work
     shell:
-        "cat $(find {input} -type f -name \"*.fastq.gz\") "
+        "zcat $(find {input} -type f -name \"*.fastq.gz\") |" ## concatenate all fastq files
+        "awk -v seed=$RANDOM 'BEGIN{{ prnt=-4; nr=100; srand(seed) }}; " ## "falsify" print flag, set nr for fraction and set random seed. Note: downsampling is a fraction here not a number of reads
+        "NR%4==1{{ " ## for every fourth line -> all headers
+        "rhundr=1+int(rand()*nr); " ## get a random number between 1 and nr
+        "if(rhundr%nr==0)" ## if the number is nr
+        "{{ prnt=NR }}" ## set prnt flag to current line number to... 
+        " }}; "
+        "NR<prnt+4' | " ## ...print this and the next three lines
+        "gzip " ## gzip output
         ">> {output}"
 
 rule find_reads_in_fastq:
