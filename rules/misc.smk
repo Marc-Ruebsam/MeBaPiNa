@@ -29,7 +29,7 @@ rule fasq_pipe:
     input:
         "01_processeddata/{run}/basecall/pass"
     output:
-        temp("02_analysis/{run}/basecall/nanoqc/pipe.fastq.gz") ## pipe didn't work neighter did named pipes (no fastq file extension)
+        temp("02_analysis/{run}/basecall/nanoqc/pipe.fastq") ## pipe didn't work neighter did named pipes (no fastq file extension)
     log:
         "02_analysis/{run}/basecall/nanoqc/MeBaPiNa_fasq_pipe.log"
     benchmark:
@@ -39,12 +39,11 @@ rule fasq_pipe:
         "awk -v seed=$RANDOM 'BEGIN{{ prnt=-4; nr=100; srand(seed) }}; " ## "falsify" print flag, set nr for fraction and set random seed. Note: downsampling is a fraction here not a number of reads
         "NR%4==1{{ " ## for every fourth line -> all headers
         "rhundr=1+int(rand()*nr); " ## get a random number between 1 and nr
-        "if(rhundr%nr==0)" ## if the number is nr
+        "if(rhundr==nr)" ## if the number is nr (by chance of 1/nr)
         "{{ prnt=NR }}" ## set prnt flag to current line number to... 
         " }}; "
-        "NR<prnt+4' | " ## ...print this and the next three lines
-        "gzip " ## gzip output
-        ">> {output}"
+        "NR<prnt+4' " ## ...print this and the next three lines
+        ">> {output} 2> {log}"
 
 ########################
 ## SEQUENCING SUMMARY ##

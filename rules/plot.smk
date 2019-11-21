@@ -80,7 +80,7 @@ rule nanocomp_seqsum:
 
 rule nanoqc:
     input:
-        "02_analysis/{run}/basecall/nanoqc/pipe.fastq.gz"
+        "02_analysis/{run}/basecall/nanoqc/pipe.fastq"
     output:
         "02_analysis/{run}/basecall/nanoqc/nanoQC.html"
     log:
