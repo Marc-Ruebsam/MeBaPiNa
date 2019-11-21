@@ -1,3 +1,6 @@
+########################################
+## FILE CONVERSION AND  CONCATENATION ##
+########################################
 
 rule sam_to_bam:
     input:
@@ -26,7 +29,11 @@ rule fasq_pipe:
     input:
         "01_processeddata/{run}/basecall/pass"
     output:
-        temp("02_analysis/{run}/basecall/nanoqc/pipe.fastq.gz") ## pipe didn't work
+        temp("02_analysis/{run}/basecall/nanoqc/pipe.fastq.gz") ## pipe didn't work neighter did named pipes (no fastq file extension)
+    log:
+        "02_analysis/{run}/basecall/nanoqc/MeBaPiNa_fasq_pipe.log"
+    benchmark:
+        "02_analysis/{run}/basecall/nanoqc/MeBaPiNa_fasq_pipe.benchmark.tsv"
     shell:
         "zcat $(find {input} -type f -name \"*.fastq.gz\") |" ## concatenate all fastq files
         "awk -v seed=$RANDOM 'BEGIN{{ prnt=-4; nr=100; srand(seed) }}; " ## "falsify" print flag, set nr for fraction and set random seed. Note: downsampling is a fraction here not a number of reads
@@ -38,6 +45,10 @@ rule fasq_pipe:
         "NR<prnt+4' | " ## ...print this and the next three lines
         "gzip " ## gzip output
         ">> {output}"
+
+########################
+## SEQUENCING SUMMARY ##
+########################
 
 rule find_reads_in_fastq:
     input:
@@ -57,11 +68,11 @@ rule split_seqsum_barc:
     input:
         "01_processeddata/{run}/basecall/sequencing_summary.txt"
     output:
-        directory("01_processeddata/{run}/basecall/sequencing_summary_barc")
+        directory("01_processeddata/{run}/basecall/sequencing_summary")
     log:
-        "01_processeddata/{run}/basecall/sequencing_summary_barc/MeBaPiNa_split_seqsum_barc.log"
+        "01_processeddata/{run}/basecall/sequencing_summary/MeBaPiNa_split_seqsum_barc.log"
     benchmark:
-        "01_processeddata/{run}/basecall/sequencing_summary_barc/MeBaPiNa_split_seqsum_barc.benchmark.tsv"
+        "01_processeddata/{run}/basecall/sequencing_summary/MeBaPiNa_split_seqsum_barc.benchmark.tsv"
     conda:
         "../envs/pycoqc.yml"
     params:
@@ -72,6 +83,10 @@ rule split_seqsum_barc:
         "Barcode_split {params} "
         "--summary_file {input} "
         "--output_dir {output} > {log} 2>&1"
+
+############################
+## CHECKPOINT AGGREGATION ##
+############################
 
 def input_aggregate(wildcards):
     from os import listdir

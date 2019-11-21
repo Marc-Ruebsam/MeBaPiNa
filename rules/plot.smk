@@ -158,7 +158,7 @@ rule nanoplot_bam:
 
 rule pycoqc_bam:
     input:
-        seqsum="01_processeddata/{run}/basecall/sequencing_summary_barc",
+        seqsum="01_processeddata/{run}/basecall/sequencing_summary",
         bam="01_processeddata/{run}/{align}/{barc}_alignment_sorted.bam"
     output:
         html="02_analysis/{run}/{align}/{barc}_pycoqc/pycoQC_report.html",
