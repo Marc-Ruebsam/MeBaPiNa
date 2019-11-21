@@ -40,6 +40,8 @@ rule pycoqc_seqsum:
         "02_analysis/{run}/basecall/pycoqc/pycoQC_report.benchmark.tsv"
     conda:
         "../envs/pycoqc.yml"
+    threads:
+        config["machine"]["cpu"]
     params:
         "--min_pass_qual 0",
         "--filter_calibration", ## leave out calibration_strands
@@ -87,6 +89,8 @@ rule nanoqc:
         "02_analysis/{run}/basecall/nanoqc/MeBaPiNa_nanoqc.benchmark.tsv"
     conda:
         "../envs/nanopack.yml"
+    threads:
+        config["machine"]["cpu"]
     params:
         "--minlen 240"
     shell:
@@ -165,6 +169,8 @@ rule pycoqc_bam:
         "02_analysis/{run}/{align}/{barc}_pycoqc/pycoQC_report.benchmark.tsv"
     conda:
         "../envs/pycoqc.yml"
+    threads:
+        config["machine"]["cpu"]
     params:
         "--min_pass_qual 0",
         "--sample " + PLOT_SMPL, ## downsampling
