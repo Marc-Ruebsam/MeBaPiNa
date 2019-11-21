@@ -30,7 +30,7 @@ rule nanoplot_seqsum:
 
 rule pycoqc_seqsum:
     input:
-        "01_processeddata/{run}/basecall/sequencing_summary.txt"
+        "01_processeddata/{run}/basecall/sequencing_summary/sequencing_summary_downsampled.txt"
     output:
         html="02_analysis/{run}/basecall/pycoqc/pycoQC_report.html",
         json="02_analysis/{run}/basecall/pycoqc/pycoQC_report.json"
@@ -45,7 +45,7 @@ rule pycoqc_seqsum:
     params:
         "--min_pass_qual 0",
         "--filter_calibration", ## leave out calibration_strands
-        "--sample " + PLOT_SMPL, ## downsampling
+        # downsampling is done during generation of input "--sample " + PLOT_SMPL, ## downsampling
         "--min_barcode_percent 0.001", ## barcodes below 0.001% of reads are removed (1 in 100'000)
         "--verbose"
     shell:
@@ -56,7 +56,7 @@ rule pycoqc_seqsum:
 
 rule nanocomp_seqsum:
     input:
-        "01_processeddata/{run}/basecall/sequencing_summary.txt"
+        "01_processeddata/{run}/basecall/sequencing_summary/sequencing_summary_sorted.txt"
     output:
         "02_analysis/{run}/basecall/nanocomp/NanoStats.txt"
     log:

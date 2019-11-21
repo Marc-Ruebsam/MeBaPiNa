@@ -83,6 +83,37 @@ rule split_seqsum_barc:
         "--summary_file {input} "
         "--output_dir {output} > {log} 2>&1"
 
+rule sort_seqsum_barc:
+    input:
+        "01_processeddata/{run}/basecall/sequencing_summary.txt"
+    output:
+        "01_processeddata/{run}/basecall/sequencing_summary/sequencing_summary_sorted.txt"
+    log:
+        "01_processeddata/{run}/basecall/sequencing_summary/MeBaPiNa_sort_seqsum_barc.log"
+    benchmark:
+        "01_processeddata/{run}/basecall/sequencing_summary/MeBaPiNa_sort_seqsum_barc.benchmark.tsv"
+    shell:
+        "cat {input} | (read -r; printf \"%s\\n\" \"$REPLY\"; sort -V -k"
+        "$(awk '{{ for(i;i<=NF;i++){{if($i==\"barcode_arrangement\"){{ print i }}}}; exit 0 }}' {input})," ## finds the "barcode_arrangement" column...
+        "$(awk '{{ for(i;i<=NF;i++){{if($i==\"barcode_arrangement\"){{ print i }}}}; exit 0 }}' {input}) -k7,7) " ## ...twice
+        ">> {output} 2> {log}"
+
+rule downsample_seqsum:
+    input:
+        "01_processeddata/{run}/basecall/sequencing_summary/sequencing_summary_sorted.txt"
+    output:
+        "01_processeddata/{run}/basecall/sequencing_summary/sequencing_summary_downsampled.txt"
+    log:
+        "01_processeddata/{run}/basecall/sequencing_summary/MeBaPiNa_downsample_seqsum.log"
+    benchmark:
+        "01_processeddata/{run}/basecall/sequencing_summary/MeBaPiNa_downsample_seqsum.benchmark.tsv"
+    shell:
+        "cat {input} | (read -r; printf \"%s\\n\" \"$REPLY\"; "
+        "awk -v seed=$RANDOM 'BEGIN{{ prnt=-4; nr=100; srand(seed) }}; " ## "falsify" print flag, set nr for fraction and set random seed. Note: downsampling is a fraction here not a number of reads
+        "{{ rhundr=1+int(rand()*nr) }}; " ## get a random number between 1 and nr
+        "rhundr==nr') " ## if the number is nr (by chance of 1/nr) print the line
+        ">> {output} 2> {log}"
+
 ############################
 ## CHECKPOINT AGGREGATION ##
 ############################
