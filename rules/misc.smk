@@ -92,8 +92,10 @@ rule sort_seqsum_barc:
         "01_processeddata/{run}/basecall/sequencing_summary/MeBaPiNa_sort_seqsum_barc.log"
     benchmark:
         "01_processeddata/{run}/basecall/sequencing_summary/MeBaPiNa_sort_seqsum_barc.benchmark.tsv"
+    threads:
+        config["machine"]["cpu"]
     shell:
-        "cat {input} | (read -r; printf \"%s\\n\" \"$REPLY\"; sort -V -k"
+        "cat {input} | (read -r; printf \"%s\\n\" \"$REPLY\"; sort -V -k --parallel={threads}"
         "$(awk '{{ for(i;i<=NF;i++){{if($i==\"barcode_arrangement\"){{ print i }}}}; exit 0 }}' {input})," ## finds the "barcode_arrangement" column...
         "$(awk '{{ for(i;i<=NF;i++){{if($i==\"barcode_arrangement\"){{ print i }}}}; exit 0 }}' {input}) -k7,7) " ## ...twice
         ">> {output} 2> {log}"
