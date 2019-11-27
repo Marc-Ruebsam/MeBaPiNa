@@ -154,7 +154,7 @@ rule nanoplot_bam:
 
 rule pycoqc_bam:
     input:
-        seqsum="01_processeddata/{run}/basecall/sequencing_summary",
+        seqsum="01_processeddata/{run}/basecall/sequencing_summary/barcode", ## only folder is specified as output in splitting rule
         bam="01_processeddata/{run}/{align}/{barc}_alignment_sorted.bam"
     output:
         html="02_analysis/{run}/{align}/{barc}_pycoqc/pycoQC_report.html",
@@ -171,10 +171,16 @@ rule pycoqc_bam:
         "--verbose"
     shell:
         "pycoQC {params} "
-        "--summary_file {input.seqsum}/sequencing_summary_{wildcards.barc}.txt "
+        "--summary_file {input.seqsum}/sequencing_summary_{wildcards.barc}.txt " ## only folder is specified as output in splitting rule
         "--bam_file {input.bam} "
         "--html_outfile {output.html} "
         "--json_outfile {output.json} > {log} 2>&1"
+
+# samtools:
+# plot-bamstats -s /ag-halama/Microbiome/16S_Metabarcoding/00_rawdata/reference_sequences/silva_arb/SILVA_132_SSURef_Nr99_tax_silva.fasta > /ag-halama/Microbiome/16S_Metabarcoding/00_rawdata/reference_sequences/silva_arb/SILVA_132_SSURef_Nr99_tax_silva.fasta.gc
+# plot-bamstats -r /ag-halama/Microbiome/16S_Metabarcoding/00_rawdata/reference_sequences/silva_arb/SILVA_132_SSURef_Nr99_tax_silva.fasta.gc -p /ag-halama/Microbiome/16S_Metabarcoding/02_analysis/dummy_pool/align/samtools/ <(samtools stats unclassified_alignment.sam)
+# plot-bamstats -s /ag-halama/Microbiome/16S_Metabarcoding/00_rawdata/reference_sequences/lambda/lambda_full_NC_001416.1_13-AUG-2018.fasta > /ag-halama/Microbiome/16S_Metabarcoding/00_rawdata/reference_sequences/lambda/lambda_full_NC_001416.1_13-AUG-2018.fasta.gc
+# plot-bamstats -r /ag-halama/Microbiome/16S_Metabarcoding/00_rawdata/reference_sequences/lambda/lambda_full_NC_001416.1_13-AUG-2018.fasta.gc -p /ag-halama/Microbiome/16S_Metabarcoding/02_analysis/20191001_HD-T980_RapidHMW/Lamda/Lambda/20191001_1411_MN31344_FAK77797_2a466f85/align/samtools/ <(samtools stats unclassified_alignment.sam)
 
 
 # wub:
