@@ -1,5 +1,5 @@
 ########################################
-## FILE CONVERSION AND  CONCATENATION ##
+## FILE CONVERSION AND CONCATENATION ##
 ########################################
 
 rule sam_to_bam:
@@ -40,8 +40,8 @@ rule fasq_pipe:
         "NR%4==1{{ " ## for every fourth line -> all headers
         "rhundr=1+int(rand()*nr); " ## get a random number between 1 and nr
         "if(rhundr==nr)" ## if the number is nr (by chance of 1/nr)
-        "{{ prnt=NR }}" ## set prnt flag to current line number to... 
-        " }}; "
+        "{{ prnt=NR }} " ## set prnt flag to current line number to... 
+        "}}; "
         "NR<prnt+4' " ## ...print this and the next three lines
         ">> {output} 2> {log}"
 
@@ -67,7 +67,7 @@ rule split_seqsum_barc:
     input:
         "01_processeddata/{run}/basecall/sequencing_summary.txt"
     output:
-        directory("01_processeddata/{run}/basecall/sequencing_summary")
+        directory("01_processeddata/{run}/basecall/sequencing_summary/barcode")
     log:
         "01_processeddata/{run}/basecall/sequencing_summary/MeBaPiNa_split_seqsum_barc.log"
     benchmark:
@@ -95,7 +95,7 @@ rule sort_seqsum_barc:
     threads:
         config["machine"]["cpu"]
     shell:
-        "cat {input} | (read -r; printf \"%s\\n\" \"$REPLY\"; sort -V -k --parallel={threads}"
+        "cat {input} | (read -r; printf \"%s\\n\" \"$REPLY\"; sort -V --parallel={threads} -k"
         "$(awk '{{ for(i;i<=NF;i++){{if($i==\"barcode_arrangement\"){{ print i }}}}; exit 0 }}' {input})," ## finds the "barcode_arrangement" column...
         "$(awk '{{ for(i;i<=NF;i++){{if($i==\"barcode_arrangement\"){{ print i }}}}; exit 0 }}' {input}) -k7,7) " ## ...twice
         ">> {output} 2> {log}"
@@ -131,7 +131,7 @@ def input_aggregate(wildcards):
 
 rule aggr_align_barc:
     input:
-        input_aggregate
+        input_aggregate ## if it keeps returning only the pass folder, some but not all of the output and input of the guppy rule exists. Create it, even if its only an empty folder to fix the problem.
     output:
         "02_analysis/{run}/align/MeBaPiNa_barcode_aggregation.txt"
     shell:
