@@ -72,16 +72,16 @@ rule split_seqsum_barc:
         "01_processeddata/{run}/basecall/sequencing_summary/MeBaPiNa_split_seqsum_barc.log"
     benchmark:
         "01_processeddata/{run}/basecall/sequencing_summary/MeBaPiNa_split_seqsum_barc.benchmark.tsv"
-    conda:
-        "../envs/pycoqc.yml"
-    params:
-        "--output_unclassified", ## keep unclassified in sparate file
-        "--min_barcode_percent 0.001", ## barcodes below 0.001% of reads are removed (1 in 100'000)
-        "--verbose"
     shell:
-        "Barcode_split {params} "
-        "--summary_file {input} "
-        "--output_dir {output} > {log} 2>&1"
+        "mkdir {output}; "
+        "awk 'NR==1{{ header=$0; " ## save header string (first line) and ...
+        "for(i;i<=NF;i++){{if($i==\"barcode_arrangement\"){{ barc_col=i }}}} }}; " ## ...find column with barcode name
+        "NR!=1{{ " ## for all other lines
+        "if(firstencounter[$barc_col]==0){{ " ## when the barcode is encountered the first time (no file exsist, yet)...
+        "print header > \"{output}\" \"/sequencing_summary_\" $barc_col \".txt\"; " ## ...write the header string to the barcode specific file
+        "firstencounter[$barc_col]++ }}; " ## set the firstencounter for this string to false (!=0)
+        "print $0 > \"{output}\" \"/sequencing_summary_\" $barc_col \".txt\" " ## print the current line to the corresponding barcode specific file
+        "}}' {input} > {log} 2>&1"
 
 rule sort_seqsum_barc:
     input:
