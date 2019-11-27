@@ -166,6 +166,7 @@ rule pycoqc_bam:
     conda:
         "../envs/pycoqc.yml"
     params:
+        ("--config ../scripts/pycoQC_config.json" if not {wildcard.barc} == "lambda" else ""),
         "--min_pass_qual 0",
         "--sample " + PLOT_SMPL, ## downsampling
         "--verbose"
