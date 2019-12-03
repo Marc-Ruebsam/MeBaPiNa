@@ -1,8 +1,14 @@
-rule guppy:
+checkpoint guppy:
     input:
         "00_rawdata/{run}/fast5"
     output:
-        "01_processeddata/{run}/basecall/sequencing_summary.txt" ## used as dummy for the other folders
+        list(filter(None,[
+        directory("01_processeddata/{run}/basecall/pass"),
+        ## evaluation of Lambda calibration strands only when specified
+        (config["guppy"]["lam_DCS"] and
+        directory("01_processeddata/{run}/basecall/calibration_strands")),
+        "01_processeddata/{run}/basecall/sequencing_summary.txt"
+        ]))
     log:
         "01_processeddata/{run}/basecall/MeBaPiNa_guppy.log"
     benchmark:
@@ -15,7 +21,7 @@ rule guppy:
         ("--flowcell " + config["guppy"]["flowcell"]),
         ("--kit " + config["guppy"]["seq_kit"]),
         ("--calib_detect" if config["guppy"]["lam_DCS"] else ""), ## includes detection of lambda clibration strands
-        ("--barcode_kits " + config["guppy"]["bac_kit"] if config["guppy"]["bac_kit"] else ""), ## includes demultiplexing
+        "--barcode_kits " + BAC_KIT, ## always includes demultiplexing (all reads marked as unclassified if no barcodes were used)
         "--qscore_filtering",
         ("--min_qscore " + config["guppy"]["q_cut"]),
         ("--device cuda:all:100%" if config["machine"]["gpu"] else ""),

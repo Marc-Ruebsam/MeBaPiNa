@@ -1,3 +1,7 @@
+##############
+## BASECALL ##
+##############
+
 rule nanoplot_seqsum:
     input:
         "01_processeddata/{run}/basecall/sequencing_summary.txt"
@@ -12,11 +16,12 @@ rule nanoplot_seqsum:
     threads:
         config["machine"]["cpu"]
     params:
-        "--drop_outliers",
+        "--maxlength " + PLOT_MAXLEN, # "--drop_outliers", ## keep consistent with other plots
         "--plots kde hex dot",
         "--format svg",
-        "--colormap plasma",
+        "--colormap viridis",
         "--color black", ## use NanoPlot --listcolors to get list of valid colors
+        "--downsample " + PLOT_SMPL, ## downlsampling
         "--verbose" ## or nothing to log
     shell:
         "NanoPlot --threads {threads} {params} "
@@ -25,19 +30,21 @@ rule nanoplot_seqsum:
 
 rule pycoqc_seqsum:
     input:
-        "01_processeddata/{run}/{align}/alignment_sorted.bam"
+        "01_processeddata/{run}/basecall/sequencing_summary/sequencing_summary_downsampled.txt" # "01_processeddata/{run}/basecall/sequencing_summary/sequencing_summary_sorted.txt"
     output:
-        html="02_analysis/{run}/{align}/pycoqc/pycoQC_report.html",
-        json="02_analysis/{run}/{align}/pycoqc/pycoQC_report.json"
+        html="02_analysis/{run}/basecall/pycoqc/pycoQC_report.html",
+        json="02_analysis/{run}/basecall/pycoqc/pycoQC_report.json"
     log:
-        "02_analysis/{run}/{align}/pycoqc/pycoQC_report.log"
+        "02_analysis/{run}/basecall/pycoqc/pycoQC_report.log"
     benchmark:
-        "02_analysis/{run}/{align}/pycoqc/pycoQC_report.benchmark.tsv"
+        "02_analysis/{run}/basecall/pycoqc/pycoQC_report.benchmark.tsv"
     conda:
         "../envs/pycoqc.yml"
     params:
         "--min_pass_qual 0",
-        "--sample 100000",
+        "--filter_calibration", ## leave out calibration_strands
+        # downsampling is done during generation of input "--sample " + PLOT_SMPL, ## downsampling
+        "--min_barcode_percent 0.001", ## barcodes below 0.001% of reads are removed (1 in 100'000)
         "--verbose"
     shell:
         "pycoQC {params} "
@@ -45,62 +52,33 @@ rule pycoqc_seqsum:
         "--html_outfile {output.html} "
         "--json_outfile {output.json} > {log} 2>&1"
 
-# rule nanoplot_fastq:
-#     input:
-#         "01_processeddata/{run}/basecall/pass"
-#         "01_processeddata/{run}/sequencing_summary.txt"
-#     output:
-#         "02_analysis/{run}/nanopack/nanoplot/LengthvsQualityScatterPlot_kde.svg"
-#     log:
-#         "02_analysis/{run}/nanopack/nanoplot/MeBaPiNa_nanoplot_fastq.log"
-#     benchmark:
-#         "02_analysis/{run}/nanopack/nanoplot/MeBaPiNa_nanoplot_fastq.benchmark.tsv"
-#     conda:
-#         "../envs/nanopack.yml"
-#     threads:
-#         config["machine"]["cpu"]
-#     params:
-#         "--drop_outliers",
-#         "--plots kde hex dot",
-#         "--format svg",
-#         "--colormap plasma",
-#         "--color black", ## use NanoPlot --listcolors to get list of valid colors
-#         "--verbose" ## or nothing to log
-#     shell:
-#         "NanoPlot --threads {threads} {params} "
-#         "--outdir 02_analysis/{run}/nanopack/nanoplot "
-#         "--fastq_rich {input} > {log} 2>&1"
-
-ruleorder: pycoqc_seqsum > nanoplot_seqsum # > nanoplot_fastq ## to solve disambiguities for now
-
-rule nanoplot_bam:
+rule nanocomp_seqsum:
     input:
-        "01_processeddata/{run}/{align}/alignment_sorted.bam"
+        "01_processeddata/{run}/basecall/sequencing_summary/sequencing_summary_sorted.txt"
     output:
-        "02_analysis/{run}/{align}/nanoplot/NanoStats.txt"
+        "02_analysis/{run}/basecall/nanocomp/NanoStats.txt"
     log:
-        "02_analysis/{run}/{align}/nanoplot/MeBaPiNa_nanoplot_bam.log"
+        "02_analysis/{run}/basecall/nanocomp/MeBaPiNa_nanocomp_seqsum.log"
     benchmark:
-        "02_analysis/{run}/{align}/nanoplot/MeBaPiNa_nanoplot_bam.benchmark.tsv"
+        "02_analysis/{run}/basecall/nanocomp/MeBaPiNa_nanocomp_seqsum.benchmark.tsv"
     conda:
         "../envs/nanopack.yml"
     threads:
         config["machine"]["cpu"]
     params:
-        "--drop_outliers",
-        "--plots kde hex dot",
+        "--maxlength " + PLOT_MAXLEN,
+        "--barcoded",
+        "--plot violin", ## violin,box,ridge
         "--format svg",
-        "--colormap plasma",
-        "--color black", ## use NanoPlot --listcolors to get list of valid colors
         "--verbose" ## or nothing to log
     shell:
-        "NanoPlot --threads {threads} {params} "
-        "--outdir 02_analysis/{wildcards.run}/{wildcards.align}/nanoplot "
-        "--bam {input} > {log} 2>&1"
+        "NanoComp --threads {threads} {params} "
+        "--outdir 02_analysis/{wildcards.run}/basecall/nanocomp "
+        "--summary {input} > {log} 2>&1"
 
 rule nanoqc:
     input:
-        "02_analysis/{run}/basecall/nanoqc/pipe.fastq.gz"
+        "02_analysis/{run}/basecall/nanoqc/pipe.fastq"
     output:
         "02_analysis/{run}/basecall/nanoqc/nanoQC.html"
     log:
@@ -109,7 +87,92 @@ rule nanoqc:
         "02_analysis/{run}/basecall/nanoqc/MeBaPiNa_nanoqc.benchmark.tsv"
     conda:
         "../envs/nanopack.yml"
+    params:
+        "--minlen 240"
     shell:
-        "nanoQC "
+        "nanoQC {params} "
         "--outdir 02_analysis/{wildcards.run}/basecall/nanoqc "
         "{input} > {log} 2>&1"
+
+rule nanoplot_fastq_calib:
+    input:
+        "01_processeddata/{run}/basecall/calibration_strands"
+    output:
+        "02_analysis/{run}/basecall_calibration_strands/nanoplot/NanoStats.txt"
+    log:
+        "02_analysis/{run}/basecall_calibration_strands/nanoplot/MeBaPiNa_nanoplot_seqsum.log"
+    benchmark:
+        "02_analysis/{run}/basecall_calibration_strands/nanoplot/MeBaPiNa_nanoplot_seqsum.benchmark.tsv"
+    conda:
+        "../envs/nanopack.yml"
+    threads:
+        config["machine"]["cpu"]
+    params:
+        "--drop_outliers", ## other functions use "--maxlength 10000",
+        "--plots kde hex dot",
+        "--format svg",
+        "--colormap viridis",
+        "--color black", ## use NanoPlot --listcolors to get list of valid colors
+        "--downsample " + PLOT_SMPL, ## downlsampling
+        "--verbose" ## or nothing to log
+    shell:
+        "NanoPlot --threads {threads} {params} "
+        "--outdir 02_analysis/{wildcards.run}/basecall_calibration_strands/nanoplot "
+        "--fastq_rich {input}/* > {log} 2>&1"
+
+###########
+## ALIGN ##
+###########
+
+rule nanoplot_bam:
+    input:
+        bam="01_processeddata/{run}/{align}/{barc}_alignment_sorted.bam",
+        bai="01_processeddata/{run}/{align}/{barc}_alignment_sorted.bam.bai"
+    output:
+        "02_analysis/{run}/{align}/{barc}_nanoplot/NanoStats.txt"
+    log:
+        "02_analysis/{run}/{align}/{barc}_nanoplot/MeBaPiNa_nanoplot_bam.log"
+    benchmark:
+        "02_analysis/{run}/{align}/{barc}_nanoplot/MeBaPiNa_nanoplot_bam.benchmark.tsv"
+    conda:
+        "../envs/nanopack.yml"
+    threads:
+        config["machine"]["cpu"]
+    params:
+        "--maxlength 10000", ## to keep it consistent with other plots"--drop_outliers",
+        "--alength", ## Use aligned read lengths rather than sequenced length (bam mode)
+        "--plots kde hex dot",
+        "--format svg",
+        "--colormap plasma",
+        "--color black", ## use NanoPlot --listcolors to get list of valid colors
+        "--downsample " + PLOT_SMPL, ## downlsampling
+        "--verbose" ## or nothing to log
+    shell:
+        "NanoPlot --threads {threads} {params} "
+        "--outdir 02_analysis/{wildcards.run}/{wildcards.align}/{wildcards.barc}_nanoplot "
+        "--bam {input.bam} > {log} 2>&1"
+
+rule pycoqc_bam:
+    input:
+        seqsum="01_processeddata/{run}/basecall/sequencing_summary/barcode", ## only folder is specified as output in splitting rule
+        bam="01_processeddata/{run}/{align}/{barc}_alignment_sorted.bam"
+    output:
+        html="02_analysis/{run}/{align}/{barc}_pycoqc/pycoQC_report.html",
+        json="02_analysis/{run}/{align}/{barc}_pycoqc/pycoQC_report.json"
+    log:
+        "02_analysis/{run}/{align}/{barc}_pycoqc/pycoQC_report.log"
+    benchmark:
+        "02_analysis/{run}/{align}/{barc}_pycoqc/pycoQC_report.benchmark.tsv"
+    conda:
+        "../envs/pycoqc.yml"
+    params:
+        ("--config MeBaPiNa/scripts/pycoQC_config.json " if not "{wildcards.barc}" == "lambda" else ""), ## use custom config (without coverage plot) for barcodes, but not control strains
+        "--min_pass_qual 0",
+        "--sample " + PLOT_SMPL, ## downsampling
+        "--verbose"
+    shell:
+        "pycoQC {params} "
+        "--summary_file {input.seqsum}/sequencing_summary_{wildcards.barc}.txt " ## only folder is specified as output in splitting rule
+        "--bam_file {input.bam} "
+        "--html_outfile {output.html} "
+        "--json_outfile {output.json} > {log} 2>&1"

@@ -6,7 +6,7 @@ experiment_directory:
   ## path to directory containing main folders (00_rawdata, 01_processeddata, ...)
   base: "/ag-halama/Microbiome/16S_Metabarcoding"
   ## run folder structure generated bay MinKNOW
-  run: "dummy"
+  run: "20191001_HD-T980_RapidHMW/Lamda/Lambda/20191001_1411_MN31344_FAK77797_2a466f85"
 
 machine:
   gpu: False
@@ -16,12 +16,12 @@ guppy:
   ## run set-up
   flowcell: "FLO-MIN106"
   seq_kit: "SQK-RAB204"
-  bac_kit: "SQK-RAB204" ## deactivate demultiplexing by leaving it empty: ""
-  lam_DCS: True ## deactivate detection of Lambda calibration strands by setting it: False
+  bac_kit: "" ## deactivate analysis of barcoodes by leaving it empty: "" Note: this doesn't deactivate demultiplexing, only the analysis of the individual barcodes
+  lam_DCS: False ## deactivate detection of Lambda calibration strands by setting it: False
   ## basecalling
   q_cut: "0" ## deactivate quality filtering by setting it to "0"
 
 align:
-  reference: "lambda_full_NC_001416.1_13-AUG-2018"
+  reference: "silva_arb/SILVA_132_SSURef_Nr99_tax_silva" ## don't add fasta ending
 
 ## TODO: use shema and add from snakemake.utils import validate to Snakefile
