@@ -30,7 +30,7 @@ rule nanoplot_seqsum:
 
 rule pycoqc_seqsum:
     input:
-        "01_processeddata/{run}/basecall/sequencing_summary/sequencing_summary_downsampled.txt"
+        "01_processeddata/{run}/basecall/sequencing_summary/sequencing_summary_downsampled.txt" # "01_processeddata/{run}/basecall/sequencing_summary/sequencing_summary_sorted.txt"
     output:
         html="02_analysis/{run}/basecall/pycoqc/pycoQC_report.html",
         json="02_analysis/{run}/basecall/pycoqc/pycoQC_report.json"
@@ -166,7 +166,7 @@ rule pycoqc_bam:
     conda:
         "../envs/pycoqc.yml"
     params:
-        ("--config ../scripts/pycoQC_config.json" if not {wildcard.barc} == "lambda" else ""),
+        ("--config MeBaPiNa/scripts/pycoQC_config.json " if not "{wildcards.barc}" == "lambda" else ""), ## use custom config (without coverage plot) for barcodes, but not control strains
         "--min_pass_qual 0",
         "--sample " + PLOT_SMPL, ## downsampling
         "--verbose"
@@ -176,22 +176,3 @@ rule pycoqc_bam:
         "--bam_file {input.bam} "
         "--html_outfile {output.html} "
         "--json_outfile {output.json} > {log} 2>&1"
-
-# samtools:
-# plot-bamstats -s /ag-halama/Microbiome/16S_Metabarcoding/00_rawdata/reference_sequences/silva_arb/SILVA_132_SSURef_Nr99_tax_silva.fasta > /ag-halama/Microbiome/16S_Metabarcoding/00_rawdata/reference_sequences/silva_arb/SILVA_132_SSURef_Nr99_tax_silva.fasta.gc
-# plot-bamstats -r /ag-halama/Microbiome/16S_Metabarcoding/00_rawdata/reference_sequences/silva_arb/SILVA_132_SSURef_Nr99_tax_silva.fasta.gc -p /ag-halama/Microbiome/16S_Metabarcoding/02_analysis/dummy_pool/align/samtools/ <(samtools stats unclassified_alignment.sam)
-# plot-bamstats -s /ag-halama/Microbiome/16S_Metabarcoding/00_rawdata/reference_sequences/lambda/lambda_full_NC_001416.1_13-AUG-2018.fasta > /ag-halama/Microbiome/16S_Metabarcoding/00_rawdata/reference_sequences/lambda/lambda_full_NC_001416.1_13-AUG-2018.fasta.gc
-# plot-bamstats -r /ag-halama/Microbiome/16S_Metabarcoding/00_rawdata/reference_sequences/lambda/lambda_full_NC_001416.1_13-AUG-2018.fasta.gc -p /ag-halama/Microbiome/16S_Metabarcoding/02_analysis/20191001_HD-T980_RapidHMW/Lamda/Lambda/20191001_1411_MN31344_FAK77797_2a466f85/align/samtools/ <(samtools stats unclassified_alignment.sam)
-
-
-# wub:
-# "bam_accuracy.py -g bam_accuracy.tsv -l bam_accuracy_reads.tsv -r bam_accuracy.pdf -e ../../../01_processeddata/dummy_pool/align_calibration_strands/lambda_alignment_sorted.bam"
-# "bam_alignment_length.py -t bam_alignment_length.tsv ../../../01_processeddata/dummy_pool/align_calibration_strands/lambda_alignment_sorted.bam"
-# "bam_alignment_qc.py -f ../../../00_rawdata/reference_sequences/lambda/lambda_3.6kb.fasta -r bam_alignment_qc.pdf ../../../01_processeddata/dummy_pool/align_calibration_strands/lambda_alignment_sorted.bam"
-#     "-x	Do not plot per-reference information. Default: False"
-# "bam_count_reads.py -z ../../../00_rawdata/reference_sequences/lambda/lambda_3.6kb.fasta -g -t bam_count_reads.tsv ../../../01_processeddata/dummy_pool/align_calibration_strands/lambda_alignment_sorted.bam"
-# "bam_gc_vs_qual.py -f ../../../00_rawdata/reference_sequences/lambda/lambda_3.6kb.fasta -r bam_gc_vs_qual.pdf -t bam_gc_vs_qual.tsv ../../../01_processeddata/dummy_pool/align_calibration_strands/lambda_alignment_sorted.bam"
-# "bam_multi_qc -h"
-# "bam_ref_base_coverage.py -f ../../../00_rawdata/reference_sequences/lambda/lambda_3.6kb.fasta -t bam_ref_base_coverage.tsv ../../../01_processeddata/dummy_pool/align_calibration_strands/lambda_alignment_sorted.bam"
-# "bam_soft_clips_tab.py -t bam_soft_clips_tab.tsv ../../../01_processeddata/dummy_pool/align_calibration_strands/lambda_alignment_sorted.bam"
-# "bias_explorer.py -r bias_explorer.pdf bam_count_reads.tsv"

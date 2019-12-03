@@ -116,16 +116,6 @@ rule downsample_seqsum:
         "rhundr==nr') " ## if the number is nr (by chance of 1/nr) print the line
         ">> {output} 2> {log}"
 
-## EPI2ME ##
-
-# ~/_Temp/epi2me-cli-linux-2019.11.11-2920621 --dryrun -b 71622089 --consentedHuman -w 1760 --params '{"1":{"1_1_min_qscore":"7","1_2_detect_barcode":"RAB204"}}' \
-# --inputfolder="/ag-halama/Microbiome/16S_Metabarcoding/01_processeddata/16S_nanopore_primer/Testpool/20191007_1559_MN31344_FAK76605_2bf006ff/basecall/pass/barcode01" \
-# --outputfolder="/ag-halama/Microbiome/16S_Metabarcoding/02_analysis/16S_nanopore_primer/Testpool/20191007_1559_MN31344_FAK76605_2bf006ff/EPI2ME/barcode01"
-# 
-# When used with the --instance=ARG and -w options, it will download the summary of the workflow results as used in the report), e.g.
-# --instance 12345 -t -w 1711
-
-
 ############################
 ## CHECKPOINT AGGREGATION ##
 ############################
