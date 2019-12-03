@@ -27,33 +27,43 @@ wildcard_constraints:
 rule all:
     input:
         list(filter(None,[
+        
         ## BASECALL ##
-        ## comprehensive QC of all reads INcluding calibtation strands
+        
+        ## general QC: all reads, including calibtation strads, intentional downsampling
         expand("02_analysis/{run}/basecall/nanoplot/NanoStats.txt",
         run=config["experiment_directory"]["run"]),
-        ## comprehensive QC of all reads EXcluding calibrations strands
+        ## general QC: all reads, forced downsampling
         expand("02_analysis/{run}/basecall/pycoqc/pycoQC_report.json",
         run=config["experiment_directory"]["run"]),
-        ## per base quality overview EXcluding calibtation strands
+        ## per base QC: all reads, forced downsampling
         expand("02_analysis/{run}/basecall/nanoqc/nanoQC.html",
         run=config["experiment_directory"]["run"]),
-        ## comparison of the barcodes INcluding calibtation strands
+        
+        ## barcode QC: per barcode
         ("" if not config["guppy"]["bac_kit"] else ## "" if bac_kit is ""
         expand("02_analysis/{run}/basecall/nanocomp/NanoStats.txt",
         run=config["experiment_directory"]["run"])),
-        ## calibration strand specific comprehensive QC (parially overlaps with bam analysis)
+                
+        ## calibration QC: only calinration strands
         ("" if not config["guppy"]["lam_DCS"] else ## "" if lam_DCS is False
         expand("02_analysis/{run}/basecall_calibration_strands/nanoplot/NanoStats.txt",
         run=config["experiment_directory"]["run"])),
         
         ## ALIGNMENT ##
-        # ## do NanoPlot of aligned reads reads
-        # expand("02_analysis/{run}/align/MeBaPiNa_barcode_aggregation.txt",
-        # run=config["experiment_directory"]["run"]),
-        ## calibration strand specific comprehensive QC
+        
+        ## general QC: per barcode, intentional downsampling
+        expand("02_analysis/{run}/align/MeBaPiNa_barcode_aggregation.txt",
+        run=config["experiment_directory"]["run"]),
+        
+        ## calibration QC: only calinration strands
         ("" if not config["guppy"]["lam_DCS"] else ## "" if lam_DCS is False
         expand("02_analysis/{run}/align_calibration_strands/lambda_nanoplot/NanoStats.txt",
+        run=config["experiment_directory"]["run"])),
+        ("" if not config["guppy"]["lam_DCS"] else ## "" if lam_DCS is False
+        expand("02_analysis/{run}/align_calibration_strands/lambda_pycoqc/pycoQC_report.json",
         run=config["experiment_directory"]["run"]))
+        
         ]))
 
 ## include other rules
