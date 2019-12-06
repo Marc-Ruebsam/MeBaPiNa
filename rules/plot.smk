@@ -166,7 +166,9 @@ rule pycoqc_bam:
     conda:
         "../envs/pycoqc.yml"
     params:
-        ("--config MeBaPiNa/scripts/pycoQC_config.json " if not "{wildcards.barc}" == "lambda" else ""), ## use custom config (without coverage plot) for barcodes, but not control strains
+        ("--config MeBaPiNa/scripts/pycoQC_config.json " if  ## use custom config (without coverage plot) for barcodes...
+        not config["align"]["reference"] == "ZymoBIOMICS.STD.refseq.v2/ssrRNAs/_all" ## ...but not for the Zymo reference
+        and not "{wildcards.barc}" == "lambda" else ""), ## or calibration strains
         "--min_pass_qual 0",
         "--sample " + PLOT_SMPL, ## downsampling
         "--verbose"
