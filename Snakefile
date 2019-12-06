@@ -69,6 +69,5 @@ rule all:
 ## include other rules
 include: "rules/basecall.smk"
 include: "rules/plot.smk"
-include: "rules/demultiplex.smk"
 include: "rules/align.smk"
 include: "rules/misc.smk"
