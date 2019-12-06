@@ -16,7 +16,7 @@ checkpoint guppy:
     version:
         subprocess.check_output("guppy_basecaller --version | awk '{print $NF}'", shell=True)
     threads:
-        config["machine"]["cpu"]
+        8
     params:
         ("--flowcell " + config["guppy"]["flowcell"]),
         ("--kit " + config["guppy"]["seq_kit"]),
