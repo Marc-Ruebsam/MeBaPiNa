@@ -14,15 +14,12 @@ rule sam_to_bam:
         "01_processeddata/{run}/{align}/{barc}_MeBaPiNa_sam_bam.benchmark.tsv"
     version:
         subprocess.check_output("samtools --version | awk 'NR==1{print $NF}'", shell=True)
-    params:
-        "-u" ## uncompressed bam to pipe
     conda:
         "../envs/samtools.yml"
     threads:
         config["machine"]["cpu"]
     shell:
-        "samtools view --threads {threads} {params} {input} | "
-        "samtools sort --threads {threads} -o {output.bam} > {log} 2>&1; "
+        "samtools sort --threads {threads} -o {output.bam} {input} > {log} 2>&1; "
         "samtools index -@ {threads} {output.bam} > {log} 2>&1"
 
 rule fasq_pipe:
