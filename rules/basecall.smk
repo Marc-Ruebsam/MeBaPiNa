@@ -22,9 +22,16 @@ checkpoint guppy:
         ("--kit " + config["guppy"]["seq_kit"]),
         ("--calib_detect" if config["guppy"]["lam_DCS"] else ""), ## includes detection of lambda clibration strands
         "--barcode_kits " + BAC_KIT, ## always includes demultiplexing (all reads marked as unclassified if no barcodes were used)
+        # "--require_barcodes_both_ends",
         "--qscore_filtering",
         ("--min_qscore " + config["guppy"]["q_cut"]),
-        ("--device cuda:all:100%" if config["machine"]["gpu"] else ""),
+        ("--device cuda:all:100% "
+        + "--gpu_runners_per_device 6 " 
+        + "--chunks_per_runner 1536 " 
+        + "--chunk_size 1000 " 
+        + "--chunks_per_caller 10000 " 
+        + "--num_barcode_threads 8" 
+        if config["machine"]["gpu"] else ""),
         "--compress_fastq",
         "--fast5_out"
     shell:
