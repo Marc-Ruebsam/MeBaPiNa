@@ -17,7 +17,7 @@ rule sam_to_bam:
     conda:
         "../envs/samtools.yml"
     threads:
-        config["machine"]["cpu"]
+        2
     shell:
         "samtools sort --threads {threads} -o {output.bam} {input} > {log} 2>&1; "
         "samtools index -@ {threads} {output.bam} > {log} 2>&1"
@@ -90,7 +90,7 @@ rule sort_seqsum_barc:
     benchmark:
         "01_processeddata/{run}/basecall/sequencing_summary/MeBaPiNa_sort_seqsum_barc.benchmark.tsv"
     threads:
-        config["machine"]["cpu"]
+        2
     shell:
         "cat {input} | (read -r; printf \"%s\\n\" \"$REPLY\"; sort -V --parallel={threads} -k"
         "$(awk '{{ for(i;i<=NF;i++){{if($i==\"barcode_arrangement\"){{ print i }}}}; exit 0 }}' {input})," ## finds the "barcode_arrangement" column...

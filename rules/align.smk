@@ -12,7 +12,7 @@ rule minimap2_index:
     conda:
         "../envs/minimap2.yml"
     threads:
-        config["machine"]["cpu"]
+        2
     shell:
         "minimap2 -t {threads} {params} -d {output} {input} > {log} 2>&1"
 
@@ -32,7 +32,7 @@ rule minimap2:
     conda:
         "../envs/minimap2.yml"
     threads:
-        config["machine"]["cpu"]
+        8
     shell:
         "minimap2 -t {threads} {params} -o {output} "
         "{input.target} "
@@ -55,7 +55,7 @@ rule minimap2_calibration_strands:
     conda:
         "../envs/minimap2.yml"
     threads:
-        config["machine"]["cpu"]
+        8
     shell:
         "minimap2 -t {threads} {params} -o {output} "
         "{input.target} "

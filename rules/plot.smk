@@ -14,7 +14,7 @@ rule nanoplot_seqsum:
     conda:
         "../envs/nanopack.yml"
     threads:
-        config["machine"]["cpu"]
+        2
     params:
         "--maxlength " + PLOT_MAXLEN, # "--drop_outliers", ## keep consistent with other plots
         "--plots kde hex dot",
@@ -64,7 +64,7 @@ rule nanocomp_seqsum:
     conda:
         "../envs/nanopack.yml"
     threads:
-        config["machine"]["cpu"]
+        2
     params:
         "--maxlength " + PLOT_MAXLEN,
         "--barcoded",
@@ -106,7 +106,7 @@ rule nanoplot_fastq_calib:
     conda:
         "../envs/nanopack.yml"
     threads:
-        config["machine"]["cpu"]
+        2
     params:
         "--drop_outliers", ## other functions use "--maxlength 10000",
         "--plots kde hex dot",
@@ -137,7 +137,7 @@ rule nanoplot_bam:
     conda:
         "../envs/nanopack.yml"
     threads:
-        config["machine"]["cpu"]
+        2
     params:
         "--maxlength 10000", ## to keep it consistent with other plots"--drop_outliers",
         "--alength", ## Use aligned read lengths rather than sequenced length (bam mode)
