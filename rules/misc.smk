@@ -119,8 +119,13 @@ rule downsample_seqsum:
 
 def input_aggregate(wildcards):
     from os import listdir
+    ## "pass" directory
     basecall_dir = checkpoints.guppy.get(run=wildcards.run).output[0]
+    ## directory names within "pass" directory
     barcs = listdir(basecall_dir)
+    ## retain only strings containing "barcode"
+    barcs = [i for i in barcs if "barcode" in i]
+    ## create file names with barcodes
     barc_dirs = expand("02_analysis/{run}/align/{barc}_pycoqc/pycoQC_report.json",
         run=wildcards.run,
         barc=barcs)
