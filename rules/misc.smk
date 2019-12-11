@@ -1,3 +1,29 @@
+##############################
+## TRIMM FILTER DEMULTIPLEX ##
+##############################
+
+rule nanofilt:
+    input:
+        fastq="01_processeddata/{run}/basecall/pass/{barc}",
+        seqsum="01_processeddata/{run}/basecall/sequencing_summary.txt"
+    output:
+        "01_processeddata/{run}/filter/{barc}.fastq.gz"
+    log:
+        "01_processeddata/{run}/filter/{barc}_MeBaPiNa_nanofilt.log"
+    benchmark:
+        "01_processeddata/{run}/filter/{barc}_MeBaPiNa_nanofilt.benchmark.tsv"
+    conda:
+        "../envs/nanopack.yml"
+    params:
+        ("--length " + config["guppy"]["len_min"]),
+        ("--maxlength " + config["guppy"]["len_max"]),
+        ("--quality " + config["guppy"]["q_min"])
+    shell:
+        "gunzip -c $(find {input.fastq} -type f -name \"*.fastq.gz\") | "
+        "NanoFilt {params} --summary {input.seqsum} "
+        "--logfile {log} "
+        "| gzip > {output}"
+
 ########################################
 ## FILE CONVERSION AND CONCATENATION ##
 ########################################
