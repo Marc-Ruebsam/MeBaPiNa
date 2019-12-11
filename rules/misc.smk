@@ -62,7 +62,7 @@ rule find_reads_in_fastq:
 
 rule split_seqsum_barc:
     input:
-        "01_processeddata/{run}/basecall/sequencing_summary.txt"
+        "01_processeddata/{run}/basecall/sequencing_summary/sequencing_summary_sorted.txt"
     output:
         directory("01_processeddata/{run}/basecall/sequencing_summary/barcode")
     log:
@@ -80,7 +80,7 @@ rule split_seqsum_barc:
         "print $0 > \"{output}\" \"/sequencing_summary_\" $barc_col \".txt\" " ## print the current line to the corresponding barcode specific file
         "}}' {input} > {log} 2>&1"
 
-rule sort_seqsum_barc:
+rule sort_seqsum:
     input:
         "01_processeddata/{run}/basecall/sequencing_summary.txt"
     output:
@@ -90,11 +90,12 @@ rule sort_seqsum_barc:
     benchmark:
         "01_processeddata/{run}/basecall/sequencing_summary/MeBaPiNa_sort_seqsum_barc.benchmark.tsv"
     threads:
-        2
+        4
     shell:
-        "cat {input} | (read -r; printf \"%s\\n\" \"$REPLY\"; sort -V --parallel={threads} -k"
-        "$(awk '{{ for(i;i<=NF;i++){{if($i==\"barcode_arrangement\"){{ print i }}}}; exit 0 }}' {input})," ## finds the "barcode_arrangement" column...
-        "$(awk '{{ for(i;i<=NF;i++){{if($i==\"barcode_arrangement\"){{ print i }}}}; exit 0 }}' {input}) -k7,7) " ## ...twice
+        "barc_col=$( awk '{{ header=$0; " ## save header string and ...
+        "for(i;i<=NF;i++){{if($i==\"barcode_arrangement\"){{ barc_col=i }}}} }}; " ## ...find column with barcode name
+        "{{ print header > \"{output}\"; print barc_col; exit 0 }}' ); " ## write header to file and print barcode column number to save to variable, exit after first line
+        "sort -V --parallel={threads} -k$barc_col,$barc_col -k7,7 <( tail -n +2 {input} )" ## sort by barcode column and start time (Note, start time column might have another index in later versions)
         ">> {output} 2> {log}"
 
 rule downsample_seqsum:
