@@ -24,7 +24,7 @@ checkpoint guppy:
         "--barcode_kits " + BAC_KIT, ## always includes demultiplexing (all reads marked as unclassified if no barcodes were used)
         # "--require_barcodes_both_ends",
         "--qscore_filtering",
-        ("--min_qscore " + config["guppy"]["q_cut"]),
+        ("--min_qscore " + config["guppy"]["q_min"]),
         ("--device cuda:all:100% "
         + "--gpu_runners_per_device 6 " 
         + "--chunks_per_runner 1536 " 

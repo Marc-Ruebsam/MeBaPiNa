@@ -19,7 +19,9 @@ guppy:
   bac_kit: "SQK-RAB204" ## deactivate analysis of barcoodes by leaving it empty: "" Note: this doesn't deactivate demultiplexing, only the analysis of the individual barcodes
   lam_DCS: False ## deactivate detection of Lambda calibration strands by setting it: False
   ## basecalling
-  q_cut: "0" ## deactivate quality filtering by setting it to "0"
+  q_min: "0" ## deactivate quality filtering by setting it to "0"
+  len_min: "1000"
+  len_max: "2800"
 
 align:
   reference: "silva_arb/SILVA_132_SSURef_Nr99_tax_silva" ## don't add fasta ending
