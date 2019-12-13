@@ -4,12 +4,12 @@
 
 experiment_directory:
   ## path to directory containing main folders (00_rawdata, 01_processeddata, ...)
-  base: "/ag-halama/Microbiome/16S_Metabarcoding"
+  base: "/mnt/AG-Halama/Microbiome/16S_Metabarcoding"
   ## run folder structure generated bay MinKNOW
-  run: "16S_nanopore_primer/Testpool/20191007_1559_MN31344_FAK76605_2bf006ff"
+  run: "16S_nanopore_primer/ETAB_MT/20191205_1807_MN31344_FAK73557_303059af"
 
 machine:
-  gpu: False
+  gpu: True
   cpu: 12
 
 guppy:
@@ -19,7 +19,7 @@ guppy:
   bac_kit: "SQK-RAB204" ## deactivate analysis of barcoodes by leaving it empty: "" Note: this doesn't deactivate demultiplexing, only the analysis of the individual barcodes
   lam_DCS: False ## deactivate detection of Lambda calibration strands by setting it: False
   ## basecalling
-  q_min: "0" ## deactivate quality filtering by setting it to "0"
+  q_min: "7" ## deactivate quality filtering by setting it to "0"
   len_min: "1000"
   len_max: "2800"
 

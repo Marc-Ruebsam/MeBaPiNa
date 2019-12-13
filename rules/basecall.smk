@@ -1,6 +1,6 @@
 checkpoint guppy:
     input:
-        "00_rawdata/{run}/fast5"
+        "/mnt/NRD/{run}/fast5"
     output:
         list(filter(None,[
         directory("01_processeddata/{run}/basecall/pass"),
