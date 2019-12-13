@@ -72,3 +72,27 @@ rule qcat:
         "--barcode_dir {output} "
         "> {log} 2>&1"
 
+############
+## FILTER ##
+############
+
+rule nanofilt:
+    input:
+        fastq="01_processeddata/{run}/trim/{barc}",
+        seqsum="01_processeddata/{run}/basecall/sequencing_summary.txt"
+    output:
+        "01_processeddata/{run}/filter/{barc}.fastq"
+    log:
+        "01_processeddata/{run}/filter/{barc}_MeBaPiNa_nanofilt.log"
+    benchmark:
+        "01_processeddata/{run}/filter/{barc}_MeBaPiNa_nanofilt.benchmark.tsv"
+    conda:
+        "../envs/nanopack.yml"
+    params:
+        ("--length " + config["guppy"]["len_min"]),
+        ("--maxlength " + config["guppy"]["len_max"]),
+        ("--quality " + config["guppy"]["q_min"])
+    shell:
+        "NanoFilt {params} --summary {input.seqsum} "
+        "--logfile {log} {input.fastq}/{wildcards.barc}.fastq"
+        "> {output}"

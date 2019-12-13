@@ -1,32 +1,6 @@
-##############################
-## TRIMM FILTER DEMULTIPLEX ##
-##############################
-
-rule nanofilt:
-    input:
-        fastq="01_processeddata/{run}/basecall/pass/{barc}",
-        seqsum="01_processeddata/{run}/basecall/sequencing_summary.txt"
-    output:
-        "01_processeddata/{run}/filter/{barc}.fastq.gz"
-    log:
-        "01_processeddata/{run}/filter/{barc}_MeBaPiNa_nanofilt.log"
-    benchmark:
-        "01_processeddata/{run}/filter/{barc}_MeBaPiNa_nanofilt.benchmark.tsv"
-    conda:
-        "../envs/nanopack.yml"
-    params:
-        ("--length " + config["guppy"]["len_min"]),
-        ("--maxlength " + config["guppy"]["len_max"]),
-        ("--quality " + config["guppy"]["q_min"])
-    shell:
-        "gunzip -c $(find {input.fastq} -type f -name \"*.fastq.gz\") | "
-        "NanoFilt {params} --summary {input.seqsum} "
-        "--logfile {log} "
-        "| gzip > {output}"
-
-########################################
-## FILE CONVERSION AND CONCATENATION ##
-########################################
+#####################
+## FILE CONVERSION ##
+#####################
 
 rule sam_to_bam:
     input:
@@ -47,26 +21,6 @@ rule sam_to_bam:
     shell:
         "samtools sort --threads {threads} -o {output.bam} {input} > {log} 2>&1; "
         "samtools index -@ {threads} {output.bam} > {log} 2>&1"
-
-rule fasq_pipe:
-    input:
-        "01_processeddata/{run}/basecall/pass"
-    output:
-        temp("02_analysis/{run}/basecall/nanoqc/pipe.fastq") ## pipe didn't work neighter did named pipes (no fastq file extension)
-    log:
-        "02_analysis/{run}/basecall/nanoqc/MeBaPiNa_fasq_pipe.log"
-    benchmark:
-        "02_analysis/{run}/basecall/nanoqc/MeBaPiNa_fasq_pipe.benchmark.tsv"
-    shell:
-        "zcat $(find {input} -type f -name \"*.fastq.gz\") |" ## concatenate all fastq files
-        "awk -v seed=$RANDOM 'BEGIN{{ prnt=-4; nr=100; srand(seed) }}; " ## "falsify" print flag, set nr for fraction and set random seed. Note: downsampling is a fraction here not a number of reads
-        "NR%4==1{{ " ## for every fourth line -> all headers
-        "rhundr=1+int(rand()*nr); " ## get a random number between 1 and nr
-        "if(rhundr==nr)" ## if the number is nr (by chance of 1/nr)
-        "{{ prnt=NR }} " ## set prnt flag to current line number to... 
-        "}}; "
-        "NR<prnt+4' " ## ...print this and the next three lines
-        ">> {output} 2> {log}"
 
 ########################
 ## SEQUENCING SUMMARY ##
