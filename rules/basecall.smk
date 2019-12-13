@@ -1,3 +1,7 @@
+##########################
+## BASECALL DEMULTIPLEX ##
+##########################
+
 checkpoint guppy:
     input:
         "/mnt/NRD/{run}/fast5"
@@ -38,3 +42,33 @@ checkpoint guppy:
         "guppy_basecaller --num_callers {threads} {params} "
         "--save_path 01_processeddata/{wildcards.run}/basecall "
         "--input_path {input} > {log} 2>&1"
+
+#######################
+## TRIMM DEMULTIPLEX ##
+#######################
+
+rule qcat:
+    input:
+        "01_processeddata/{run}/basecall/pass/{barc}"
+    output:
+        directory("01_processeddata/{run}/trim/{barc}")
+    log:
+        "01_processeddata/{run}/trim/{barc}/MeBaPiNa_qcat.log"
+    benchmark:
+        "01_processeddata/{run}/trim/{barc}/MeBaPiNa_qcat.benchmark.tsv"
+    conda:
+        "../envs/qcat.yml"
+    threads:
+        1
+    params:
+        "--min-score 75", ## Minimum barcode score. Barcode calls with a lower score will be discarded. Must be between 0 and 100. (default: 60)
+        "--detect-middle", ## Search for adapters in the whole read
+        ("--min-read-length " + config["guppy"]["len_min"]), ## Reads short than <min-read-length> after trimming will be discarded.
+        "--trim", ## Remove adapter and barcode sequences from reads.
+        ("--kit RAB204" if BAC_KIT == "SQK-RAB204" else "--kit Auto")
+    shell:
+        "cat $(find {input} -type f -name \"*.fastq\") | "
+        "qcat --threads {threads} {params} "
+        "--barcode_dir {output} "
+        "> {log} 2>&1"
+
