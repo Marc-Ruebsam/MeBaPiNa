@@ -12,15 +12,13 @@ rule sam_to_bam:
         "01_processeddata/{run}/{align}/{barc}_MeBaPiNa_sam_bam.log"
     benchmark:
         "01_processeddata/{run}/{align}/{barc}_MeBaPiNa_sam_bam.benchmark.tsv"
-    version:
-        subprocess.check_output("samtools --version | awk 'NR==1{print $NF}'", shell=True)
     conda:
         "../envs/samtools.yml"
     threads:
         2
     shell:
         "samtools sort --threads {threads} -o {output.bam} {input} > {log} 2>&1; "
-        "samtools index -@ {threads} {output.bam} > {log} 2>&1"
+        "samtools index -@ {threads} {output.bam} >> {log} 2>&1"
 
 ########################
 ## SEQUENCING SUMMARY ##
@@ -50,7 +48,7 @@ rule split_seqsum_barc:
     benchmark:
         "01_processeddata/{run}/basecall/sequencing_summary/MeBaPiNa_split_seqsum_barc.benchmark.tsv"
     shell:
-        "mkdir {output}; "
+        "mkdir {output} > {log} 2>&1; "
         "awk 'NR==1{{ header=$0; " ## save header string (first line) and ...
         "for(i;i<=NF;i++){{if($i==\"barcode_arrangement\"){{ barc_col=i }}}} }}; " ## ...find column with barcode name
         "NR!=1{{ " ## for all other lines
@@ -58,7 +56,7 @@ rule split_seqsum_barc:
         "print header > \"{output}\" \"/sequencing_summary_\" $barc_col \".txt\"; " ## ...write the header string to the barcode specific file
         "firstencounter[$barc_col]++ }}; " ## set the firstencounter for this string to false (!=0)
         "print $0 > \"{output}\" \"/sequencing_summary_\" $barc_col \".txt\" " ## print the current line to the corresponding barcode specific file
-        "}}' {input} > {log} 2>&1"
+        "}}' {input} >> {log} 2>&1"
 
 rule sort_seqsum:
     input:
@@ -74,9 +72,9 @@ rule sort_seqsum:
     shell:
         "barc_col=$( awk '{{ header=$0; " ## save header string and ...
         "for(i;i<=NF;i++){{if($i==\"barcode_arrangement\"){{ barc_col=i }}}} }}; " ## ...find column with barcode name
-        "{{ print header > \"{output}\"; print barc_col; exit 0 }}' ); " ## write header to file and print barcode column number to save to variable, exit after first line
+        "{{ print header > \"{output}\"; print barc_col; exit 0 }}' ) > {log} 2>&1; " ## write header to file and print barcode column number to save to variable, exit after first line
         "sort -V --parallel={threads} -k$barc_col,$barc_col -k7,7 <( tail -n +2 {input} )" ## sort by barcode column and start time (Note, start time column might have another index in later versions)
-        ">> {output} 2> {log}"
+        ">> {output} 2>> {log}"
 
 rule downsample_seqsum:
     input:
@@ -107,9 +105,13 @@ def input_aggregate(wildcards):
     ## retain only strings containing "barcode"
     barcs = [i for i in barcs if "barcode" in i]
     ## create file names with barcodes
-    barc_dirs = expand("02_analysis/{run}/align/{barc}_pycoqc/pycoQC_report.json",
+    barc_dirs = expand("02_analysis/{run}/filter/{barc}_nanoplot/NanoStats.txt",
         run=wildcards.run,
-        barc=barcs)
+        barc=barcs) + expand("02_analysis/{run}/filter/{barc}_nanoqc/nanoQC.html",
+            run=wildcards.run,
+            barc=barcs) + expand("02_analysis/{run}/align/{barc}_pycoqc/pycoQC_report.json",
+                run=wildcards.run,
+                barc=barcs)
     return barc_dirs
 
 rule aggr_align_barc:

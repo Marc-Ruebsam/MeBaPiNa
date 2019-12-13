@@ -18,7 +18,7 @@ rule minimap2_index:
 
 rule minimap2:
     input:
-        fastq="01_processeddata/{run}/trim/{barc}.fastq.gz", 
+        fastq="01_processeddata/{run}/trim/{barc}.fastq", 
         target=expand("00_rawdata/reference_sequences/{reference}.mmi", reference=config["align"]["reference"])
     output:
         "01_processeddata/{run}/align/{barc}_alignment.sam"
