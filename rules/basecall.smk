@@ -43,7 +43,8 @@ checkpoint guppy:
         + "--num_barcode_threads 8" 
         if config["machine"]["gpu"] else ""),
         # "--compress_fastq",
-        "--fast5_out"
+        "--fast5_out",
+        "--progress_stats_frequency 1800"
     shell:
         "guppy_basecaller --num_callers {threads} {params} "
         "--save_path 01_processeddata/{wildcards.run}/basecall "
