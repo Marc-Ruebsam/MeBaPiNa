@@ -219,7 +219,7 @@ rule nanoplot_bam_align:
         "--outdir 02_analysis/{wildcards.run}/{wildcards.align}/{wildcards.barc}_nanoplot "
         "--bam {input.bam} > {log} 2>&1"
 
-rule pycoqc_bam:
+rule pycoqc_bam_align:
     input:
         seqsum="01_processeddata/{run}/basecall/sequencing_summary/barcode", ## only folder is specified as output in splitting rule
         bam="01_processeddata/{run}/{align}/{barc}_alignment_sorted.bam"
