@@ -59,11 +59,11 @@ rule qcat:
     input:
         "01_processeddata/{run}/basecall/pass/{barc}"
     output:
-        directory("01_processeddata/{run}/trim/{barc}")
+        temp(directory("01_processeddata/{run}/trim/{barc}"))
     log:
-        "01_processeddata/{run}/trim/{barc}/MeBaPiNa_qcat.log"
+        "01_processeddata/{run}/trim/{barc}_MeBaPiNa_qcat.log"
     benchmark:
-        "01_processeddata/{run}/trim/{barc}/MeBaPiNa_qcat.benchmark.tsv"
+        "01_processeddata/{run}/trim/{barc}_MeBaPiNa_qcat.benchmark.tsv"
     conda:
         "../envs/qcat.yml"
     threads:
