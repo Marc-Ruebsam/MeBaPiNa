@@ -47,7 +47,9 @@ checkpoint guppy:
     shell:
         "guppy_basecaller --num_callers {threads} {params} "
         "--save_path 01_processeddata/{wildcards.run}/basecall "
-        "--input_path {input} > {log} 2>&1"
+        "--input_path {input} > {log} 2>&1; "
+        "mkdir 01_processeddata/{wildcards.run}/basecall/guppy_basecaller_logs; "
+        "mv 01_processeddata/{wildcards.run}/basecall/guppy_basecaller_log-* 01_processeddata/{wildcards.run}/basecall/guppy_basecaller_logs/"
 
 #######################
 ## TRIMM DEMULTIPLEX ##
