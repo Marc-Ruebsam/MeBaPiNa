@@ -108,9 +108,9 @@ rule fastq_pipe_basecall:
     output:
         temp("02_analysis/{run}/basecall/nanoqc/pipe.fastq") ## pipe didn't work neighter did named pipes (no fastq file extension)
     log:
-        "02_analysis/{run}/basecall/nanoqc/MeBaPiNa_fasq_pipe.log"
+        "02_analysis/{run}/basecall/nanoqc/MeBaPiNa_fastq_pipe.log"
     benchmark:
-        "02_analysis/{run}/basecall/nanoqc/MeBaPiNa_fasq_pipe.benchmark.tsv"
+        "02_analysis/{run}/basecall/nanoqc/MeBaPiNa_fastq_pipe.benchmark.tsv"
     shell:
         "cat $(find {input} -type f -name \"*.fastq\") |" ## concatenate all fastq files
         "awk -v seed=$RANDOM 'BEGIN{{ prnt=-4; nr=100; srand(seed) }}; " ## "falsify" print flag, set nr for fraction and set random seed. Note: downsampling is a fraction here not a number of reads
@@ -169,9 +169,28 @@ rule nanoplot_fastq_filter:
         "--outdir 02_analysis/{wildcards.run}/filter/{wildcards.barc}_nanoplot "
         "--fastq_rich {input} > {log} 2>&1"
 
-rule nanoqc_fastq_filter:
+rule fastq_pipe_filter:
     input:
         "01_processeddata/{run}/filter/{barc}.fastq"
+    output:
+        temp("02_analysis/{run}/filter/{barc}_nanoqc/pipe.fastq") ## pipe didn't work neighter did named pipes (no fastq file extension)
+    log:
+        "02_analysis/{run}/filter/{barc}_nanoqc/MeBaPiNa_fastq_pipe.log"
+    benchmark:
+        "02_analysis/{run}/filter/{barc}_nanoqc/MeBaPiNa_fastq_pipe.benchmark.tsv"
+    shell:
+        "awk -v seed=$RANDOM 'BEGIN{{ prnt=-4; nr=10; srand(seed) }}; " ## "falsify" print flag, set nr for fraction and set random seed. Note: downsampling is a fraction here not a number of reads
+        "NR%4==1{{ " ## for every fourth line -> all headers
+        "rhundr=1+int(rand()*nr); " ## get a random number between 1 and nr
+        "if(rhundr==nr)" ## if the number is nr (by chance of 1/nr)
+        "{{ prnt=NR }} " ## set prnt flag to current line number to... 
+        "}}; "
+        "NR<prnt+4' {input} " ## ...print this and the next three lines
+        ">> {output} 2> {log}"
+
+rule nanoqc_fastq_filter:
+    input:
+        "02_analysis/{run}/filter/{barc}_nanoqc/pipe.fastq"
     output:
         "02_analysis/{run}/filter/{barc}_nanoqc/nanoQC.html"
     log:
