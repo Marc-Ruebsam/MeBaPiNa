@@ -16,7 +16,7 @@ rule nanoplot_fastq_calib:
     threads:
         2
     params:
-        "--drop_outliers", ## other functions use "--maxlength 10000",
+        "--drop_outliers", ## other functions use "--maxlength 10000", to keep it consistent with other plots
         "--plots kde hex dot",
         "--format svg",
         "--colormap viridis",
@@ -42,7 +42,8 @@ rule nanoplot_seqsum_basecall:
     threads:
         2
     params:
-        "--maxlength " + PLOT_MAXLEN, # "--drop_outliers", ## keep consistent with other plots
+        "--maxlength " + PLOT_MAXLEN, ## to keep it consistent with other plots
+        "--drop_outliers",
         "--plots kde hex dot",
         "--format svg",
         "--colormap viridis",
@@ -225,7 +226,8 @@ rule nanoplot_bam_align:
     threads:
         2
     params:
-        "--maxlength 10000", ## to keep it consistent with other plots"--drop_outliers",
+        "--maxlength " + PLOT_MAXLEN, ## to keep it consistent with other plots
+        "--drop_outliers",
         "--alength", ## Use aligned read lengths rather than sequenced length (bam mode)
         "--plots kde hex dot",
         "--format svg",

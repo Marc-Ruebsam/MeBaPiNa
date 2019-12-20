@@ -14,7 +14,7 @@ BAC_KIT = ("SQK-RAB204" if not config["guppy"]["bac_kit"] else config["guppy"]["
 ## sample depth for downsampling in some plots
 PLOT_SMPL = "100000"
 ## max read lengths in some plots
-PLOT_MAXLEN = "4000"
+PLOT_MAXLEN = config["guppy"]["len_max"]
 
 ## prevent unwanted extension of wildcards
 wildcard_constraints:
