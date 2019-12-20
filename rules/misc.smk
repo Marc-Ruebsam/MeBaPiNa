@@ -72,8 +72,9 @@ rule sort_seqsum:
     shell:
         "barc_col=$( awk '{{ header=$0; " ## save header string and ...
         "for(i;i<=NF;i++){{if($i==\"barcode_arrangement\"){{ barc_col=i }}}} }}; " ## ...find column with barcode name
-        "{{ print header > \"{output}\"; print barc_col; exit 0 }}' ) > {log} 2>&1; " ## write header to file and print barcode column number to save to variable, exit after first line
-        "sort -V --parallel={threads} -k$barc_col,$barc_col -k7,7 <( tail -n +2 {input} )" ## sort by barcode column and start time (Note, start time column might have another index in later versions)
+        "{{ print header > \"{output}\"; print barc_col; exit 0 }}' {input} ) > {log} 2>&1; " ## write header to file and print barcode column number to save to variable, exit after first line
+        "tail -n +2 {input} | "
+        "sort -V -S1G --parallel={threads} -k$barc_col,$barc_col -k7,7 " ## sort by barcode column and start time (Note, start time column might have another index in later versions)
         ">> {output} 2>> {log}"
 
 rule downsample_seqsum:
