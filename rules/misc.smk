@@ -48,14 +48,18 @@ rule split_seqsum_barc:
     benchmark:
         "01_processeddata/{run}/basecall/sequencing_summary/MeBaPiNa_split_seqsum_barc.benchmark.tsv"
     shell:
-        "mkdir {output} > {log} 2>&1; "
-        "awk 'NR==1{{ header=$0; " ## save header string (first line) and ...
-        "for(i;i<=NF;i++){{if($i==\"barcode_arrangement\"){{ barc_col=i }}}} }}; " ## ...find column with barcode name
+        "mkdir -p {output} > {log} 2>&1; "
+        "awk 'BEGIN{{cali_col=0}}; " ## falsify calibration strain column detection
+        "NR==1{{ header=$0; " ## save header string (first line) and...
+        "for(i;i<=NF;i++){{ if($i==\"barcode_arrangement\"){{ barc_col=i }}; " ## ...find column with barcode name and...
+        "if($i==\"calibration_strand_genome\"){{ cali_col=i; " ## ...detect the presence of calibration strands and...
+        "print header > \"{output}\" \"/sequencing_summary_lambda.txt\" }} }} }}; " ## ... write header to calibration specific file
         "NR!=1{{ " ## for all other lines
         "if(firstencounter[$barc_col]==0){{ " ## when the barcode is encountered the first time (no file exsist, yet)...
         "print header > \"{output}\" \"/sequencing_summary_\" $barc_col \".txt\"; " ## ...write the header string to the barcode specific file
         "firstencounter[$barc_col]++ }}; " ## set the firstencounter for this string to false (!=0)
-        "print $0 > \"{output}\" \"/sequencing_summary_\" $barc_col \".txt\" " ## print the current line to the corresponding barcode specific file
+        "if( cali_col != 0 && $barc_col == \"unclassified\" && $cali_col ~ /Lambda_3.6kb/){{ print $0 > \"{output}\" \"/sequencing_summary_lambda.txt\" }}"
+        "else{{ print $0 > \"{output}\" \"/sequencing_summary_\" $barc_col \".txt\" }} " ## print the current line to the corresponding barcode specific file
         "}}' {input} >> {log} 2>&1"
 
 rule sort_seqsum:
@@ -106,14 +110,11 @@ def input_aggregate(wildcards):
     ## retain only strings containing "barcode"
     barcs = [i for i in barcs if "barcode" in i]
     ## create file names with barcodes
-    barc_dirs = expand("02_analysis/{run}/filter/{barc}_nanoplot/NanoStats.txt",
+    barc_input = expand("02_analysis/{run}/align/{barc}_pycoqc/pycoQC_report.json",
         run=wildcards.run,
-        barc=barcs) + expand("02_analysis/{run}/filter/{barc}_nanoqc/nanoQC.html",
-            run=wildcards.run,
-            barc=barcs) + expand("02_analysis/{run}/align/{barc}_pycoqc/pycoQC_report.json",
-                run=wildcards.run,
-                barc=barcs)
-    return barc_dirs
+        barc=barcs)
+    barc_input.sort()
+    return barc_input
 
 rule aggr_align_barc:
     input:

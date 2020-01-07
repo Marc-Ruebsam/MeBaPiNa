@@ -16,9 +16,25 @@ rule minimap2_index:
     shell:
         "minimap2 -t {threads} {params} -d {output} {input} > {log} 2>&1"
 
+rule fastq_split_minimap2:
+    input:
+        "01_processeddata/{run}/filter/{barc}.fastq"
+    output:
+        temp(directory("01_processeddata/{run}/filter/{barc}_split"))
+    log:
+        "01_processeddata/{run}/filter/{barc}_MeBaPiNa_split.log"
+    benchmark:
+        "01_processeddata/{run}/filter/{barc}_MeBaPiNa_split.tsv"
+    shell:
+        "mkdir {output}; "
+        "awk 'BEGIN{{ file_num=0 }}; " ## split output into files with 4000 sequences each
+        "NR%16000==1{{ file_num++ }}; "
+        "{{ print $0 > \"{output}/{wildcards.barc}_\" file_num \".fastq\" }}' {input} "
+        "> {log} 2>&1"
+
 rule minimap2:
     input:
-        fastq="01_processeddata/{run}/trim/{barc}.fastq", 
+        barc_dir="01_processeddata/{run}/filter/{barc}_split", 
         target=expand("00_rawdata/reference_sequences/{reference}.mmi", reference=config["align"]["reference"])
     output:
         temp("01_processeddata/{run}/align/{barc}_alignment.sam")
@@ -35,7 +51,8 @@ rule minimap2:
         8
     shell:
         "minimap2 -t {threads} {params} -o {output} "
-        "{input.target} {input.fastq} "
+        "{input.target} "
+        "$(find {input.barc_dir} -type f -name \"*.fastq\") "
         "> {log} 2>&1"
 
 rule minimap2_calibration_strands:
@@ -58,5 +75,5 @@ rule minimap2_calibration_strands:
     shell:
         "minimap2 -t {threads} {params} -o {output} "
         "{input.target} "
-        "$(find {input.calib_dir} -type f -name \"*.fastq.gz\") "
+        "$(find {input.calib_dir} -type f -name \"*.fastq\") "
         "> {log} 2>&1"
