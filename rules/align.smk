@@ -1,3 +1,10 @@
+###############
+## ALIGNMENT ##
+###############
+
+## INDEX REFERENCE ##
+#####################
+
 rule indexing_reference:
     input:
         "METADATA/Reference_Sequences/{reference}/reference.fasta"
@@ -15,6 +22,9 @@ rule indexing_reference:
         2
     shell:
         "minimap2 -t {threads} {params} -d {output} {input} > {log} 2>&1"
+
+## ALIGNMENT ##
+###############
 
 rule splitting_filtered: #!# only required because of low memory avaialility
     input:
@@ -57,6 +67,9 @@ rule aligning_filtered:
         "$(find {input.barc_dir} -type f -name \"*.fastq\") " #!# because of split input
         "> {log} 2>&1"
 
+## FILE CONVERSION ##
+#####################
+
 rule converting_sam2bam:
     input:
         "01_processed_data/03_alignment/{run}/{barc}/{type}.sam"
@@ -83,6 +96,9 @@ rule converting_sam2bam:
 # 
 # R
 # # BiocManager::install(version = "3.10")
+
+## CALIBRATION STRAND ##
+########################
 
 rule aligning_calibration_strands:
     input:
