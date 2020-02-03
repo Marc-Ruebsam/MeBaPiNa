@@ -1,107 +1,145 @@
-##########################
+#################
+## BASECALLING ##
+#################
+
+## HOUSE KEEPING ##
+###################
+
+rule moving_raw:
+    output:
+        "00_raw_data/{run}/fast5"
+    shell:
+        "find 00_raw_data/ -name \"{wildcards.run}\" -print0 | xargs -0 -I {{}} mv {{}} \"00_raw_data/{wildcards.run}\"; "
+        "find 00_raw_data/ -depth -type d -empty -delete" #!# delete empty directories
+
+rule compressing_raw: ## after basecalling, removes uncompressed fast5
+    input:
+        fast5="00_raw_data/{run}/fast5",
+        dummy_basecalling="01_processed_data/01_basecalling/{run}/pass" ## dummy to run only after basecalling
+    output:
+        fast5="00_raw_data/{run}/fast5.tar.gz",
+        md5="00_raw_data/{run}/md5checksum.txt"
+    shell:
+        "tar -cvzf {output.fast5} {input.fast5}; "
+        "find 00_raw_data/{wildcards.run} -maxdepth 1 -type f -exec md5sum {{}} >> {output.md5} \;; "
+        "rm {input.fast5}"
+
 ## BASECALL DEMULTIPLEX ##
 ##########################
 
-checkpoint guppy:
+checkpoint basecalling_raw:
     input:
-        "/mnt/NRD/{run}/fast5"
+        "00_raw_data/{run}/fast5"
     output:
         list(filter(None,[
-        directory("01_processeddata/{run}/basecall/pass"),
+        directory("01_processed_data/01_basecalling/{run}/pass"),
         ## evaluation of Lambda calibration strands only when specified
-        (config["guppy"]["lam_DCS"] and
-        directory("01_processeddata/{run}/basecall/calibration_strands")),
-        "01_processeddata/{run}/basecall/sequencing_summary.txt"
+        (directory("01_processed_data/01_basecalling/{run}/calibration_strands")
+        if LAM_DCS else ""),
+        "01_processed_data/01_basecalling/{run}/sequencing_summary.txt"
         ]))
     log:
-        "01_processeddata/{run}/basecall/MeBaPiNa_guppy.log"
+        "01_processed_data/01_basecalling/{run}/MeBaPiNa_basecalling.log"
     benchmark:
-        "01_processeddata/{run}/basecall/MeBaPiNa_guppy.benchmark.tsv"
+        "01_processed_data/01_basecalling/{run}/MeBaPiNa_basecalling.benchmark.tsv"
     version:
         subprocess.check_output("guppy_basecaller --version | awk '{print $NF}'", shell=True)
     threads:
         22
     params:
-        ("--flowcell " + config["guppy"]["flowcell"]),
-        ("--kit " + config["guppy"]["seq_kit"]),
-        ("--calib_detect" if config["guppy"]["lam_DCS"] else ""), ## includes detection of lambda clibration strands
+        "--flowcell " + FLOWCELL,
+        "--kit " + SEQ_KIT,
         "--barcode_kits " + BAC_KIT, ## always includes demultiplexing (all reads marked as unclassified if no barcodes were used)
-        # # "--require_barcodes_both_ends",
-        # "--detect_mid_strand_barcodes",
-        # "--min_score 75",
-        # "--min_score_rear_override 70"
-        # "--min_score_mid_barcodes 70"
-        # "--trim_barcodes",
-        # " --num_extra_bases_trim 10",
+        ("--calib_detect" if LAM_DCS else ""), ## includes detection of lambda clibration strands
+        # "--min_score 75", ## minimum score for barcode match
+        # # "--require_barcodes_both_ends", ## very stringent
+        # # "--detect_mid_strand_barcodes", ## very slow
+        # # "--min_score_mid_barcodes 70"
+        # # "--min_score_rear_override 70"
+        # # "--trim_barcodes",
+        # # " --num_extra_bases_trim 10",
         "--qscore_filtering",
-        ("--min_qscore " + config["guppy"]["q_min"]),
+        ("--min_qscore " + config["filtering"]["q_min"]),
         ("--device cuda:all:100% "
         + "--gpu_runners_per_device 6 " 
         + "--chunks_per_runner 1536 " 
         + "--chunk_size 1000 " 
         + "--chunks_per_caller 10000 " 
         + "--num_barcode_threads 8" 
-        if config["machine"]["gpu"] else ""),
+        if config["workstation"]["gpu"] else ""),
         # "--compress_fastq",
-        "--fast5_out",
-        "--progress_stats_frequency 1800"
+        "--fast5_out", #!#
+        "--progress_stats_frequency 1800" ## every 30 minutes
     shell:
         "guppy_basecaller --num_callers {threads} {params} "
-        "--save_path 01_processeddata/{wildcards.run}/basecall "
-        "--input_path {input} > {log} 2>&1; "
-        "mkdir -p 01_processeddata/{wildcards.run}/basecall/guppy_basecaller_logs; "
-        "mv 01_processeddata/{wildcards.run}/basecall/guppy_basecaller_log-* 01_processeddata/{wildcards.run}/basecall/guppy_basecaller_logs/"
+        "--save_path 01_processed_data/01_basecalling/{wildcards.run} "
+        "--input_path {input} > {log} 2>&1"
 
-#######################
+        "mkdir -p 01_processed_data/01_basecalling/{wildcards.run}/guppy_basecaller_logs; "
+        "mv 01_processed_data/01_basecalling/{wildcards.run}/guppy_basecaller_log-* 01_processed_data/01_basecalling/{wildcards.run}/guppy_basecaller_logs/"
+
 ## TRIMM DEMULTIPLEX ##
 #######################
 
-rule qcat:
+def input_per_barcode(wildcards):
+    ## get "pass" directory and trigger checkpoint (this way we can specify output inside the checkpoints output directory "pass" without direct rule association)
+    pass_dir = checkpoints.basecalling_raw.get(run=wildcards.run).output[0]
+    ## get barcode for sample
+    sample_barcode = wildcards.barc
+    ## create file name for barcode
+    barc_input = pass_dir + "/" + sample_barcode
+    return barc_input
+
+rule trimming_basecalled:
     input:
-        "01_processeddata/{run}/basecall/pass/{barc}"
+        input_per_barcode
     output:
-        directory("01_processeddata/{run}/trim/{barc}")
+        "01_processed_data/02_trimming_filtering/{run}/{barc}/trimmed.fastq"
     log:
-        "01_processeddata/{run}/trim/{barc}_MeBaPiNa_qcat.log"
+        "01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming.log"
     benchmark:
-        "01_processeddata/{run}/trim/{barc}_MeBaPiNa_qcat.benchmark.tsv"
+        "01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming.benchmark.tsv"
     conda:
         "../envs/qcat.yml"
     threads:
         1
     params:
         "--min-score 70", ## Minimum barcode score. Barcode calls with a lower score will be discarded. Must be between 0 and 100. (default: 60)
-        "--detect-middle", ## Search for adapters in the whole read
-        ("--min-read-length " + config["guppy"]["len_min"]), ## Reads short than <min-read-length> after trimming will be discarded.
+        "--detect-middle", #!# Search for adapters in the whole read
+        "--min-read-length " + config["filtering"]["len_min"], ## Reads short than <min-read-length> after trimming will be discarded.
         "--trim", ## Remove adapter and barcode sequences from reads.
-        ("--kit RAB204" if BAC_KIT == "SQK-RAB204" else "--kit Auto")
+        ("--kit RAB204" if BAC_KIT == "SQK-RAB204" else "--kit Auto") #!#
     shell:
+        "barc_folder=01_processed_data/02_trimming_filtering/{wildcards.run}/{wildcards.barc}; " ## directory name of barcode currently processed
         "find {input} -type f -name \"*.fastq\" -exec cat {{}} \\; | "
         "qcat --threads {threads} {params} "
-        "--barcode_dir {output} "
-        "> {log} 2>&1"
+        "--barcode_dir $barc_folder "
+        "> {log} 2>&1; "
+        "mv $barc_folder/{wildcards.barc}.fastq {output} >> {log} 2>&1; " ## rename barcode fastq to "trimmed.fastq"
+        "mkdir $barc_folder/others >> {log} 2>&1; " ## create folder for all other barcode files sorted out during demultiplexing
+        "find $barc_folder -type f \( -name \"*barcode*\" -o -name \"*none*\" \) " ## move other barcodes to "others" directory
+        "-exec mv {{}} $barc_folder/others \; >> {log} 2>&1"
 
-############
 ## FILTER ##
 ############
 
-rule nanofilt:
+rule filtering_trimmed:
     input:
-        fastq="01_processeddata/{run}/trim/{barc}",
-        seqsum="01_processeddata/{run}/basecall/sequencing_summary.txt"
+        fastq="01_processed_data/02_trimming_filtering/{run}/{barc}/trimmed.fastq",
+        seqsum="01_processed_data/01_basecalling/{run}/sequencing_summary.txt"
     output:
-        "01_processeddata/{run}/filter/{barc}.fastq"
+        "01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq"
     log:
-        "01_processeddata/{run}/filter/{barc}_MeBaPiNa_nanofilt.log"
+        "01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering.log"
     benchmark:
-        "01_processeddata/{run}/filter/{barc}_MeBaPiNa_nanofilt.benchmark.tsv"
+        "01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering.benchmark.tsv"
     conda:
         "../envs/nanopack.yml"
     params:
-        ("--length " + config["guppy"]["len_min"]),
-        ("--maxlength " + config["guppy"]["len_max"]),
-        ("--quality " + config["guppy"]["q_min"])
+        ("--length " + config["filtering"]["len_min"]),
+        ("--maxlength " + config["filtering"]["len_max"]),
+        ("--quality " + config["filtering"]["q_min"])
     shell:
         "NanoFilt {params} --summary {input.seqsum} "
-        "--logfile {log} {input.fastq}/{wildcards.barc}.fastq"
+        "--logfile {log} {input.fastq}"
         "> {output} 2> {log}"

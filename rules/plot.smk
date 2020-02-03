@@ -1,18 +1,21 @@
 ##############
-## BASECALL ##
+## PLOTTING ##
 ##############
+
+## BASECALLING ##
+#################
 
 ## NANOPLOT ##
 
-rule nanoplot_seqsum_basecall:
+rule plot_nanoplot_seqsum_basecall:
     input:
-        "01_processeddata/{run}/basecall/sequencing_summary.txt"
+        "01_processed_data/01_basecalling/{run}/sequencing_summary.txt"
     output:
-        "02_analysis/{run}/basecall/nanoplot/NanoStats.txt"
+        "02_analysis_results/01_basecalling/{run}/nanoplot/NanoStats.txt"
     log:
-        "02_analysis/{run}/basecall/nanoplot/MeBaPiNa_nanoplot_seqsum.log"
+        "02_analysis_results/01_basecalling/{run}/nanoplot/MeBaPiNa_nanoplot_seqsum_basecall.log"
     benchmark:
-        "02_analysis/{run}/basecall/nanoplot/MeBaPiNa_nanoplot_seqsum.benchmark.tsv"
+        "02_analysis_results/01_basecalling/{run}/nanoplot/MeBaPiNa_nanoplot_seqsum_basecall.benchmark.tsv"
     conda:
         "../envs/nanopack.yml"
     threads:
@@ -28,27 +31,27 @@ rule nanoplot_seqsum_basecall:
         "--verbose" ## or nothing to log
     shell:
         "NanoPlot --threads {threads} {params} "
-        "--outdir 02_analysis/{wildcards.run}/basecall/nanoplot "
+        "--outdir 02_analysis_results/01_basecalling/{wildcards.run}/nanoplot "
         "--summary {input} > {log} 2>&1"
 
 ## PYCOQC ##
 
-rule pycoqc_seqsum_basecall:
+rule plot_pycoqc_seqsum_basecall:
     input:
-        "01_processeddata/{run}/basecall/sequencing_summary/sequencing_summary_downsampled.txt" # "01_processeddata/{run}/basecall/sequencing_summary/sequencing_summary_sorted.txt"
+        "01_processed_data/01_basecalling/{run}/sequencing_summary/sequencing_summary_downsampled.txt" #!# "01_processed_data/01_basecalling/{run}/sequencing_summary/sequencing_summary_sorted.txt"
     output:
-        html="02_analysis/{run}/basecall/pycoqc/pycoQC_report.html",
-        json="02_analysis/{run}/basecall/pycoqc/pycoQC_report.json"
+        html="02_analysis_results/01_basecalling/{run}/pycoqc/pycoQC_report.html",
+        json="02_analysis_results/01_basecalling/{run}/pycoqc/pycoQC_report.json"
     log:
-        "02_analysis/{run}/basecall/pycoqc/pycoQC_report.log"
+        "02_analysis_results/01_basecalling/{run}/pycoqc/pycoqc_seqsum_basecall.log"
     benchmark:
-        "02_analysis/{run}/basecall/pycoqc/pycoQC_report.benchmark.tsv"
+        "02_analysis_results/01_basecalling/{run}/pycoqc/pycoqc_seqsum_basecall.benchmark.tsv"
     conda:
         "../envs/pycoqc.yml"
     params:
         "--min_pass_qual 0",
         "--filter_calibration", ## leave out calibration_strands
-        # downsampling is done during generation of input "--sample " + PLOT_SMPL, ## downsampling
+        #!# downsampling is done during generation of input "--sample " + PLOT_SMPL, ## downsampling
         "--min_barcode_percent 0.001", ## barcodes below 0.001% of reads are removed (1 in 100'000)
         "--verbose"
     shell:
@@ -59,15 +62,15 @@ rule pycoqc_seqsum_basecall:
 
 ## NANOCOMP ##
 
-rule nanocomp_seqsum_basecall:
+rule plot_nanocomp_seqsum_basecall:
     input:
-        "01_processeddata/{run}/basecall/sequencing_summary/sequencing_summary_sorted.txt"
+        "01_processed_data/01_basecalling/{run}/sequencing_summary/sequencing_summary_sorted.txt"
     output:
-        "02_analysis/{run}/basecall/nanocomp/NanoStats.txt"
+        "02_analysis_results/01_basecalling/{run}/nanocomp/NanoStats.txt"
     log:
-        "02_analysis/{run}/basecall/nanocomp/MeBaPiNa_nanocomp_seqsum.log"
+        "02_analysis_results/01_basecalling/{run}/nanocomp/MeBaPiNa_nanocomp_seqsum_basecall.log"
     benchmark:
-        "02_analysis/{run}/basecall/nanocomp/MeBaPiNa_nanocomp_seqsum.benchmark.tsv"
+        "02_analysis_results/01_basecalling/{run}/nanocomp/MeBaPiNa_nanocomp_seqsum_basecall.benchmark.tsv"
     conda:
         "../envs/nanopack.yml"
     threads:
@@ -80,20 +83,20 @@ rule nanocomp_seqsum_basecall:
         "--verbose" ## or nothing to log
     shell:
         "NanoComp --threads {threads} {params} "
-        "--outdir 02_analysis/{wildcards.run}/basecall/nanocomp "
+        "--outdir 02_analysis_results/01_basecalling/{wildcards.run}/nanocomp "
         "--summary {input} > {log} 2>&1"
 
 ## NANOQC ##
 
-rule fastq_pipe_basecall:
+rule plot_fastq_pipe_basecall:
     input:
-        "01_processeddata/{run}/basecall/pass"
+        "01_processed_data/01_basecalling/{run}/pass"
     output:
-        temp("02_analysis/{run}/basecall/nanoqc/pipe.fastq") ## pipe didn't work neighter did named pipes (no fastq file extension)
+        temp("02_analysis_results/01_basecalling/{run}/nanoqc/pipe.fastq") ## pipe didn't work (no fastq file extension) neighter did named pipes (started but nevenr finished)
     log:
-        "02_analysis/{run}/basecall/nanoqc/MeBaPiNa_fastq_pipe.log"
+        "02_analysis_results/01_basecalling/{run}/nanoqc/MeBaPiNa_nanoqc_fastq_basecall.log"
     benchmark:
-        "02_analysis/{run}/basecall/nanoqc/MeBaPiNa_fastq_pipe.benchmark.tsv"
+        "02_analysis_results/01_basecalling/{run}/nanoqc/MeBaPiNa_nanoqc_fastq_basecall.benchmark.tsv"
     shell:
         "find {input} -type f -name \"*.fastq\" -exec cat {{}} \\; | " ## concatenate all fastq files
         "awk -v seed=$RANDOM 'BEGIN{{ prnt=-4; nr=100; srand(seed) }}; " ## "falsify" print flag, set nr for fraction and set random seed. Note: downsampling is a fraction here not a number of reads
@@ -105,35 +108,35 @@ rule fastq_pipe_basecall:
         "NR<prnt+4' " ## ...print this and the next three lines
         ">> {output} 2> {log}"
 
-rule nanoqc_fastq_basecall:
+rule plot_nanoqc_fastq_basecall:
     input:
-        "02_analysis/{run}/basecall/nanoqc/pipe.fastq"
+        "02_analysis_results/01_basecalling/{run}/nanoqc/pipe.fastq"
     output:
-        "02_analysis/{run}/basecall/nanoqc/nanoQC.html"
+        "02_analysis_results/01_basecalling/{run}/nanoqc/nanoQC.html"
     log:
-        "02_analysis/{run}/basecall/nanoqc/MeBaPiNa_nanoqc.log"
+        "02_analysis_results/01_basecalling/{run}/nanoqc/MeBaPiNa_nanoqc_fastq_basecall.log"
     benchmark:
-        "02_analysis/{run}/basecall/nanoqc/MeBaPiNa_nanoqc.benchmark.tsv"
+        "02_analysis_results/01_basecalling/{run}/nanoqc/MeBaPiNa_nanoqc_fastq_basecall.benchmark.tsv"
     conda:
         "../envs/nanopack.yml"
     params:
         "--minlen 240"
     shell:
         "nanoQC {params} "
-        "--outdir 02_analysis/{wildcards.run}/basecall/nanoqc "
-        "{input} > {log} 2>&1"
+        "--outdir 02_analysis_results/01_basecalling/{wildcards.run}/nanoqc "
+        "{input} >> {log} 2>&1"
 
 ## FASTQC ##
 
-rule fastqc_fastq_basecall:
+rule plot_fastqc_fastq_basecall:
     input:
-        "01_processeddata/{run}/basecall/pass"
+        "01_processed_data/01_basecalling/{run}/pass"
     output:
-        "02_analysis/{run}/basecall/fastqc/stdin_fastqc.html"
+        "02_analysis_results/01_basecalling/{run}/fastqc/stdin_fastqc.html"
     log:
-        "02_analysis/{run}/basecall/fastqc/MeBaPiNa_fastqc.log"
+        "02_analysis_results/01_basecalling/{run}/fastqc/MeBaPiNa_fastqc_fastq_basecall.log"
     benchmark:
-        "02_analysis/{run}/basecall/fastqc/MeBaPiNa_fastqc.benchmark.tsv"
+        "02_analysis_results/01_basecalling/{run}/fastqc/MeBaPiNa_fastqc_fastq_basecall.benchmark.tsv"
     conda:
         "../envs/fastqc.yml"
     threads:
@@ -144,41 +147,23 @@ rule fastqc_fastq_basecall:
     shell:
         "find {input} -type f -name \"*.fastq\" -exec cat {{}} \\; | "
         "fastqc --threads 8 {params} " #!!!#
-        "--outdir 02_analysis/{wildcards.run}/basecall/fastqc "
+        "--outdir 02_analysis_results/01_basecalling/{wildcards.run}/fastqc "
         "stdin > {log} 2>&1"
 
-#####################
 ## TRIM AND FILTER ##
 #####################
 
-## INPUT FUNCTION ##
-
-def input_fastq_filter(wildcards):
-    from os import listdir
-    ## "pass" directory
-    basecall_dir = checkpoints.guppy.get(run=wildcards.run).output[0]
-    ## directory names within "pass" directory
-    barcs = listdir(basecall_dir)
-    ## retain only strings containing "barcode"
-    barcs = [i for i in barcs if "barcode" in i]
-    ## create file names with barcodes
-    barc_input = expand("01_processeddata/{run}/filter/{barc}.fastq",
-        run=wildcards.run,
-        barc=barcs)
-    barc_input.sort()
-    return barc_input
-
 ## NANOPLOT ##
 
-rule nanoplot_fastq_filter:
+rule plot_nanoplot_fastq_filter:
     input:
-        input_fastq_filter
+        expand("01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq", run = RUNS, barc = SAMPLES.keys())
     output:
-        "02_analysis/{run}/filter/nanoplot/NanoStats.txt"
+        "02_analysis_results/02_trimming_filtering/{run}/nanoplot/NanoStats.txt"
     log:
-        "02_analysis/{run}/filter/nanoplot/MeBaPiNa_nanoplot_seqsum.log"
+        "02_analysis_results/02_trimming_filtering/{run}/nanoplot/MeBaPiNa_nanoplot_fastq_filter.log"
     benchmark:
-        "02_analysis/{run}/filter/nanoplot/MeBaPiNa_nanoplot_seqsum.benchmark.tsv"
+        "02_analysis_results/02_trimming_filtering/{run}/nanoplot/MeBaPiNa_nanoplot_fastq_filter.benchmark.tsv"
     conda:
         "../envs/nanopack.yml"
     threads:
@@ -188,24 +173,25 @@ rule nanoplot_fastq_filter:
         "--format svg",
         "--colormap viridis",
         "--color black", ## use NanoPlot --listcolors to get list of valid colors
+        # "--raw", ## store "sequencing_summary"-like data
         "--downsample " + PLOT_SMPL, ## downlsampling
         "--verbose" ## or nothing to log
     shell:
         "NanoPlot --threads {threads} {params} "
-        "--outdir 02_analysis/{wildcards.run}/filter/nanoplot "
+        "--outdir 02_analysis_results/02_trimming_filtering/{wildcards.run}/nanoplot "
         "--fastq_rich {input} > {log} 2>&1"
 
 ## NANOCOMP ##
 
-rule nanocomp_fastq_filter:
+rule plot_nanocomp_fastq_filter:
     input:
-        input_fastq_filter
+        expand("01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq", run = RUNS, barc = SAMPLES.keys())
     output:
-        "02_analysis/{run}/filter/nanocomp/NanoStats.txt"
+        "02_analysis_results/02_trimming_filtering/{run}/nanocomp/NanoStats.txt"
     log:
-        "02_analysis/{run}/filter/nanocomp/MeBaPiNa_nanocomp_seqsum.log"
+        "02_analysis_results/02_trimming_filtering/{run}/nanocomp/MeBaPiNa_nanocomp_fastq_filter.log"
     benchmark:
-        "02_analysis/{run}/filter/nanocomp/MeBaPiNa_nanocomp_seqsum.benchmark.tsv"
+        "02_analysis_results/02_trimming_filtering/{run}/nanocomp/MeBaPiNa_nanocomp_fastq_filter.benchmark.tsv"
     conda:
         "../envs/nanopack.yml"
     threads:
@@ -214,28 +200,28 @@ rule nanocomp_fastq_filter:
         "--maxlength " + PLOT_MAXLEN,
         "--plot violin", ## violin,box,ridge
         "--format svg",
-        "--verbose" ## or nothing to log
+        "--verbose", ## or nothing to log
+        "--names " + " ".join(SAMPLES.values())
     shell:
         "NanoComp --threads {threads} {params} "
-        "--outdir 02_analysis/{wildcards.run}/filter/nanocomp "
-        "--names $(echo {input} | sed 's#01_processeddata/{wildcards.run}/filter/##g' | sed 's#.fastq##g') "
+        "--outdir 02_analysis_results/02_trimming_filtering/{wildcards.run}/nanocomp "
         "--fastq {input} > {log} 2>&1"
 
 ## NANOQC ##
 
-rule fastq_pipe_filter:
+rule plot_fastq_pipe_filter:
     input:
-        input_fastq_filter
+        expand("01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq", run = RUNS, barc = SAMPLES.keys())
     output:
-        temp("02_analysis/{run}/filter/nanoqc/pipe.fastq") ## pipe didn't work neighter did named pipes (no fastq file extension)
+        temp("02_analysis_results/02_trimming_filtering/{run}/nanoqc/pipe.fastq") ## pipe (snakemake built-in or bash) didn't work neighter did named pipes (no fastq file extension)
     log:
-        "02_analysis/{run}/filter/nanoqc/MeBaPiNa_fastq_pipe.log"
+        "02_analysis_results/02_trimming_filtering/{run}/nanoqc/MeBaPiNa_fastq_pipe_filter.log"
     benchmark:
-        "02_analysis/{run}/filter/nanoqc/MeBaPiNa_fastq_pipe.benchmark.tsv"
+        "02_analysis_results/02_trimming_filtering/{run}/nanoqc/MeBaPiNa_fastq_pipe_filter.benchmark.tsv"
     shell:
         "cat {input} |" ## concatenate all fastq files
         "awk -v seed=$RANDOM 'BEGIN{{ prnt=-4; nr=100; srand(seed) }}; " ## "falsify" print flag, set nr for fraction and set random seed. Note: downsampling is a fraction here not a number of reads
-        "NR%4==1{{ " ## for every fourth line -> all headers
+        "NR%4==1{{ " #!# downsampling: for every fourth line -> all headers 
         "rhundr=1+int(rand()*nr); " ## get a random number between 1 and nr
         "if(rhundr==nr)" ## if the number is nr (by chance of 1/nr)
         "{{ prnt=NR }} " ## set prnt flag to current line number to... 
@@ -243,35 +229,35 @@ rule fastq_pipe_filter:
         "NR<prnt+4' " ## ...print this and the next three lines
         ">> {output} 2> {log}"
 
-rule nanoqc_fastq_filter:
+rule plot_nanoqc_fastq_filter:
     input:
-        "02_analysis/{run}/filter/nanoqc/pipe.fastq"
+        "02_analysis_results/02_trimming_filtering/{run}/nanoqc/pipe.fastq"
     output:
-        "02_analysis/{run}/filter/nanoqc/nanoQC.html"
+        "02_analysis_results/02_trimming_filtering/{run}/nanoqc/nanoQC.html"
     log:
-        "02_analysis/{run}/filter/nanoqc/MeBaPiNa_nanoqc.log"
+        "02_analysis_results/02_trimming_filtering/{run}/nanoqc/MeBaPiNa_nanoqc_fastq_filter.log"
     benchmark:
-        "02_analysis/{run}/filter/nanoqc/MeBaPiNa_nanoqc.benchmark.tsv"
+        "02_analysis_results/02_trimming_filtering/{run}/nanoqc/MeBaPiNa_nanoqc_fastq_filter.benchmark.tsv"
     conda:
         "../envs/nanopack.yml"
     params:
         "--minlen 240"
     shell:
         "nanoQC {params} "
-        "--outdir 02_analysis/{wildcards.run}/filter/nanoqc "
+        "--outdir 02_analysis_results/02_trimming_filtering/{wildcards.run}/nanoqc "
         "{input} > {log} 2>&1"
 
 ## FASTQC ##
 
-rule fastqc_fastq_filter:
+rule plot_fastqc_fastq_filter:
     input:
-        input_fastq_filter
+        expand("01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq", run = RUNS, barc = SAMPLES.keys())
     output:
-        "02_analysis/{run}/filter/fastqc/stdin_fastqc.html"
+        "02_analysis_results/02_trimming_filtering/{run}/fastqc/stdin_fastqc.html"
     log:
-        "02_analysis/{run}/filter/fastqc/MeBaPiNa_fastqc.log"
+        "02_analysis_results/02_trimming_filtering/{run}/fastqc/MeBaPiNa_fastqc_fastq_filter.log"
     benchmark:
-        "02_analysis/{run}/filter/fastqc/MeBaPiNa_fastqc.benchmark.tsv"
+        "02_analysis_results/02_trimming_filtering/{run}/fastqc/MeBaPiNa_fastqc_fastq_filter.benchmark.tsv"
     conda:
         "../envs/fastqc.yml"
     threads:
@@ -282,53 +268,23 @@ rule fastqc_fastq_filter:
     shell:
         "cat {input} | "
         "fastqc --threads 8 {params} " #!!!#
-        "--outdir 02_analysis/{wildcards.run}/filter/fastqc "
+        "--outdir 02_analysis_results/02_trimming_filtering/{wildcards.run}/fastqc "
         "stdin > {log} 2>&1"
 
-###########
 ## ALIGN ##
 ###########
 
-# rule nanoplot_bam_align:
-#     input:
-#         bam="01_processeddata/{run}/{align}/{barc}_alignment_sorted.bam",
-#         bai="01_processeddata/{run}/{align}/{barc}_alignment_sorted.bam.bai"
-#     output:
-#         "02_analysis/{run}/{align}/{barc}_nanoplot/NanoStats.txt"
-#     log:
-#         "02_analysis/{run}/{align}/{barc}_nanoplot/MeBaPiNa_nanoplot_bam.log"
-#     benchmark:
-#         "02_analysis/{run}/{align}/{barc}_nanoplot/MeBaPiNa_nanoplot_bam.benchmark.tsv"
-#     conda:
-#         "../envs/nanopack.yml"
-#     threads:
-#         2
-#     params:
-#         "--maxlength " + PLOT_MAXLEN, ## to keep it consistent with other plots
-#         "--drop_outliers",
-#         "--alength", ## Use aligned read lengths rather than sequenced length (bam mode)
-#         "--plots kde hex dot",
-#         "--format svg",
-#         "--colormap plasma",
-#         "--color black", ## use NanoPlot --listcolors to get list of valid colors
-#         "--downsample " + PLOT_SMPL, ## downlsampling
-#         "--verbose" ## or nothing to log
-#     shell:
-#         "NanoPlot --threads {threads} {params} "
-#         "--outdir 02_analysis/{wildcards.run}/{wildcards.align}/{wildcards.barc}_nanoplot "
-#         "--bam {input.bam} > {log} 2>&1"
-
-rule pycoqc_bam_align:
+rule plot_pycoqc_bam_align:
     input:
-        seqsum="01_processeddata/{run}/basecall/sequencing_summary/barcode", ## only folder is specified as output in splitting rule
-        bam="01_processeddata/{run}/{align}/{barc}_alignment_sorted.bam"
+        seqsum="01_processed_data/01_basecalling/{run}/sequencing_summary/split", ## only folder is specified as output in splitting rule
+        bam="01_processed_data/03_alignment/{run}/{barc}/{type}_sorted.bam"
     output:
-        html="02_analysis/{run}/{align}/{barc}_pycoqc/pycoQC_report.html",
-        json="02_analysis/{run}/{align}/{barc}_pycoqc/pycoQC_report.json"
+        html="02_analysis_results/03_alignment/{run}/{barc}/pycoqc/{type}.html",
+        json="02_analysis_results/03_alignment/{run}/{barc}/pycoqc/{type}.json"
     log:
-        "02_analysis/{run}/{align}/{barc}_pycoqc/pycoQC_report.log"
+        "02_analysis_results/03_alignment/{run}/pycoqc/MeBaPiNa_pycoqc_bam_align_{barc}_{type}.log"
     benchmark:
-        "02_analysis/{run}/{align}/{barc}_pycoqc/pycoQC_report.benchmark.tsv"
+        "02_analysis_results/03_alignment/{run}/pycoqc/MeBaPiNa_pycoqc_bam_align_{barc}_{type}.benchmark.tsv"
     conda:
         "../envs/pycoqc.yml"
     params:
@@ -340,24 +296,23 @@ rule pycoqc_bam_align:
         "--verbose"
     shell:
         "pycoQC {params} "
-        "--summary_file {input.seqsum}/sequencing_summary_{wildcards.barc}.txt " ## only folder is specified as output in splitting rule
+        "--summary_file {input.seqsum}/{wildcards.barc}.txt " ## only folder is specified as output in splitting rule
         "--bam_file {input.bam} "
         "--html_outfile {output.html} "
         "--json_outfile {output.json} > {log} 2>&1"
 
-########################
 ## CALIBRATION STRAIN ##
 ########################
 
-rule nanoplot_fastq_calib:
+rule plot_nanoplot_seqsum_calib:
     input:
-        "01_processeddata/{run}/basecall/calibration_strands"
+        "01_processed_data/01_basecalling/{run}/sequencing_summary/split"
     output:
-        "02_analysis/{run}/basecall_calibration_strands/nanoplot/NanoStats.txt"
+        "02_analysis_results/01_basecalling/{run}_calibration_strands/nanoplot/NanoStats.txt"
     log:
-        "02_analysis/{run}/basecall_calibration_strands/nanoplot/MeBaPiNa_nanoplot_seqsum.log"
+        "02_analysis_results/01_basecalling/{run}_calibration_strands/nanoplot/MeBaPiNa_nanoplot_seqsum_calib.log"
     benchmark:
-        "02_analysis/{run}/basecall_calibration_strands/nanoplot/MeBaPiNa_nanoplot_seqsum.benchmark.tsv"
+        "02_analysis_results/01_basecalling/{run}_calibration_strands/nanoplot/MeBaPiNa_nanoplot_seqsum_calib.benchmark.tsv"
     conda:
         "../envs/nanopack.yml"
     threads:
@@ -372,7 +327,7 @@ rule nanoplot_fastq_calib:
         "--verbose" ## or nothing to log
     shell:
         "NanoPlot --threads {threads} {params} "
-        "--outdir 02_analysis/{wildcards.run}/basecall_calibration_strands/nanoplot "
-        "--fastq_rich {input}/* > {log} 2>&1"
+        "--outdir 02_analysis_results/01_basecalling/{wildcards.run}/nanoplot "
+        "--summary {input}/lambda.txt > {log} 2>&1"
 
 ## alignment plots are created by the functions above

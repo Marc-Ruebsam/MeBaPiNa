@@ -2,28 +2,32 @@
 
 ## Analysis configuration
 
-experiment_directory:
-  ## path to directory containing main folders (00_rawdata, 01_processeddata, ...)
-  base: "/mnt/AG-Halama/Microbiome/16S_Metabarcoding"
-  ## run folder structure generated bay MinKNOW
-  run: "16S_nanopore_primer/ETAB_MT/20191205_1807_MN31344_FAK73557_303059af"
+experiments:
+  ## path to directory containing main folders (00_raw_data, 01_processed_data, ...)
+  project: "/mnt/Nanopore/Nanopore_Projects/Internal/NCT/PROMISE/Microbiome/16S_Metabarcoding"
+  ## samples to analyze, matching "Sample name"s in EXPERIMENT_SEQUENCING.xlsx #!# currently only one single run analysis is supported
+  samples: 
+    ["NTC", 
+    "Extraction-control", 
+    "ZymoDNA", 
+    "ZymoCell", 
+    "OP61", 
+    "PROM-01-0001-MS-T1T2", 
+    "PROM-01-0002-MS-T1T2", 
+    "PROM-01-0001-MS-T2ERW", 
+    "PROM-01-0003-MS-T1T2", 
+    "PROM-01-0004-MS-T1T2", 
+    "PROM-01-0005-MS-T1T2", 
+    "PROM-01-0002-MS-T2ERW"]
 
-machine:
+workstation:
   gpu: True
   cpu: 12
 
-guppy:
-  ## run set-up
-  flowcell: "FLO-MIN106"
-  seq_kit: "SQK-RAB204"
-  bac_kit: "SQK-RAB204" ## deactivate analysis of barcoodes by leaving it empty: "" Note: this doesn't deactivate demultiplexing, only the analysis of the individual barcodes
-  lam_DCS: False ## deactivate detection of Lambda calibration strands by setting it: False
-  ## basecalling
+filtering:
   q_min: "7" ## deactivate quality filtering by setting it to "0"
   len_min: "1000"
   len_max: "2800"
 
 align:
-  reference: "silva_arb/SILVA_132_SSURef_Nr99_tax_silva" ## don't add fasta ending
-
-## TODO: use shema and add from snakemake.utils import validate to Snakefile
+  reference: "SILVA_138_SSURef_Nr99_tax_silva" # "kraken2/silva_132_species"
