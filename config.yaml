@@ -30,4 +30,4 @@ filtering:
   len_max: "2800"
 
 align:
-  reference: "SILVA_138_SSURef_Nr99_tax_silva" # "kraken2/silva_132_species"
+  reference: "silva" # "kraken2/silva_132_species"

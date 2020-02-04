@@ -107,8 +107,9 @@ rule all:
         ## ALIGNMENT ##
 
         ## general QC: per barcode, intentional downsampling
-        "02_analysis_results/03_alignment/{run}/{barc}/pycoqc/filtered.html",
-        # "02_analysis_results/03_kmer_mapping/{run}/bracken/barcode03/barcode03_S.bracken",
+        # "02_analysis_results/03_alignment/{run}/{barc}/pycoqc/filtered.html",
+        "02_analysis_results/03_kmer_mapping/{run}/bracken/barcode03/Species.bracken",
+
 
         ## CALIBRATION STRAIN ##
 
