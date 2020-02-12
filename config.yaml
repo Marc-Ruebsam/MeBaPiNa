@@ -29,5 +29,6 @@ filtering:
   len_min: "1000"
   len_max: "2800"
 
-align:
-  reference: "silva" # "kraken2/silva_132_species"
+reference:
+  source: "silva"
+  type: "species" ## one of "default", "species", "genus"; species and genus only in conjuction with source: "silva"

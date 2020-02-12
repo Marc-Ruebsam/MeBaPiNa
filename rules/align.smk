@@ -24,7 +24,7 @@ rule splitting_filtered: #!# only required because of low memory avaialility
 rule aligning_filtered:
     input:
         barc_dir="01_processed_data/02_trimming_filtering/{run}/{barc}/split", 
-        target=expand("METADATA/Reference_Sequences/{reference}/reference.mmi", reference=config["align"]["reference"])
+        target=expand("METADATA/Reference_Sequences/{reference}/reference.mmi", reference = config["reference"]["source"])
     output:
         temp("01_processed_data/03_alignment/{run}/{barc}/filtered.sam")
     log:
@@ -51,14 +51,14 @@ rule aligning_filtered:
 
 rule converting_sam2bam:
     input:
-        "01_processed_data/03_alignment/{run}/{barc}/{type}.sam"
+        "01_processed_data/03_alignment/{run}/{barc}/{altype}.sam"
     output:
-        bam="01_processed_data/03_alignment/{run}/{barc}/{type}_sorted.bam",
-        bai="01_processed_data/03_alignment/{run}/{barc}/{type}_sorted.bam.bai"
+        bam="01_processed_data/03_alignment/{run}/{barc}/{altype}_sorted.bam",
+        bai="01_processed_data/03_alignment/{run}/{barc}/{altype}_sorted.bam.bai"
     log:
-        "01_processed_data/03_alignment/{run}/{barc}/MeBaPiNa_converting_{type}.log"
+        "01_processed_data/03_alignment/{run}/{barc}/MeBaPiNa_converting_{altype}.log"
     benchmark:
-        "01_processed_data/03_alignment/{run}/{barc}/MeBaPiNa_converting_{type}.benchmark.tsv"
+        "01_processed_data/03_alignment/{run}/{barc}/MeBaPiNa_converting_{altype}.benchmark.tsv"
     conda:
         "../envs/samtools.yml"
     threads:
