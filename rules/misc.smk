@@ -60,3 +60,134 @@ rule downsampling_seqsum: #!#
         "{{ rhundr=1+int(rand()*nr) }}; " ## get a random number between 1 and nr
         "rhundr==nr') " ## if the number is nr (by chance of 1/nr) print the line
         ">> {output} 2> {log}"
+
+################
+## REFERENCES ##
+################
+
+## SILVA ##
+###########
+
+rule download_reffiles:
+    output:
+        fasta="METADATA/Reference_Sequences/silva/reference.fasta",
+        ncbimap="METADATA/Reference_Sequences/silva/ncbimap.txt",
+        slvmap="METADATA/Reference_Sequences/silva/slvmap.txt",
+        taxlist="METADATA/Reference_Sequences/silva/taxlist.txt"
+        # fasta2="{reference}/kraken2/species_tmp/library/silva.fna",
+        # fasta3="{reference}/kraken2/genus_tmp/library/silva.fna"
+    log:
+        "METADATA/Reference_Sequences/silva/MeBaPiNa_reffiles.log"
+    benchmark:
+        "METADATA/Reference_Sequences/silva/MeBaPiNa_reffiles.benchmark.tsv"
+    shell:
+        "bash Pineline/MeBaPiNa/scripts/download_silva.sh METADATA/Reference_Sequences/silva >> {log} 2>&1"
+
+rule krona_reffile:
+    output:
+        directory("METADATA/Reference_Sequences/ncbi/krona")
+    log:
+        "METADATA/Reference_Sequences/ncbi/MeBaPiNa_reffiles.log"
+    benchmark:
+        "METADATA/Reference_Sequences/ncbi/MeBaPiNa_reffiles.benchmark.tsv"
+    conda:
+        "../envs/krona.yml"
+    shell:
+        "ktUpdateTaxonomy.sh {output} >> {log} 2>&1"
+
+rule construct_reffiles:
+    input:
+        ncbimap="METADATA/Reference_Sequences/silva/ncbimap.txt",
+        slvmap="METADATA/Reference_Sequences/silva/slvmap.txt",
+        taxlist="METADATA/Reference_Sequences/silva/taxlist.txt",
+        ncbikrona="METADATA/Reference_Sequences/ncbi/krona"
+    output:
+        krak_S=directory("METADATA/Reference_Sequences/silva/kraken2/species_tmp"),
+        krak_G=directory("METADATA/Reference_Sequences/silva/kraken2/genus_tmp"),
+        krona_S=directory("METADATA/Reference_Sequences/silva/krona/species"),
+        krona_G=directory("METADATA/Reference_Sequences/silva/krona/genus")
+    log:
+        "METADATA/Reference_Sequences/silva/MeBaPiNa_reffiles.log"
+    benchmark:
+        "METADATA/Reference_Sequences/silva/MeBaPiNa_reffiles.benchmark.tsv"
+    script:
+        "../scripts/construct_reffiles.py"
+
+## KRAKEN2 DATABASE ##
+######################
+
+rule building_database_fromreffiles:
+    input:
+        "METADATA/Reference_Sequences/{reference}/kraken2/{reftype}_tmp"
+    output:
+        directory("METADATA/Reference_Sequences/{reference}/kraken2/{reftype}")
+    log:
+        "METADATA/Reference_Sequences/{reference}/kraken2/MeBaPiNa_{reftype}.log"
+    benchmark:
+        "METADATA/Reference_Sequences/{reference}/kraken2/MeBaPiNa_{reftype}.benchmark.tsv"
+    conda:
+        "../envs/kraken2.yml"
+    threads:
+        8
+    params:
+        "35" ## k-mer length
+    shell:
+        "mv {input} {output}; "
+        # "kraken2-build --threads {threads} --download-taxonomy --skip-maps --db {output} > {log} 2>&1; "
+        # "kraken2-build --threads {threads} --download-library bacteria --no-masking --db {output} >> {log} 2>&1; "
+        # # "kraken2-build --threads {threads} --download-library archaea --no-masking --db {output} >> {log} 2>&1; "
+        "kraken2-build --threads {threads} --kmer-len {params} --build "
+        "--db {output} "
+        ">> {log} 2>&1; "
+        # "kraken2-build --clean --db {output} >> {log} 2>&1"
+        # "kraken2-build --threads {threads} " ## unfortunately --kmer-len {params} is ignored by when --special is used
+        # "--special {wildcards.reference} --db {output} > {log}; " ## reference can be one of "greengenes", "silva", "rdp"
+        "bracken-build -t {threads} -k {params} -l 1451 " ## 1451 ismedian read length after filtering in 20191007_1559_MN31344_FAK76605_2bf006ff
+        "-d {output} "
+        ">> {log} 2>&1; "
+        "kraken2-build --clean --db {output} >> {log} 2>&1"
+
+rule building_database_alone:
+    output:
+        directory("METADATA/Reference_Sequences/{reference}/kraken2/{reftype}") ## reftype has no incluence on this rule, but is used for silva species database (rule building_database_fromreffiles)
+    log:
+        "METADATA/Reference_Sequences/{reference}/kraken2/MeBaPiNa_{reftype}.log"
+    benchmark:
+        "METADATA/Reference_Sequences/{reference}/kraken2/MeBaPiNa_{reftype}.benchmark.tsv"
+    conda:
+        "../envs/kraken2.yml"
+    threads:
+        8
+    params:
+        "35" ## k-mer length
+    shell:
+        "kraken2-build --threads {threads} " ## unfortunately --kmer-len {params} is ignored by when --special is used
+        "--special {wildcards.reference} --db {output} " ## reference can be one of "greengenes", "silva", "rdp"
+        "> {log}; "
+        "bracken-build -t {threads} -k {params} -l 1451 -d {output} " ## 1451 ismedian read length after filtering in 20191007_1559_MN31344_FAK76605_2bf006ff
+        ">> {log}; "
+        "rm -rf {output}/data "
+        "kraken2-build --clean --db {output} >> {log} 2>&1"
+
+ruleorder: building_database_fromreffiles > building_database_alone
+
+## MINIMA2 INDEX ##
+###################
+
+rule indexing_reference:
+    input:
+        "METADATA/Reference_Sequences/{reference}/reference.fasta"
+    output:
+        "METADATA/Reference_Sequences/{reference}/reference.mmi"
+    log:
+        "METADATA/Reference_Sequences/{reference}/MeBaPiNa_indexing.log"
+    benchmark:
+        "METADATA/Reference_Sequences/{reference}/MeBaPiNa_indexing.benchmark.tsv"
+    params:
+        "-x map-ont" ## naopore specific
+    conda:
+        "../envs/minimap2.yml"
+    threads:
+        2
+    shell:
+        "minimap2 -t {threads} {params} -d {output} {input} > {log} 2>&1"

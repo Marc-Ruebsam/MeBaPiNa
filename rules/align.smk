@@ -2,27 +2,6 @@
 ## ALIGNMENT ##
 ###############
 
-## INDEX REFERENCE ##
-#####################
-
-rule indexing_reference:
-    input:
-        "METADATA/Reference_Sequences/{reference}/reference.fasta"
-    output:
-        "METADATA/Reference_Sequences/{reference}/reference.mmi"
-    log:
-        "METADATA/Reference_Sequences/{reference}/MeBaPiNa_indexing.log"
-    benchmark:
-        "METADATA/Reference_Sequences/{reference}/MeBaPiNa_indexing.benchmark.tsv"
-    params:
-        "-x map-ont" ## naopore specific
-    conda:
-        "../envs/minimap2.yml"
-    threads:
-        2
-    shell:
-        "minimap2 -t {threads} {params} -d {output} {input} > {log} 2>&1"
-
 ## ALIGNMENT ##
 ###############
 
