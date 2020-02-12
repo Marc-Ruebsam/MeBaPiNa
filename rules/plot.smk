@@ -277,19 +277,19 @@ rule plot_fastqc_fastq_filter:
 rule plot_pycoqc_bam_align:
     input:
         seqsum="01_processed_data/01_basecalling/{run}/sequencing_summary/split", ## only folder is specified as output in splitting rule
-        bam="01_processed_data/03_alignment/{run}/{barc}/{type}_sorted.bam"
+        bam="01_processed_data/03_alignment/{run}/{barc}/{altype}_sorted.bam"
     output:
-        html="02_analysis_results/03_alignment/{run}/{barc}/pycoqc/{type}.html",
-        json="02_analysis_results/03_alignment/{run}/{barc}/pycoqc/{type}.json"
+        html="02_analysis_results/03_alignment/{run}/{barc}/pycoqc/{altype}.html",
+        json="02_analysis_results/03_alignment/{run}/{barc}/pycoqc/{altype}.json"
     log:
-        "02_analysis_results/03_alignment/{run}/pycoqc/MeBaPiNa_pycoqc_bam_align_{barc}_{type}.log"
+        "02_analysis_results/03_alignment/{run}/pycoqc/MeBaPiNa_pycoqc_bam_align_{barc}_{altype}.log"
     benchmark:
-        "02_analysis_results/03_alignment/{run}/pycoqc/MeBaPiNa_pycoqc_bam_align_{barc}_{type}.benchmark.tsv"
+        "02_analysis_results/03_alignment/{run}/pycoqc/MeBaPiNa_pycoqc_bam_align_{barc}_{altype}.benchmark.tsv"
     conda:
         "../envs/pycoqc.yml"
     params:
-        ("--config MeBaPiNa/scripts/pycoQC_config.json " if  ## use custom config (without coverage plot) for barcodes...
-        not config["align"]["reference"] == "ZymoBIOMICS.STD.refseq.v2/ssrRNAs/_all" ## ...but not for the Zymo reference
+        ("--config Pineline/MeBaPiNa/scripts/pycoQC_config.json " if  ## use custom config (without coverage plot) for barcodes...
+        not config["reference"]["source"] == "zymobiomics" ## ...but not for the Zymo reference
         and not "{wildcards.barc}" == "lambda" else ""), ## or calibration strains
         "--min_pass_qual 0",
         "--sample " + PLOT_SMPL, ## downsampling
@@ -300,6 +300,28 @@ rule plot_pycoqc_bam_align:
         "--bam_file {input.bam} "
         "--html_outfile {output.html} "
         "--json_outfile {output.json} > {log} 2>&1"
+
+## K-MER MAPPING ##
+###################
+
+rule plot_krona_kraken2:
+    input:
+        output="01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kraken2",
+        reference="METADATA/Reference_Sequences/{reference}/krona/{reftype}"
+    output:
+        "02_analysis_results/03_kmer_mapping/{run}/{barc}/krona/{reference}_{reftype}/filtered.html"
+    log:
+        "02_analysis_results/03_kmer_mapping/{run}/{barc}/krona/{reference}_{reftype}/MeBaPiNa_krona_kraken2.log"
+    benchmark:
+                "02_analysis_results/03_kmer_mapping/{run}/{barc}/krona/{reference}_{reftype}/MeBaPiNa_krona_kraken2.benchmark.tsv"
+    conda:
+        "../envs/krona.yml"
+    params:
+        "-i", ## Include a wedge for queries with no hits.
+        # "-q 2", ## Column of input files to use as query ID. Required if magnitude files are specified. [Default: '1']
+        "-t 3" ## Column of input files to use as taxonomy ID. [Default: '2']
+    shell:
+        "ktImportTaxonomy {params} -tax {input.reference} {input.output} -o {output} > {log} 2>&1"
 
 ## CALIBRATION STRAIN ##
 ########################

@@ -1,0 +1,8 @@
+channels:
+  - bioconda
+  - defaults
+dependencies:
+  - _libgcc_mutex=0.1=main
+  - krona=2.7.1=pl526_1
+  - libgcc-ng=9.1.0=hdf63c60_0
+  - perl=5.26.2=h14c3975_0
