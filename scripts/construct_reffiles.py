@@ -25,8 +25,8 @@ output_dict = {
     'krakseq2tax_G' : snakemake.output['krak_G'] + "/seqid2taxid.map",
     'krona_S' : snakemake.output['krona_S'] + "/taxonomy.tab",
     'krona_G' : snakemake.output['krona_G'] + "/taxonomy.tab",
-    'taxlist_S' : snakemake.output['taxlist_S'],
-    'taxlist_G' : snakemake.output['taxlist_G']
+    'taxlist_S' : snakemake.output['taxlist_S'] + "/taxlist.txt",
+    'taxlist_G' : snakemake.output['taxlist_G'] + "/taxlist.txt"
 }
 
 # input_dict = {
@@ -192,9 +192,9 @@ df_slv = df_slv.drop_duplicates(subset=['taxID_slv','depth_slv','targetID_slv','
 ## write taxlist-like file (without last columns)
 pd.concat([
     ## include root
-    pd.DataFrame([[1,";","root"]],columns=['taxID_slv','pathname_slv','rank_slv']),
+    pd.DataFrame([[";",1,"root"]],columns=['pathname_slv','taxID_slv','rank_slv']),
     ## include higher ranks
-    df_taxlist.loc[:,['taxID_slv','pathname_slv','rank_slv']]
+    df_taxlist.loc[:,['pathname_slv','taxID_slv','rank_slv']]
 ]).to_csv(
     ## save
     output_dict['taxlist_G'], mode='w', sep='\t', header=False, index=False, quoting=0, float_format="%g"
@@ -202,11 +202,11 @@ pd.concat([
 ## write taxlist-like file (without last columns) INCLUDING SPECIES
 pd.concat([
     ## include root
-    pd.DataFrame([[1,";","root"]],columns=['taxID_slv','pathname_slv','rank_slv']),
+    pd.DataFrame([[";",1,"root"]],columns=['pathname_slv','taxID_slv','rank_slv']),
     ## include higher ranks
-    df_taxlist.loc[:,['taxID_slv','pathname_slv','rank_slv']],
+    df_taxlist.loc[:,['pathname_slv','taxID_slv','rank_slv']],
     ## include species
-    df_slv.loc[:,['taxID_slv','pathname_slv','rank_slv']]
+    df_slv.loc[:,['pathname_slv','taxID_slv','rank_slv']]
 ]).to_csv(
     ## save
     output_dict['taxlist_S'], mode='w', sep='\t', header=False, index=False, quoting=0, float_format="%g"
