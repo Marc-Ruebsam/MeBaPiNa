@@ -162,10 +162,17 @@ for dupliID in dupli_taxIDs:
 ## but the new taxIDs are to long =(
 single_taxIDs = df_slv['taxID_new'].unique()
 ## creata a range of numbers as long as all higer taxa + new species taxIDs (this should be the maximum number of taxIDs needed, if all would be continuous)
+<<<<<<< HEAD
 potential_taxIDs = set(range( 0, len(df_taxlist.index) +  len(single_taxIDs) + 2 )) ## +2 to not use 0 and 1 as taxID
 ## exclude all taxIDs used by higer taxa
 potential_taxIDs = potential_taxIDs - set(df_taxlist['taxID_slv'])
 potential_taxIDs = potential_taxIDs - set([0,1]) ## exclude 0 for root
+=======
+potential_taxIDs = set(range( 0, len(df_taxlist.index) +  len(single_taxIDs) + 1 )) ## + 1 for root
+## exclude all taxIDs used by higer taxa
+potential_taxIDs = potential_taxIDs - set(df_taxlist['taxID_slv'])
+potential_taxIDs = potential_taxIDs - set([0]) ## exclude 0 for root
+>>>>>>> 4918fcb4d5cde0e657e246fcd5dbe64a0e93906f
 ## get the exact number of required new taxIDs (if some of the higer taxIDs are above the length if the bumber range, they cannot be excluded by the step above)
 potential_taxIDs = list(potential_taxIDs)[0:len(single_taxIDs)]
 ## associate new taxIDs with accIDs
