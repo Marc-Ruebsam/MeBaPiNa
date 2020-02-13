@@ -105,7 +105,9 @@ rule construct_reffiles:
         krak_S=directory("METADATA/Reference_Sequences/silva/kraken2/species_tmp"),
         krak_G=directory("METADATA/Reference_Sequences/silva/kraken2/genus_tmp"),
         krona_S=directory("METADATA/Reference_Sequences/silva/krona/species"),
-        krona_G=directory("METADATA/Reference_Sequences/silva/krona/genus")
+        krona_G=directory("METADATA/Reference_Sequences/silva/krona/genus"),
+        taxlist_S="METADATA/Reference_Sequences/silva/krona/species/taxonomy.tab",
+        taxlist_G="METADATA/Reference_Sequences/silva/krona/genus/taxonomy.tab"
     log:
         "METADATA/Reference_Sequences/silva/MeBaPiNa_reffiles.log"
     benchmark:

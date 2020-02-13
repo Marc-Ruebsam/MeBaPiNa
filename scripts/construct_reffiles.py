@@ -24,7 +24,9 @@ output_dict = {
     'kraknodes_G' : snakemake.output['krak_G'] + "/taxonomy/nodes.dmp",
     'krakseq2tax_G' : snakemake.output['krak_G'] + "/seqid2taxid.map",
     'krona_S' : snakemake.output['krona_S'] + "/taxonomy.tab",
-    'krona_G' : snakemake.output['krona_G'] + "/taxonomy.tab"
+    'krona_G' : snakemake.output['krona_G'] + "/taxonomy.tab",
+    'taxlist_S' : snakemake.output['taxlist_S'],
+    'taxlist_G' : snakemake.output['taxlist_G']
 }
 
 # input_dict = {
@@ -41,7 +43,9 @@ output_dict = {
 #     'kraknodes_G' : "METADATA/Reference_Sequences/silva/kraken2/genus_tmp/taxonomy/nodes.dmp",
 #     'krakseq2tax_G' : "METADATA/Reference_Sequences/silva/kraken2/genus_tmp/seqid2taxid.map",
 #     'krona_S' : "METADATA/Reference_Sequences/silva/krona/species/taxonomy.tab",
-#     'krona_G' : "METADATA/Reference_Sequences/silva/krona/genus/taxonomy.tab"
+#     'krona_G' : "METADATA/Reference_Sequences/silva/krona/genus/taxonomy.tab",
+#     'taxlist_S' : "METADATA/Reference_Sequences/silva/krona/species/taxonomy.tab",
+#     'taxlist_G' : "METADATA/Reference_Sequences/silva/krona/genus/taxonomy.tab"
 # }
 
 
@@ -129,6 +133,9 @@ df_slv.loc[df_slv['name']=="bacterium",'rank_new'] = "no rank"
 df_slv_norank = df_slv.loc[ df_slv['rank_new']=="no rank",:]
 df_slv = df_slv.loc[ df_slv['rank_new']!="no rank",:]
 
+## reconstruct full path with name with tailing ";" at the end
+df_slv['pathname_slv'] = df_slv['path_slv'].map(str) + df_slv['name'].map(str) + ";"
+
 ## overwrite taxonomy rank for used taxa
 df_slv['rank_slv'] = df_slv['rank_new']
 
@@ -156,7 +163,7 @@ for dupliID in dupli_taxIDs:
 df_slv['taxID_slv'] = df_slv['taxID_new']
 
 
-## SEQID 2 TAXID ##
+## SILVA LIKE ##
 
 ## write sequence taxon association
 pd.concat([
@@ -179,11 +186,31 @@ pd.concat([
     output_dict['krakseq2tax_S'], mode='w', sep='\t', header=False, index=False, quoting=0, float_format="%g"
 )
 
+## remove duplicates: many taxa have more than one accID
+df_slv = df_slv.drop_duplicates(subset=['taxID_slv','depth_slv','targetID_slv','rank_slv','name'])
 
-## REMOVE ACCID DUPLICATES ##
-
-## many taxa have more than one accID
-df_slv = df_slv.loc[:,['taxID_slv','depth_slv','targetID_slv','rank_slv','name']].drop_duplicates()
+## write taxlist-like file (without last columns)
+pd.concat([
+    ## include root
+    pd.DataFrame([[1,";","root"]],columns=['taxID_slv','pathname_slv','rank_slv']),
+    ## include higher ranks
+    df_taxlist.loc[:,['taxID_slv','pathname_slv','rank_slv']]
+]).to_csv(
+    ## save
+    output_dict['taxlist_G'], mode='w', sep='\t', header=False, index=False, quoting=0, float_format="%g"
+)
+## write taxlist-like file (without last columns) INCLUDING SPECIES
+pd.concat([
+    ## include root
+    pd.DataFrame([[1,";","root"]],columns=['taxID_slv','pathname_slv','rank_slv']),
+    ## include higher ranks
+    df_taxlist.loc[:,['taxID_slv','pathname_slv','rank_slv']],
+    ## include species
+    df_slv.loc[:,['taxID_slv','pathname_slv','rank_slv']]
+]).to_csv(
+    ## save
+    output_dict['taxlist_S'], mode='w', sep='\t', header=False, index=False, quoting=0, float_format="%g"
+)
 
 
 ## KRONA ##
@@ -198,7 +225,7 @@ pd.concat([
     ## save
     output_dict['krona_G'], mode='w', sep='\t', header=False, index=False, quoting=0, float_format="%g"
 )
-## krona silva reference taxonomy INCLUDING SPECIES
+## write krona silva reference taxonomy INCLUDING SPECIES
 pd.concat([
     ## include root
     pd.DataFrame([[1,0,1,"no rank","root"]],columns=['taxID_slv','depth_slv','targetID_slv','rank_slv','name']),
