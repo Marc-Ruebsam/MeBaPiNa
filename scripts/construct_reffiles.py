@@ -145,9 +145,10 @@ df_slv['depth_slv'] = df_slv['depth_slv'] + 1
 ## targetID is taxID for used taxa
 df_slv['targetID_slv'] = df_slv['taxID_slv']
 
-## create custom taxID from silva and ncbi ID for used taxa
-df_slv['taxID_new'] = (df_slv['taxID_ncbi'].map(str) + "0" + df_slv['taxID_slv'].map(str)).str.replace('-', '') ## adding additional "0" to wnsure unique ID, also some taxIDs in the ena file are negative
+## to figure out which accID needs a new taxID, create custom taxID from silva and ncbi ID for used taxa
+df_slv['taxID_new'] = (df_slv['taxID_ncbi'].map(str) + "000" + df_slv['taxID_slv'].map(str)).str.replace("-", "") ## adding some additional "0"s to ensure unique ID, also some taxIDs in the ncbi file are negative, hence remove all "-"
 ## some taxIDs are used more than once ... -.-
+## find duplicated taxIDs with different depth, target, rank or name
 dupli_taxIDs = df_slv.loc[:,['taxID_new', 'depth_slv', 'targetID_slv', 'rank_slv', 'name']].drop_duplicates()['taxID_new'].value_counts()
 dupli_taxIDs = dupli_taxIDs[dupli_taxIDs > 1].index.tolist()
 ## loop over duplicate taxIDs
@@ -158,9 +159,21 @@ for dupliID in dupli_taxIDs:
     unique_taxIDs = [dupliID + str(s) for s in list(range(0,len(dupli_rows)))]
     ## replace duplicate taxID_new with unique taxID_new
     df_slv.loc[dupli_rows,'taxID_new'] = unique_taxIDs
+## but the new taxIDs are to long =(
+single_taxIDs = df_slv['taxID_new'].unique()
+## creata a range of numbers as long as all higer taxa + new species taxIDs (this should be the maximum number of taxIDs needed, if all would be continuous)
+potential_taxIDs = set(range( 0, len(df_taxlist.index) +  len(single_taxIDs) + 1 )) ## + 1 for root
+## exclude all taxIDs used by higer taxa
+potential_taxIDs = potential_taxIDs - set(df_taxlist['taxID_slv'])
+potential_taxIDs = potential_taxIDs - set([0]) ## exclude 0 for root
+## get the exact number of required new taxIDs (if some of the higer taxIDs are above the length if the bumber range, they cannot be excluded by the step above)
+potential_taxIDs = list(potential_taxIDs)[0:len(single_taxIDs)]
+## associate new taxIDs with accIDs
+df_pottax = pd.DataFrame({'taxIDs_pot' : potential_taxIDs,'taxID_new' : single_taxIDs})
+df_slv = pd.merge(df_slv, df_pottax, how='left', on='taxID_new')
 
 ## taxID newly created taxID for used taxa
-df_slv['taxID_slv'] = df_slv['taxID_new']
+df_slv['taxID_slv'] = df_slv['taxID_pot']
 
 
 ## SILVA LIKE ##
