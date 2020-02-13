@@ -44,8 +44,8 @@ output_dict = {
 #     'krakseq2tax_G' : "METADATA/Reference_Sequences/silva/kraken2/genus_tmp/seqid2taxid.map",
 #     'krona_S' : "METADATA/Reference_Sequences/silva/krona/species/taxonomy.tab",
 #     'krona_G' : "METADATA/Reference_Sequences/silva/krona/genus/taxonomy.tab",
-#     'taxlist_S' : "METADATA/Reference_Sequences/silva/krona/species/taxonomy.tab",
-#     'taxlist_G' : "METADATA/Reference_Sequences/silva/krona/genus/taxonomy.tab"
+#     'taxlist_S' : "METADATA/Reference_Sequences/silva/krona/species/taxlist.txt",
+#     'taxlist_G' : "METADATA/Reference_Sequences/silva/krona/genus/taxlist.txt"
 # }
 
 
