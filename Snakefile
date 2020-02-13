@@ -29,7 +29,7 @@ workdir: config["experiments"]["project"]
 wildcard_constraints:
     barc="[a-zA-Z0-9_-]+", 
     run="\w+", ## is equalt to [a-zA-Z0-9_]+
-    reftype="[a-zA-Z0-9]+"
+    reftype="[a-zA-Z0-9]+",
     reference="[a-zA-Z0-9_\.]+"
 
 ## METADATA AND THRESHOLDS ##

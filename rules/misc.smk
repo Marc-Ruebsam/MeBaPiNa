@@ -81,7 +81,7 @@ rule download_reffiles:
     benchmark:
         "METADATA/Reference_Sequences/silva/MeBaPiNa_reffiles.benchmark.tsv"
     shell:
-        "bash Pineline/MeBaPiNa/scripts/download_silva.sh METADATA/Reference_Sequences/silva >> {log} 2>&1"
+        "bash Pineline/MeBaPiNa/scripts/download_silva.sh METADATA/Reference_Sequences/silva > {log} 2>&1"
 
 rule krona_reffile:
     output:
@@ -93,7 +93,7 @@ rule krona_reffile:
     conda:
         "../envs/krona.yml"
     shell:
-        "ktUpdateTaxonomy.sh {output} >> {log} 2>&1"
+        "ktUpdateTaxonomy.sh {output} > {log} 2>&1"
 
 rule construct_reffiles:
     input:
@@ -140,7 +140,7 @@ rule building_database_fromreffiles:
         # # "kraken2-build --threads {threads} --download-library archaea --no-masking --db {output} >> {log} 2>&1; "
         "kraken2-build --threads {threads} --kmer-len {params} --build "
         "--db {output} "
-        ">> {log} 2>&1; "
+        "> {log} 2>&1; "
         # "kraken2-build --clean --db {output} >> {log} 2>&1"
         # "kraken2-build --threads {threads} " ## unfortunately --kmer-len {params} is ignored by when --special is used
         # "--special {wildcards.reference} --db {output} > {log}; " ## reference can be one of "greengenes", "silva", "rdp"
@@ -165,9 +165,9 @@ rule building_database_alone:
     shell:
         "kraken2-build --threads {threads} " ## unfortunately --kmer-len {params} is ignored by when --special is used
         "--special {wildcards.reference} --db {output} " ## reference can be one of "greengenes", "silva", "rdp"
-        "> {log}; "
+        "> {log} 2>&1; "
         "bracken-build -t {threads} -k {params} -l 1451 -d {output} " ## 1451 ismedian read length after filtering in 20191007_1559_MN31344_FAK76605_2bf006ff
-        ">> {log}; "
+        ">> {log} 2>&1; "
         "rm -rf {output}/data "
         "kraken2-build --clean --db {output} >> {log} 2>&1"
 
