@@ -72,16 +72,15 @@ checkpoint basecalling_raw:
         "--progress_stats_frequency 1800" ## every 30 minutes
     shell:
         "guppy_basecaller --num_callers {threads} {params} "
-        "--input_path {input} > {log} 2>&1"
-
         "--save_path {wildcards.tmp}01_processed_data/01_basecalling/{wildcards.run} "
+        "--input_path {input} > {log} 2>&1; "
         "mkdir -p {wildcards.tmp}01_processed_data/01_basecalling/{wildcards.run}/guppy_basecaller_logs; "
         "mv {wildcards.tmp}01_processed_data/01_basecalling/{wildcards.run}/guppy_basecaller_log-* {wildcards.tmp}01_processed_data/01_basecalling/{wildcards.run}/guppy_basecaller_logs/"
 
 ## TRIMM DEMULTIPLEX ##
 #######################
 
-def input_per_barcode(wildcards):
+def basecalls_per_barcode(wildcards):
     ## get "pass" directory and trigger checkpoint (this way we can specify output inside the checkpoints output directory "pass" without direct rule association)
     pass_dir = checkpoints.basecalling_raw.get(run=wildcards.run,tmp=wildcards.tmp).output[0]
     ## get barcode for sample
@@ -92,7 +91,7 @@ def input_per_barcode(wildcards):
 
 rule trimming_basecalled:
     input:
-        input_per_barcode
+        basecalls_per_barcode
     output:
         "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/trimmed.fastq"
     log:

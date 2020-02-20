@@ -93,31 +93,31 @@ rule all:
         "{tmp}02_analysis_results/01_basecalling/{run}/nanocomp/NanoStats.txt"),
         
         ## TRIM AND FILTER ##
-
+        
         ## general QC: trimed and filtered barcoded reads, intentional downsampling
         "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoplot/NanoStats.txt",
         ## per base QC: trimed and filtered barcoded reads, forced downsampling
         "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoqc/nanoQC.html",
         ## read QC: trimed and filtered barcoded reads
-
         "{tmp}02_analysis_results/02_trimming_filtering/{run}/fastqc/stdin_fastqc.html",
+        
         ## barcode QC: trimed and filtered barcoded reads
         ("" if not BAC_KIT else ## "" if bac_kit is ""
-
         "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanocomp/NanoStats.txt"),
+        
         ## ALIGNMENT ##
-
+        
         ## general QC: per barcode, intentional downsampling
-
-
         # "{tmp}02_analysis_results/03_alignment/{run}/{barc}/pycoqc/filtered.html",
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/krona/silva_species/Species.html",
+        
+        
         ## CALIBRATION STRAIN ##
-
+        
         ## calibration QC: only calinration strands
         ("" if not LAM_DCS else ## "" if lam_DCS is False
-
         "{tmp}02_analysis_results/01_basecalling/{run}_calibration_strands/nanoplot/NanoStats.txt"),
+        
         ## calibration QC: only calinration strands
         ("" if not LAM_DCS else ## "" if lam_DCS is False
         "{tmp}02_analysis_results/03_alignment/{run}_calibration_strands/lambda_nanoplot/NanoStats.txt"),

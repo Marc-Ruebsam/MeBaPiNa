@@ -67,15 +67,6 @@ rule converting_sam2bam:
         "samtools sort --threads {threads} -o {output.bam} {input} > {log} 2>&1; "
         "samtools index -@ {threads} {output.bam} >> {log} 2>&1"
 
-# rule
-# 
-# 
-# conda create -c defaults -c bioconda -c conda-forge -n rdp rdptools=2.0.2 libopenblas r-ggplot2 r-reshape2 bioconductor-phyloseq=1.30.0
-# 
-# 
-# R
-# # BiocManager::install(version = "3.10")
-
 ## CALIBRATION STRAND ##
 ########################
 

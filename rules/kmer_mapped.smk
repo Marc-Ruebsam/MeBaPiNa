@@ -16,9 +16,9 @@ rule kmer_mapping_filtered:
     threads:
         8
     params:
-        "--confidence 0.0 " ## how many of the k-mers have to map to a reference to be assigned (higher taxonomies accumulate the counts of lower ones)
+        "--confidence 0.0" ## how many of the k-mers have to map to a reference to be assigned (higher taxonomies accumulate the counts of lower ones)
     shell:
-        "kraken2 --threads {threads} {params}"
+        "kraken2 --threads {threads} {params} "
         "--db {input.target} "
         "--output {output.output} " ## information per sequence
         "--report {output.report} " ## information per taxon

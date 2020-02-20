@@ -2,6 +2,9 @@
 ## SEQUENCING SUMMARY ##
 ########################
 
+## SORTING ##
+#############
+
 rule sorting_seqsum_barc:
     input:
         "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary.txt"
@@ -20,6 +23,9 @@ rule sorting_seqsum_barc:
         "tail -n +2 {input} | "
         "sort -V -S1G --parallel={threads} -k$barc_col,$barc_col -k7,7 " ## sort by barcode column and start time (Note, start time column might have another index in later versions)
         ">> {output} 2>> {log}"
+
+## SPLITTING ##
+###############
 
 rule splitting_seqsum_barc:
     input:
@@ -44,6 +50,9 @@ rule splitting_seqsum_barc:
         "if( cali_col != 0 && $barc_col == \"unclassified\" && $cali_col ~ /Lambda_3.6kb/){{ print $0 > \"{output}\" \"/lambda.txt\" }}"
         "else{{ print $0 > \"{output}\" \"/\" $barc_col \".txt\" }} " ## print the current line to the corresponding barcode specific file
         "}}' {input} >> {log} 2>&1"
+
+## DOWNSAMPLING ##
+##################
 
 rule downsampling_seqsum: #!#
     input:
