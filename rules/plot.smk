@@ -304,9 +304,8 @@ rule plot_pycoqc_bam_align:
 ## K-MER MAPPING ##
 ###################
 
-rule plot_krona_kraken2:
+rule plot_krona_kraken_text:
     input:
-        reference="METADATA/Reference_Sequences/{reference}/krona/{reftype}"
         "{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.ktaxlist"
     output:
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/krona/{reference}_{reftype}/Species.html"
@@ -317,11 +316,9 @@ rule plot_krona_kraken2:
     conda:
         "../envs/krona.yml"
     params:
-        "-i", ## Include a wedge for queries with no hits.
-        # "-q 2", ## Column of input files to use as query ID. Required if magnitude files are specified. [Default: '1']
-        "-t 3" ## Column of input files to use as taxonomy ID. [Default: '2']
+        "-n \"Root\"" ## name for highest taxon
     shell:
-        "ktImportTaxonomy {params} -tax {input.reference} {input.output} -o {output} > {log} 2>&1"
+        "ktImportText {params} -o {output} {input} > {log} 2>&1"
 
 ## CALIBRATION STRAIN ##
 ########################
