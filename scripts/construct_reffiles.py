@@ -26,8 +26,8 @@ output_dict = {
     'krakseq2tax_G' : snakemake.output['krak_G'] + "/seqid2taxid.map",
     'krona_S' : snakemake.output['krona_S'] + "/taxonomy.tab",
     'krona_G' : snakemake.output['krona_G'] + "/taxonomy.tab",
-    'taxlist_S' : snakemake.output['taxlist_S'] + "/taxlist.txt",
-    'taxlist_G' : snakemake.output['taxlist_G'] + "/taxlist.txt"
+    'taxlist_S' : snakemake.output['krona_S'] + "/taxlist.txt",
+    'taxlist_G' : snakemake.output['krona_G'] + "/taxlist.txt"
 }
 
 # input_dict = {
@@ -160,46 +160,30 @@ df_slv['depth_slv'] = df_slv['depth_slv'] + 1
 ## targetID is taxID for used taxa
 df_slv['targetID_slv'] = df_slv['taxID_slv']
 
-## to figure out which accID needs a new taxID, create custom taxID from silva and ncbi ID for used taxa
-df_slv['taxID_new'] = (df_slv['taxID_ncbi'].map(str) + "000" + df_slv['taxID_slv'].map(str)).str.replace("-", "") ## adding some additional "0"s to ensure unique ID, also some taxIDs in the ncbi file are negative, hence remove all "-"
-## some taxIDs are used more than once ... -.-
-## find duplicated taxIDs with different depth, target, rank or name
-dupli_taxIDs = df_slv.loc[:,['taxID_new', 'depth_slv', 'targetID_slv', 'rank_slv', 'name']].drop_duplicates()['taxID_new'].value_counts()
-dupli_taxIDs = dupli_taxIDs[dupli_taxIDs > 1].index.tolist()
-## loop over duplicate taxIDs
-for dupliID in dupli_taxIDs:
-    ## get index of rows matching this id in df_slv
-    dupli_rows = df_slv.loc[df_slv['taxID_new']==dupliID,'taxID_new'].index
-    ## add a number to the end of the taxID (...0, ...1, ...2)
-    unique_taxIDs = [dupliID + str(s) for s in list(range(0,len(dupli_rows)))]
-    ## replace duplicate taxID_new with unique taxID_new
-    df_slv.loc[dupli_rows,'taxID_new'] = unique_taxIDs
-
-## but the new taxIDs are to long =(
-single_taxIDs = df_slv['taxID_new'].unique()
-## creata a range of numbers as long as all higer taxa + new species taxIDs (this should be the maximum number of taxIDs needed, if all would be continuous)
-potential_taxIDs = set(range( 0, len(df_taxlist.index) +  len(single_taxIDs) + 2 )) ## +2 to not use 0 and 1 as taxID
+## to figure out which accID needs a new taxID, find accIDs with the same depth, rank, target taxID, and name
+single_taxIDs = df_slv.loc[:,['depth_slv', 'targetID_slv', 'rank_slv', 'name']].drop_duplicates()
+## creata a range of potential taxIDs for the species as long as all higer taxa + new species taxIDs (this should be the maximum number of taxIDs needed, if all would be continuous)
+potential_taxIDs = set(range( 10000, len(df_taxlist.index) + len(single_taxIDs.index) + 10000 )) ## +10000 to not use 0 to 9999 as taxID
 ## exclude all taxIDs used by higer taxa
 potential_taxIDs = potential_taxIDs - set(df_taxlist['taxID_slv'])
-potential_taxIDs = potential_taxIDs - set([0,1]) ## exclude 0 for root
-## get the exact number of required new taxIDs (if some of the higer taxIDs are above the length if the bumber range, they cannot be excluded by the step above)
-potential_taxIDs = list(potential_taxIDs)[0:len(single_taxIDs)]
-## associate new taxIDs with accIDs
-df_pottax = pd.DataFrame({'taxID_pot' : potential_taxIDs, 'taxID_new' : single_taxIDs})
-df_slv = pd.merge(df_slv, df_pottax, how='left', on='taxID_new')
+## reduce to exact number of required taxIDs
+potential_taxIDs = list(potential_taxIDs)[0:len(single_taxIDs.index)]
+## add new taxIDs to unique species
+single_taxIDs['taxID_new'] = potential_taxIDs
+## combine with main data frame
+df_slv = pd.merge(df_slv, single_taxIDs, how='left', on=['depth_slv', 'targetID_slv', 'rank_slv', 'name'])
 
 ## taxID newly created taxID for used taxa
-df_slv['taxID_slv'] = df_slv['taxID_pot']
-
+df_slv['taxID_slv'] = df_slv['taxID_new']
 
 ## SILVA LIKE ##
 
 ## write sequence taxon association
 pd.concat([
     ## used taxons with higher taxon ID (was reassignes to targetID here)
-    df_slv.loc[:,['accIDstartend','targetID_slv']],
+    df_slv.loc[:,['accIDstartend','targetID_slv']].rename(columns={"targetID_slv" : "taxID_slv"}),
     ## unused taxons ("no rank") with higher taxon ID (was left as taxID here)
-    df_slv_norank.loc[:,['accIDstartend','taxID_slv']],
+    df_slv_norank.loc[:,['accIDstartend','taxID_slv']]
 ]).to_csv(
     ## save
     output_dict['krakseq2tax_G'], mode='w', sep='\t', header=False, index=False, quoting=0, float_format="%g"
@@ -209,14 +193,14 @@ pd.concat([
     ## used taxons with species taxon ID (was created as taxID here)
     df_slv.loc[:,['accIDstartend','taxID_slv']],
     ## unused taxons ("no rank") with "species" taxon ID (not actually species taxon ID, but left at higer taxID here)
-    df_slv_norank.loc[:,['accIDstartend','taxID_slv']],
+    df_slv_norank.loc[:,['accIDstartend','taxID_slv']]
 ]).to_csv(
     ## save
     output_dict['krakseq2tax_S'], mode='w', sep='\t', header=False, index=False, quoting=0, float_format="%g"
 )
 
 ## remove duplicates: many taxa have more than one accID
-df_slv = df_slv.drop_duplicates(subset=['taxID_slv','depth_slv','targetID_slv','rank_slv','name'])
+df_slv = df_slv.drop_duplicates(subset=['depth_slv', 'targetID_slv', 'rank_slv', 'name'])
 
 ## write taxlist-like file (without last columns)
 pd.concat([
