@@ -48,6 +48,20 @@ output_dict = {
 #     'taxlist_G' : "METADATA/Reference_Sequences/silva/krona/genus/taxlist.txt"
 # }
 
+## create output directories
+os.makedirs( snakemake.output['krak_S'] + "/library" )
+os.makedirs( snakemake.output['krak_G'] + "/library" )
+os.makedirs( snakemake.output['krak_S'] + "/taxonomy" )
+os.makedirs( snakemake.output['krak_G'] + "/taxonomy" )
+os.makedirs( snakemake.output['krona_S'] )
+os.makedirs( snakemake.output['krona_G'] )
+
+# os.makedirs("METADATA/Reference_Sequences/silva/kraken2/species_tmp/library")
+# os.makedirs("METADATA/Reference_Sequences/silva/kraken2/genus_tmp/library")
+# os.makedirs("METADATA/Reference_Sequences/silva/kraken2/species_tmp/taxonomy")
+# os.makedirs("METADATA/Reference_Sequences/silva/kraken2/genus_tmp/taxonomy")
+# os.makedirs("METADATA/Reference_Sequences/silva/krona/species")
+# os.makedirs("METADATA/Reference_Sequences/silva/krona/genus")
 
 ## LOAD DATA ##
 

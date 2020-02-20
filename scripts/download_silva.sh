@@ -26,11 +26,4 @@ wget "$REMOTE_DIR/taxonomy/${TAXLIST_FILENAME}.gz"
 gunzip "${TAXLIST_FILENAME}.gz"
 mv "${TAXLIST_FILENAME}" "taxlist.txt"
 
-mkdir -p kraken2/species_tmp/library \
-kraken2/species_tmp/taxonomy \
-kraken2/genus_tmp/library \
-kraken2/genus_tmp/taxonomy \
-krona/species \
-krona/genus
-sed -e '/^>/!y/U/T/' "reference.fasta" > "kraken2/species_tmp/library/library.fna"
-cp "kraken2/species_tmp/library/library.fna" "kraken2/genus_tmp/library/library.fna"
+sed -e '/^>/!y/U/T/' "reference.fasta" > "reference_thymine.fasta"

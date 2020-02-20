@@ -141,7 +141,9 @@ rule building_database_fromreffiles:
     params:
         "35" ## k-mer length
     shell:
-        "mv {input} {output}; "
+        "mkdir -p {output}; "
+        "mv {input.krak_dir}/* {output}; "
+        "cp \"{input.fastaT}\" \"{output}/library/library.fna\"; "
         # "kraken2-build --threads {threads} --download-taxonomy --skip-maps --db {output} > {log} 2>&1; "
         # "kraken2-build --threads {threads} --download-library bacteria --no-masking --db {output} >> {log} 2>&1; "
         # # "kraken2-build --threads {threads} --download-library archaea --no-masking --db {output} >> {log} 2>&1; "
