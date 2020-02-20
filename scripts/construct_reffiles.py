@@ -2,6 +2,7 @@
 
 ## dependencies
 import pandas as pd
+import os
 
 ## logging
 sys.stdout = open(snakemake.log[0], 'w')
