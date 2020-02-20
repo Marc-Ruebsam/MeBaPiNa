@@ -64,3 +64,17 @@ rule ranking_taxonomy:
         "-i {input.report} "
         "-o {output.rankF} >> {log} 2>&1; "
         "mv {wildcards.tmp}01_processed_data/03_kmer_mapping/{wildcards.run}/{wildcards.barc}/{wildcards.reference}_{wildcards.reftype}/filtered_bracken.kreport2 {output.tableF} "
+
+rule convert_report:
+    input:
+        # report="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kreport2",
+        report="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/bracken/{reference}_{reftype}/Species.kreport2",
+        taxlist="{tmp}METADATA/Reference_Sequences/{reference}/krona/{reftype}/"
+    output:
+        ktaxlist="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.ktaxlist"
+    log:
+        "{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_converted.log"
+    benchmark:
+        "{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_converted.benchmark.tsv"
+    script:
+        "../scripts/convert_kreport.py"
