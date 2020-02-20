@@ -2,15 +2,15 @@
 
 rule kmer_mapping_filtered:
     input:
-        fastq="01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq", 
-        target="METADATA/Reference_Sequences/{reference}/kraken2/{reftype}"
+        fastq="{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq", 
+        target="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}"
     output:
-        report="01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kreport2",
-        output="01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kraken2"
+        report="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kreport2",
+        output="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kraken2"
     log:
-        "01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmer_mapped.log"
+        "{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmer_mapped.log"
     benchmark:
-        "01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmer_mapped.benchmark.tsv"
+        "{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmer_mapped.benchmark.tsv"
     conda:
         "../envs/kraken2.yml"
     threads:
@@ -26,20 +26,20 @@ rule kmer_mapping_filtered:
 
 rule ranking_taxonomy:
     input:
-        report="01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kreport2",
-        output="01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kraken2",
-        target=expand("METADATA/Reference_Sequences/kraken2_{reference}", reference = config["reference"]["source"])
+        report="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kreport2",
+        output="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kraken2",
+        target="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}"
     output:
-        rankS="02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/bracken/Species.bracken",
-        tableS="02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/bracken/Species.kreport2",
-        rankG="02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/bracken/Genus.bracken",
-        tableG="02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/bracken/Genus.kreport2",
-        rankF="02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/bracken/Family.bracken",
-        tableF="02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/bracken/Family.kreport2"
+        rankS="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/bracken/{reference}_{reftype}/Species.bracken",
+        tableS="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/bracken/{reference}_{reftype}/Species.kreport2",
+        rankG="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/bracken/{reference}_{reftype}/Genus.bracken",
+        tableG="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/bracken/{reference}_{reftype}/Genus.kreport2",
+        rankF="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/bracken/{reference}_{reftype}/Family.bracken",
+        tableF="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/bracken/{reference}_{reftype}/Family.kreport2"
     log:
-        "02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/bracken/MeBaPiNa_ranking.log"
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/bracken/{reference}_{reftype}/MeBaPiNa_ranking.log"
     benchmark:
-        "02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/bracken/MeBaPiNa_ranking.benchmark.tsv"
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/bracken/{reference}_{reftype}/MeBaPiNa_ranking.benchmark.tsv"
     conda:
         "../envs/kraken2.yml"
     params:
@@ -51,16 +51,16 @@ rule ranking_taxonomy:
         "-d {input.target} "
         "-i {input.report} "
         "-o {output.rankS} > {log} 2>&1; "
-        "mv 01_processed_data/03_kmer_mapping/{wildcards.run}/{wildcards.barc}/{reference}_{reftype}/filtered_bracken.kreport2 {output.tableS}; "
+        "mv {wildcards.tmp}01_processed_data/03_kmer_mapping/{wildcards.run}/{wildcards.barc}/{wildcards.reference}_{wildcards.reftype}/filtered_bracken.kreport2 {output.tableS}; "
         "bracken {params} "
         "-l G "
         "-d {input.target} "
         "-i {input.report} "
         "-o {output.rankG} >> {log} 2>&1; "
-        "mv 01_processed_data/03_kmer_mapping/{wildcards.run}/{wildcards.barc}/{reference}_{reftype}/filtered_bracken.kreport2 {output.tableG}; "
+        "mv {wildcards.tmp}01_processed_data/03_kmer_mapping/{wildcards.run}/{wildcards.barc}/{wildcards.reference}_{wildcards.reftype}/filtered_bracken.kreport2 {output.tableG}; "
         "bracken {params} "
         "-l F "
         "-d {input.target} "
         "-i {input.report} "
         "-o {output.rankF} >> {log} 2>&1; "
-        "mv 01_processed_data/03_kmer_mapping/{wildcards.run}/{wildcards.barc}/{reference}_{reftype}/filtered_bracken.kreport2 {output.tableF} "
+        "mv {wildcards.tmp}01_processed_data/03_kmer_mapping/{wildcards.run}/{wildcards.barc}/{wildcards.reference}_{wildcards.reftype}/filtered_bracken.kreport2 {output.tableF} "

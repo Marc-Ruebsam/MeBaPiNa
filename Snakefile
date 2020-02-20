@@ -36,7 +36,7 @@ wildcard_constraints:
 #############################
 
 ## load run information
-METADATA = pd.read_excel( "METADATA/EXPERIMENT_SEQUENCING.xlsx", header = 1 )
+METADATA = pd.read_excel( config["experiments"]["tmp"] + "METADATA/EXPERIMENT_SEQUENCING.xlsx", header = 1 )
 ## find meta data for required samples
 METADATA = METADATA.loc[ METADATA['Sample name'].isin(config["experiments"]["samples"]), : ]
 #!# currently only one single run analysis is supported. Use run with most sample overlaps
@@ -80,48 +80,48 @@ rule all:
         ## BASECALL ##
 
         ## general QC: all reads, including calibtation strads, intentional downsampling
-        "02_analysis_results/01_basecalling/{run}/nanoplot/NanoStats.txt",
+        "{tmp}02_analysis_results/01_basecalling/{run}/nanoplot/NanoStats.txt",
         ## general QC: all reads, forced downsampling
-        "02_analysis_results/01_basecalling/{run}/pycoqc/pycoQC_report.json",
+        "{tmp}02_analysis_results/01_basecalling/{run}/pycoqc/pycoQC_report.json",
         ## per base QC: all reads, forced downsampling
-        "02_analysis_results/01_basecalling/{run}/nanoqc/nanoQC.html",
+        "{tmp}02_analysis_results/01_basecalling/{run}/nanoqc/nanoQC.html",
         ## read QC: all passed reads
-        "02_analysis_results/01_basecalling/{run}/fastqc/stdin_fastqc.html",
-
+        "{tmp}02_analysis_results/01_basecalling/{run}/fastqc/stdin_fastqc.html",
+        
         ## barcode QC: per barcode
         ("" if not BAC_KIT else ## "" if bac_kit is ""
-        "02_analysis_results/01_basecalling/{run}/nanocomp/NanoStats.txt"),
-
+        "{tmp}02_analysis_results/01_basecalling/{run}/nanocomp/NanoStats.txt"),
+        
         ## TRIM AND FILTER ##
 
         ## general QC: trimed and filtered barcoded reads, intentional downsampling
-        "02_analysis_results/02_trimming_filtering/{run}/nanoplot/NanoStats.txt",
+        "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoplot/NanoStats.txt",
         ## per base QC: trimed and filtered barcoded reads, forced downsampling
-        "02_analysis_results/02_trimming_filtering/{run}/nanoqc/nanoQC.html",
+        "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoqc/nanoQC.html",
         ## read QC: trimed and filtered barcoded reads
-        "02_analysis_results/02_trimming_filtering/{run}/fastqc/stdin_fastqc.html",
 
+        "{tmp}02_analysis_results/02_trimming_filtering/{run}/fastqc/stdin_fastqc.html",
         ## barcode QC: trimed and filtered barcoded reads
         ("" if not BAC_KIT else ## "" if bac_kit is ""
-        "02_analysis_results/02_trimming_filtering/{run}/nanocomp/NanoStats.txt"),
 
+        "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanocomp/NanoStats.txt"),
         ## ALIGNMENT ##
 
         ## general QC: per barcode, intentional downsampling
-        # "02_analysis_results/03_alignment/{run}/{barc}/pycoqc/filtered.html",
-        "02_analysis_results/03_kmer_mapping/{run}/bracken/barcode03/Species.bracken",
 
 
+        # "{tmp}02_analysis_results/03_alignment/{run}/{barc}/pycoqc/filtered.html",
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/krona/silva_species/Species.html",
         ## CALIBRATION STRAIN ##
 
         ## calibration QC: only calinration strands
         ("" if not LAM_DCS else ## "" if lam_DCS is False
-        "02_analysis_results/01_basecalling/{run}_calibration_strands/nanoplot/NanoStats.txt"),
 
+        "{tmp}02_analysis_results/01_basecalling/{run}_calibration_strands/nanoplot/NanoStats.txt"),
         ## calibration QC: only calinration strands
         ("" if not LAM_DCS else ## "" if lam_DCS is False
-        "02_analysis_results/03_alignment/{run}_calibration_strands/lambda_nanoplot/NanoStats.txt"),
+        "{tmp}02_analysis_results/03_alignment/{run}_calibration_strands/lambda_nanoplot/NanoStats.txt"),
         ("" if not LAM_DCS else ## "" if lam_DCS is False
-        "02_analysis_results/03_alignment/{run}_calibration_strands/lambda_pycoqc/pycoQC_report.json")
+        "{tmp}02_analysis_results/03_alignment/{run}_calibration_strands/lambda_pycoqc/pycoQC_report.json")
 
-        ])), run = RUNS, barc = SAMPLES.keys())
+        ])), tmp = config["experiments"]["tmp"], run = RUNS, barc = SAMPLES.keys())

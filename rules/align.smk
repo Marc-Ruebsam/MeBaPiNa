@@ -7,13 +7,13 @@
 
 rule splitting_filtered: #!# only required because of low memory avaialility
     input:
-        "01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq"
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq"
     output:
-        temp(directory("01_processed_data/02_trimming_filtering/{run}/{barc}/split"))
+        temp(directory("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/split"))
     log:
-        "01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering.log"
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering.log"
     benchmark:
-        "01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering.benchmark.tsv"
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering.benchmark.tsv"
     shell:
         "mkdir {output}; "
         "awk 'BEGIN{{ file_num=0 }}; " ## split output into files with <=4000 sequences each
@@ -23,14 +23,14 @@ rule splitting_filtered: #!# only required because of low memory avaialility
 
 rule aligning_filtered:
     input:
-        barc_dir="01_processed_data/02_trimming_filtering/{run}/{barc}/split", 
-        target=expand("METADATA/Reference_Sequences/{reference}/reference.mmi", reference = config["reference"]["source"])
+        barc_dir="{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/split", 
+        target=expand("{tmp}METADATA/Reference_Sequences/{reference}/reference.mmi", tmp = config["experiments"]["tmp"], reference = config["reference"]["source"])
     output:
-        temp("01_processed_data/03_alignment/{run}/{barc}/filtered.sam")
+        temp("{tmp}01_processed_data/03_alignment/{run}/{barc}/filtered.sam")
     log:
-        "01_processed_data/03_alignment/{run}/{barc}/MeBaPiNa_alignment.log"
+        "{tmp}01_processed_data/03_alignment/{run}/{barc}/MeBaPiNa_alignment.log"
     benchmark:
-        "01_processed_data/03_alignment/{run}/{barc}/MeBaPiNa_alignment.benchmark.tsv"
+        "{tmp}01_processed_data/03_alignment/{run}/{barc}/MeBaPiNa_alignment.benchmark.tsv"
     params:
         "-x map-ont", ## naopore specific
         "-a" ## possition accurate CIGAR alignment in SAM output; much slower <- maybe skip?
@@ -51,14 +51,14 @@ rule aligning_filtered:
 
 rule converting_sam2bam:
     input:
-        "01_processed_data/03_alignment/{run}/{barc}/{altype}.sam"
+        "{tmp}01_processed_data/03_alignment/{run}/{barc}/{altype}.sam"
     output:
-        bam="01_processed_data/03_alignment/{run}/{barc}/{altype}_sorted.bam",
-        bai="01_processed_data/03_alignment/{run}/{barc}/{altype}_sorted.bam.bai"
+        bam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{altype}_sorted.bam",
+        bai="{tmp}01_processed_data/03_alignment/{run}/{barc}/{altype}_sorted.bam.bai"
     log:
-        "01_processed_data/03_alignment/{run}/{barc}/MeBaPiNa_converting_{altype}.log"
+        "{tmp}01_processed_data/03_alignment/{run}/{barc}/MeBaPiNa_converting_{altype}.log"
     benchmark:
-        "01_processed_data/03_alignment/{run}/{barc}/MeBaPiNa_converting_{altype}.benchmark.tsv"
+        "{tmp}01_processed_data/03_alignment/{run}/{barc}/MeBaPiNa_converting_{altype}.benchmark.tsv"
     conda:
         "../envs/samtools.yml"
     threads:
@@ -81,14 +81,14 @@ rule converting_sam2bam:
 
 rule aligning_calibration_strands:
     input:
-        calib_dir="01_processed_data/01_basecalling/{run}/calibration_strands", 
-        target="METADATA/Reference_Sequences/lambda_3.6kb/reference.mmi"
+        calib_dir="{tmp}01_processed_data/01_basecalling/{run}/calibration_strands", 
+        target="{tmp}METADATA/Reference_Sequences/lambda_3.6kb/reference.mmi"
     output:
-        temp("01_processed_data/03_alignment/{run}/lambda/calibration.sam")
+        temp("{tmp}01_processed_data/03_alignment/{run}/lambda/calibration.sam")
     log:
-        "01_processed_data/03_alignment/{run}/lambda/MeBaPiNa_alignment.log"
+        "{tmp}01_processed_data/03_alignment/{run}/lambda/MeBaPiNa_alignment.log"
     benchmark:
-        "01_processed_data/03_alignment/{run}/lambda/MeBaPiNa_alignment.benchmark.tsv"
+        "{tmp}01_processed_data/03_alignment/{run}/lambda/MeBaPiNa_alignment.benchmark.tsv"
     params:
         "-x map-ont", ## naopore specific
         "-a" ## possition accurate CIGAR alignment in SAM output; much slower <- maybe skip?

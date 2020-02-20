@@ -4,7 +4,8 @@
 
 experiments:
   ## path to directory containing main folders (00_raw_data, 01_processed_data, ...)
-  project: "/mnt/Nanopore/Nanopore_Projects/Internal/NCT/PROMISE/Microbiome/16S_Metabarcoding"
+  project: "/mnt/ag-halama/PROMISE/.tmp" # "/mnt/Nanopore/Nanopore_Projects/Internal/NCT/PROMISE/Microbiome/16S_Metabarcoding/"
+  tmp: "16S_Metabarcoding/"
   ## samples to analyze, matching "Sample name"s in EXPERIMENT_SEQUENCING.xlsx #!# currently only one single run analysis is supported
   samples: 
     ["NTC", 

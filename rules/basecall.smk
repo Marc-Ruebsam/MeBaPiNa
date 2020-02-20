@@ -7,21 +7,21 @@
 
 rule moving_raw:
     output:
-        "00_raw_data/{run}/fast5"
+        "{tmp}00_raw_data/{run}/fast5"
     shell:
-        "find 00_raw_data/ -name \"{wildcards.run}\" -print0 | xargs -0 -I {{}} mv {{}} \"00_raw_data/{wildcards.run}\"; "
-        "find 00_raw_data/ -depth -type d -empty -delete" #!# delete empty directories
+        "find {wildcards.tmp}00_raw_data/ -name \"{wildcards.run}\" -print0 | xargs -0 -I {{}} mv {{}} \"{wildcards.tmp}00_raw_data/{wildcards.run}\"; "
+        "find {wildcards.tmp}00_raw_data/ -depth -type d -empty -delete" #!# delete empty directories
 
 rule compressing_raw: ## after basecalling, removes uncompressed fast5
     input:
-        fast5="00_raw_data/{run}/fast5",
-        dummy_basecalling="01_processed_data/01_basecalling/{run}/pass" ## dummy to run only after basecalling
+        fast5="{tmp}00_raw_data/{run}/fast5",
+        dummy_basecalling="{tmp}01_processed_data/01_basecalling/{run}/pass" ## dummy to run only after basecalling
     output:
-        fast5="00_raw_data/{run}/fast5.tar.gz",
-        md5="00_raw_data/{run}/md5checksum.txt"
+        fast5="{tmp}00_raw_data/{run}/fast5.tar.gz",
+        md5="{tmp}00_raw_data/{run}/md5checksum.txt"
     shell:
         "tar -cvzf {output.fast5} {input.fast5}; "
-        "find 00_raw_data/{wildcards.run} -maxdepth 1 -type f -exec md5sum {{}} >> {output.md5} \;; "
+        "find {wildcards.tmp}00_raw_data/{wildcards.run} -maxdepth 1 -type f -exec md5sum {{}} >> {output.md5} \;; "
         "rm {input.fast5}"
 
 ## BASECALL DEMULTIPLEX ##
@@ -29,19 +29,19 @@ rule compressing_raw: ## after basecalling, removes uncompressed fast5
 
 checkpoint basecalling_raw:
     input:
-        "00_raw_data/{run}/fast5"
+        "{tmp}00_raw_data/{run}/fast5"
     output:
         list(filter(None,[
-        directory("01_processed_data/01_basecalling/{run}/pass"),
+        directory("{tmp}01_processed_data/01_basecalling/{run}/pass"),
         ## evaluation of Lambda calibration strands only when specified
-        (directory("01_processed_data/01_basecalling/{run}/calibration_strands")
+        (directory("{tmp}01_processed_data/01_basecalling/{run}/calibration_strands")
         if LAM_DCS else ""),
-        "01_processed_data/01_basecalling/{run}/sequencing_summary.txt"
+        "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary.txt"
         ]))
     log:
-        "01_processed_data/01_basecalling/{run}/MeBaPiNa_basecalling.log"
+        "{tmp}01_processed_data/01_basecalling/{run}/MeBaPiNa_basecalling.log"
     benchmark:
-        "01_processed_data/01_basecalling/{run}/MeBaPiNa_basecalling.benchmark.tsv"
+        "{tmp}01_processed_data/01_basecalling/{run}/MeBaPiNa_basecalling.benchmark.tsv"
     version:
         subprocess.check_output("guppy_basecaller --version | awk '{print $NF}'", shell=True)
     threads:
@@ -72,18 +72,18 @@ checkpoint basecalling_raw:
         "--progress_stats_frequency 1800" ## every 30 minutes
     shell:
         "guppy_basecaller --num_callers {threads} {params} "
-        "--save_path 01_processed_data/01_basecalling/{wildcards.run} "
         "--input_path {input} > {log} 2>&1"
 
-        "mkdir -p 01_processed_data/01_basecalling/{wildcards.run}/guppy_basecaller_logs; "
-        "mv 01_processed_data/01_basecalling/{wildcards.run}/guppy_basecaller_log-* 01_processed_data/01_basecalling/{wildcards.run}/guppy_basecaller_logs/"
+        "--save_path {wildcards.tmp}01_processed_data/01_basecalling/{wildcards.run} "
+        "mkdir -p {wildcards.tmp}01_processed_data/01_basecalling/{wildcards.run}/guppy_basecaller_logs; "
+        "mv {wildcards.tmp}01_processed_data/01_basecalling/{wildcards.run}/guppy_basecaller_log-* {wildcards.tmp}01_processed_data/01_basecalling/{wildcards.run}/guppy_basecaller_logs/"
 
 ## TRIMM DEMULTIPLEX ##
 #######################
 
 def input_per_barcode(wildcards):
     ## get "pass" directory and trigger checkpoint (this way we can specify output inside the checkpoints output directory "pass" without direct rule association)
-    pass_dir = checkpoints.basecalling_raw.get(run=wildcards.run).output[0]
+    pass_dir = checkpoints.basecalling_raw.get(run=wildcards.run,tmp=wildcards.tmp).output[0]
     ## get barcode for sample
     sample_barcode = wildcards.barc
     ## create file name for barcode
@@ -94,11 +94,11 @@ rule trimming_basecalled:
     input:
         input_per_barcode
     output:
-        "01_processed_data/02_trimming_filtering/{run}/{barc}/trimmed.fastq"
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/trimmed.fastq"
     log:
-        "01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming.log"
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming.log"
     benchmark:
-        "01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming.benchmark.tsv"
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming.benchmark.tsv"
     conda:
         "../envs/qcat.yml"
     threads:
@@ -110,7 +110,7 @@ rule trimming_basecalled:
         "--trim", ## Remove adapter and barcode sequences from reads.
         ("--kit RAB204" if BAC_KIT == "SQK-RAB204" else "--kit Auto") #!#
     shell:
-        "barc_folder=01_processed_data/02_trimming_filtering/{wildcards.run}/{wildcards.barc}; " ## directory name of barcode currently processed
+        "barc_folder={wildcards.tmp}01_processed_data/02_trimming_filtering/{wildcards.run}/{wildcards.barc}; " ## directory name of barcode currently processed
         "find {input} -type f -name \"*.fastq\" -exec cat {{}} \\; | "
         "qcat --threads {threads} {params} "
         "--barcode_dir $barc_folder "
@@ -125,14 +125,14 @@ rule trimming_basecalled:
 
 rule filtering_trimmed:
     input:
-        fastq="01_processed_data/02_trimming_filtering/{run}/{barc}/trimmed.fastq",
-        seqsum="01_processed_data/01_basecalling/{run}/sequencing_summary.txt"
+        fastq="{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/trimmed.fastq",
+        seqsum="{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary.txt"
     output:
-        "01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq"
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq"
     log:
-        "01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering.log"
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering.log"
     benchmark:
-        "01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering.benchmark.tsv"
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering.benchmark.tsv"
     conda:
         "../envs/nanopack.yml"
     params:
