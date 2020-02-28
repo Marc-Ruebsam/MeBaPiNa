@@ -26,20 +26,20 @@ rule aligning_filtered:
         barc_dir="{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/split", 
         target=expand("{tmp}METADATA/Reference_Sequences/{reference}/reference.mmi", tmp = config["experiments"]["tmp"], reference = config["reference"]["source"])
     output:
-        temp("{tmp}01_processed_data/03_alignment/{run}/{barc}/filtered.sam")
+        temp("{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/align.sam")
     log:
-        "{tmp}01_processed_data/03_alignment/{run}/{barc}/MeBaPiNa_alignment.log"
+        "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_alignment.log"
     benchmark:
-        "{tmp}01_processed_data/03_alignment/{run}/{barc}/MeBaPiNa_alignment.benchmark.tsv"
-    params:
-        "-x map-ont", ## naopore specific
-        "-a" ## possition accurate CIGAR alignment in SAM output; much slower <- maybe skip?
-        # -p FLOAT     min secondary-to-primary score ratio [0.8]
-        # -N INT       retain at most INT secondary alignments [5]
+        "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_alignment.benchmark.tsv"
     conda:
         "../envs/minimap2.yml"
+    params:
+        "-x map-ont", ## naopore specific
+        "-a", ## possition accurate CIGAR alignment in SAM output; much slower <- maybe use -c for PAF instead?
+        "-p 1", ## only retain multi mappings with same highest score
+        "-N 1" ## one secondary alignment is enough to identify multimapping reads
     threads:
-        8
+        34
     shell:
         "minimap2 -t {threads} {params} -o {output} "
         "{input.target} "
@@ -49,16 +49,17 @@ rule aligning_filtered:
 ## FILE CONVERSION ##
 #####################
 
-rule converting_sam2bam:
+rule filter_aligned:
     input:
-        "{tmp}01_processed_data/03_alignment/{run}/{barc}/{altype}.sam"
+        "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/{altype}.sam"
     output:
-        bam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{altype}_sorted.bam",
-        bai="{tmp}01_processed_data/03_alignment/{run}/{barc}/{altype}_sorted.bam.bai"
+        sam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/{altype}_filtered.sam",
+        bam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/{altype}_filteredsorted.bam",
+        bai="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/{altype}_filteredsorted.bam.bai"
     log:
-        "{tmp}01_processed_data/03_alignment/{run}/{barc}/MeBaPiNa_converting_{altype}.log"
+        "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_converting_{altype}.log"
     benchmark:
-        "{tmp}01_processed_data/03_alignment/{run}/{barc}/MeBaPiNa_converting_{altype}.benchmark.tsv"
+        "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_converting_{altype}.benchmark.tsv"
     conda:
         "../envs/samtools.yml"
     threads:
@@ -75,11 +76,11 @@ rule aligning_calibration_strands:
         calib_dir="{tmp}01_processed_data/01_basecalling/{run}/calibration_strands", 
         target="{tmp}METADATA/Reference_Sequences/lambda_3.6kb/reference.mmi"
     output:
-        temp("{tmp}01_processed_data/03_alignment/{run}/lambda/calibration.sam")
+        temp("{tmp}01_processed_data/03_alignment/{run}/{reference}/lambda/calibration.sam")
     log:
-        "{tmp}01_processed_data/03_alignment/{run}/lambda/MeBaPiNa_alignment.log"
+        "{tmp}01_processed_data/03_alignment/{run}/{reference}/lambda/MeBaPiNa_alignment.log"
     benchmark:
-        "{tmp}01_processed_data/03_alignment/{run}/lambda/MeBaPiNa_alignment.benchmark.tsv"
+        "{tmp}01_processed_data/03_alignment/{run}/{reference}/lambda/MeBaPiNa_alignment.benchmark.tsv"
     params:
         "-x map-ont", ## naopore specific
         "-a" ## possition accurate CIGAR alignment in SAM output; much slower <- maybe skip?
