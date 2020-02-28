@@ -102,7 +102,8 @@ rule krona_reffile:
     conda:
         "../envs/krona.yml"
     shell:
-        "ktUpdateTaxonomy.sh {output} > {log} 2>&1"
+        "out_dir={output}; out_dir=\"${{out_dir/taxonomy.tab/}}\" > {log} 2>&1; "
+        "ktUpdateTaxonomy.sh ${{out_dir}} >> {log} 2>&1"
 
 rule construct_reffiles:
     input:
