@@ -68,7 +68,7 @@ PLOT_MAXLEN = config["filtering"]["len_max"]
 include: "rules/basecall.smk"
 include: "rules/plot.smk"
 include: "rules/align.smk"
-include: "rules/kmer_mapped.smk"
+include: "rules/kmer.smk"
 include: "rules/otu.smk"
 include: "rules/misc.smk"
 include: "rules/report.smk"
