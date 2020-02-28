@@ -277,18 +277,18 @@ rule plot_fastqc_fastq_filter:
 rule plot_pycoqc_bam_align:
     input:
         seqsum="{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/split", ## only folder is specified as output in splitting rule
-        bam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{altype}_sorted.bam"
+        bam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/align_filteredsorted.bam"
     output:
-        html="{tmp}02_analysis_results/03_alignment/{run}/{barc}/pycoqc/{altype}.html",
-        json="{tmp}02_analysis_results/03_alignment/{run}/{barc}/pycoqc/{altype}.json"
+        html="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc.html",
+        json="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc.json"
     log:
-        "{tmp}02_analysis_results/03_alignment/{run}/pycoqc/MeBaPiNa_pycoqc_bam_align_{barc}_{altype}.log"
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_pycoqc_bam.log"
     benchmark:
-        "{tmp}02_analysis_results/03_alignment/{run}/pycoqc/MeBaPiNa_pycoqc_bam_align_{barc}_{altype}.benchmark.tsv"
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_pycoqc_bam.benchmark.tsv"
     conda:
         "../envs/pycoqc.yml"
     params:
-        ("--config Pineline/MeBaPiNa/scripts/pycoQC_config.json " if  ## use custom config (without coverage plot) for barcodes...
+        ("--config {tmp}Pineline/MeBaPiNa/scripts/pycoQC_config.json " if  ## use custom config (without coverage plot) for barcodes...
         not config["reference"]["source"] == "zymobiomics" ## ...but not for the Zymo reference
         and not "{wildcards.barc}" == "lambda" else ""), ## or calibration strains
         "--min_pass_qual 0",
@@ -301,24 +301,61 @@ rule plot_pycoqc_bam_align:
         "--html_outfile {output.html} "
         "--json_outfile {output.json} > {log} 2>&1"
 
-## K-MER MAPPING ##
-###################
-
-rule plot_krona_kraken_text:
+rule plot_krona_align_text:
     input:
-        "{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.ktaxlist"
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/align.counttaxlist"
     output:
-        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/krona/{reference}_{reftype}/Species.html"
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/krona.html"
     log:
-        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/krona/{reference}_{reftype}/MeBaPiNa_krona_kraken2.log"
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_krona_align.log"
     benchmark:
-        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/krona/{reference}_{reftype}/MeBaPiNa_krona_kraken2.benchmark.tsv"
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_krona_align.benchmark.tsv"
     conda:
         "../envs/krona.yml"
     params:
         "-n \"Root\"" ## name for highest taxon
     shell:
         "ktImportText {params} -o {output} {input} > {log} 2>&1"
+
+## K-MER MAPPING ##
+###################
+
+rule plot_krona_kmer_text:
+    input:
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"
+    output:
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona_bracken.html"
+    log:
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_krona_bracken.log"
+    benchmark:
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_krona_bracken.benchmark.tsv"
+    conda:
+        "../envs/krona.yml"
+    params:
+        "-n \"Root\"" ## name for highest taxon
+    shell:
+        "ktImportText {params} -o {output} {input} > {log} 2>&1"
+
+rule plot_krona_kmer_kraken:
+    input:
+        output="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kraken2",
+        kronataxtab="{tmp}METADATA/Reference_Sequences/{reference}/krona/{reftype}/taxonomy.tab"
+    output:
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona.html"
+    log:
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_krona_kraken2.log"
+    benchmark:
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_krona_kraken2.benchmark.tsv"
+    conda:
+        "../envs/krona.yml"
+    params:
+        "-i", ## Include a wedge for queries with no hits.
+        # "-q 2", ## Column of input files to use as query ID. Required if magnitude files are specified. [Default: '1']
+        "-t 3", ## Column of input files to use as taxonomy ID. [Default: '2']
+        "-d 7" ## Maximum depth of wedges to include in the chart.
+    shell:
+        "reference={input.kronataxtab}; reference=\"${{reference/taxonomy.tab/}}\" > {log} 2>&1; "
+        "ktImportTaxonomy {params} -tax  ${{reference}} {input.output} -o {output} > {log} 2>&1"
 
 ## CALIBRATION STRAIN ##
 ########################
@@ -349,4 +386,29 @@ rule plot_nanoplot_seqsum_calib:
         "--outdir {wildcards.tmp}02_analysis_results/01_basecalling/{wildcards.run}/nanoplot "
         "--summary {input}/lambda.txt > {log} 2>&1"
 
-## alignment plots are created by the functions above
+rule plot_pycoqc_bam_calib:
+    input:
+        seqsum="{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/split", ## only folder is specified as output in splitting rule
+        bam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/calibration_filteredsorted.bam"
+    output:
+        html="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc/calibration.html",
+        json="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc/calibration.json"
+    log:
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc/MeBaPiNa_pycoqc_bam_calib.log"
+    benchmark:
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc/MeBaPiNa_pycoqc_bam_calib.tsv"
+    conda:
+        "../envs/pycoqc.yml"
+    params:
+        ("--config {tmp}Pineline/MeBaPiNa/scripts/pycoQC_config.json " if  ## use custom config (without coverage plot) for barcodes...
+        not config["reference"]["source"] == "zymobiomics" ## ...but not for the Zymo reference
+        and not "{wildcards.barc}" == "lambda" else ""), ## or calibration strains
+        "--min_pass_qual 0",
+        "--sample " + PLOT_SMPL, ## downsampling
+        "--verbose"
+    shell:
+        "pycoQC {params} "
+        "--summary_file {input.seqsum}/{wildcards.barc}.txt " ## only folder is specified as output in splitting rule
+        "--bam_file {input.bam} "
+        "--html_outfile {output.html} "
+        "--json_outfile {output.json} > {log} 2>&1"
