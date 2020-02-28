@@ -62,10 +62,15 @@ rule filter_aligned:
         "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_converting_{altype}.benchmark.tsv"
     conda:
         "../envs/samtools.yml"
+    params:
+        "-F 2048", ## exclude chimeric/supplementary alignments
+        "-q 1" ## MAPQ >= 1 filters out all multimapping reads as they always have MAPQ=0
     threads:
-        2
+        4
     shell:
-        "samtools sort --threads {threads} -o {output.bam} {input} > {log} 2>&1; "
+        "samtools view -h -@ $(({threads} / 2)) {params} 2> {log} {input} | "
+        "tee {output.sam} | "
+        "samtools sort --threads $(({threads} / 2)) -o {output.bam} >> {log} 2>&1; "
         "samtools index -@ {threads} {output.bam} >> {log} 2>&1"
 
 ## CALIBRATION STRAND ##
