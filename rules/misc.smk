@@ -105,6 +105,31 @@ rule krona_reffile:
         "out_dir={output}; out_dir=\"${{out_dir/taxonomy.tab/}}\" > {log} 2>&1; "
         "ktUpdateTaxonomy.sh ${{out_dir}} >> {log} 2>&1"
 
+
+rule parse_silva_taxonomy:
+    input:
+        slvmap="{tmp}METADATA/Reference_Sequences/silva/slvmap.txt",
+        taxlist="{tmp}METADATA/Reference_Sequences/silva/taxlist.txt",
+        taxtre="{tmp}METADATA/Reference_Sequences/silva/taxlist.tre"
+    output:
+        q2tax="{tmp}METADATA/Reference_Sequences/silva/TAXONOMY.txt"
+    log:
+        "{tmp}METADATA/Reference_Sequences/silva/qiime2/MeBaPiNa_parse_silva_atxonomy.log"
+    benchmark:
+        "{tmp}METADATA/Reference_Sequences/silva/qiime2/MeBaPiNa_parse_silva_atxonomy.benchmark.tsv"
+    conda:
+        "../envs/qiime2.yml"
+    params:
+        "-s" ## include species taxa
+    shell:
+        "python {wildcards.tmp}Pineline/MeBaPiNa/scripts/make_SILVA_db/parse_silva_taxonomy.py {params} "
+        "-t {input.taxlist} "
+        "-p {input.taxtre} "
+        "-m {input.slvmap} "
+        "-o {output.q2tax}"
+
+
+
 rule construct_reffiles:
     input:
         taxlist="{tmp}METADATA/Reference_Sequences/silva/taxlist.txt",

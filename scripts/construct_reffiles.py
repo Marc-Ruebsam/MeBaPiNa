@@ -13,21 +13,23 @@ input_dict = {
     'taxlist' : snakemake.input['taxlist'],
     'slvmap' : snakemake.input['slvmap'],
     'ncbimap' : snakemake.input['ncbimap'],
-    'ncbikrona' : snakemake.input['ncbikrona'] + "/taxonomy.tab"
+    'ncbikrona' : snakemake.input['ncbikrona']
 }
 
 ## output files
 output_dict = {
-    'kraknames_S' : snakemake.output['krak_S'] + "/taxonomy/names.dmp",
-    'kraknodes_S' : snakemake.output['krak_S'] + "/taxonomy/nodes.dmp",
-    'krakseq2tax_S' : snakemake.output['krak_S'] + "/seqid2taxid.map",
-    'kraknames_G' : snakemake.output['krak_G'] + "/taxonomy/names.dmp",
-    'kraknodes_G' : snakemake.output['krak_G'] + "/taxonomy/nodes.dmp",
-    'krakseq2tax_G' : snakemake.output['krak_G'] + "/seqid2taxid.map",
-    'krona_S' : snakemake.output['krona_S'] + "/taxonomy.tab",
-    'krona_G' : snakemake.output['krona_G'] + "/taxonomy.tab",
-    'taxlist_S' : snakemake.output['krona_S'] + "/taxlist.txt",
-    'taxlist_G' : snakemake.output['krona_G'] + "/taxlist.txt"
+    'kraknames_S' : snakemake.output['kraknames_S'],
+    'kraknodes_S' : snakemake.output['kraknodes_S'],
+    'krakseq2tax_S' : snakemake.output['krakseq2tax_S'],
+    'kraknames_G' : snakemake.output['kraknames_G'],
+    'kraknodes_G' : snakemake.output['kraknodes_G'],
+    'krakseq2tax_G' : snakemake.output['krakseq2tax_G'],
+    'kronataxtab_S' : snakemake.output['kronataxtab_S'],
+    'kronataxlist_S' : snakemake.output['kronataxlist_S'],
+    'kronaseq2tax_S' : snakemake.output['kronaseq2tax_S'],
+    'kronataxtab_G' : snakemake.output['kronataxtab_G'],
+    'kronataxlist_G' : snakemake.output['kronataxlist_G'],
+    'kronaseq2tax_G' : snakemake.output['kronaseq2tax_G']
 }
 
 # input_dict = {
@@ -37,32 +39,30 @@ output_dict = {
 #     'taxlist' : "METADATA/Reference_Sequences/silva/taxlist.txt"
 # }
 # output_dict = {
-#     'kraknames_S' : "METADATA/Reference_Sequences/silva/kraken2/species_tmp/taxonomy/names.dmp",
-#     'kraknodes_S' : "METADATA/Reference_Sequences/silva/kraken2/species_tmp/taxonomy/nodes.dmp",
-#     'krakseq2tax_S' : "METADATA/Reference_Sequences/silva/kraken2/species_tmp/seqid2taxid.map",
-#     'kraknames_G' : "METADATA/Reference_Sequences/silva/kraken2/genus_tmp/taxonomy/names.dmp",
-#     'kraknodes_G' : "METADATA/Reference_Sequences/silva/kraken2/genus_tmp/taxonomy/nodes.dmp",
-#     'krakseq2tax_G' : "METADATA/Reference_Sequences/silva/kraken2/genus_tmp/seqid2taxid.map",
-#     'krona_S' : "METADATA/Reference_Sequences/silva/krona/species/taxonomy.tab",
-#     'krona_G' : "METADATA/Reference_Sequences/silva/krona/genus/taxonomy.tab",
-#     'taxlist_S' : "METADATA/Reference_Sequences/silva/krona/species/taxlist.txt",
-#     'taxlist_G' : "METADATA/Reference_Sequences/silva/krona/genus/taxlist.txt"
+#     'kraknames_S' : "METADATA/Reference_Sequences/silva/kraken2/species/taxonomy/names.dmp",
+#     'kraknodes_S' : "METADATA/Reference_Sequences/silva/kraken2/species/taxonomy/nodes.dmp",
+#     'krakseq2tax_S' : "METADATA/Reference_Sequences/silva/kraken2/species/seqid2taxid.map",
+#     'kraknames_G' : "METADATA/Reference_Sequences/silva/kraken2/genus/taxonomy/names.dmp",
+#     'kraknodes_G' : "METADATA/Reference_Sequences/silva/kraken2/genus/taxonomy/nodes.dmp",
+#     'krakseq2tax_G' : "METADATA/Reference_Sequences/silva/kraken2/genus/seqid2taxid.map",
+#     'kronataxtab_S' : "METADATA/Reference_Sequences/silva/krona/species/taxonomy.tab",
+#     'kronataxtab_G' : "METADATA/Reference_Sequences/silva/krona/genus/taxonomy.tab",
+#     'kronataxlist_S' : "METADATA/Reference_Sequences/silva/krona/species/taxlist.txt",
+#     'kronataxlist_G' : "METADATA/Reference_Sequences/silva/krona/genus/taxlist.txt",
+#     'kronaseq2tax_S' : "METADATA/Reference_Sequences/silva/krona/species/seqid2taxid.map",
+#     'kronaseq2tax_G' : "METADATA/Reference_Sequences/silva/krona/genus/seqid2taxid.map"
 # }
+# krak_dir_S = "/".join(output_dict['krakseq2tax_S'].split("/")[:-1])
+# krak_dir_G = "/".join(output_dict['krakseq2tax_G'].split("/")[:-1])
+# krona_dir_S = "/".join(output_dict['kronataxtab_S'].split("/")[:-1])
+# krona_dir_G = "/".join(output_dict['kronataxtab_G'].split("/")[:-1])
+# os.makedirs( krak_dir_S + "/library" )
+# os.makedirs( krak_dir_S + "/taxonomy" )
+# os.makedirs( krak_dir_G + "/library" )
+# os.makedirs( krak_dir_G + "/taxonomy" )
+# os.makedirs( krona_dir_S )
+# os.makedirs( krona_dir_G )
 
-## create output directories
-os.makedirs( snakemake.output['krak_S'] + "/library" )
-os.makedirs( snakemake.output['krak_G'] + "/library" )
-os.makedirs( snakemake.output['krak_S'] + "/taxonomy" )
-os.makedirs( snakemake.output['krak_G'] + "/taxonomy" )
-os.makedirs( snakemake.output['krona_S'] )
-os.makedirs( snakemake.output['krona_G'] )
-
-# os.makedirs("METADATA/Reference_Sequences/silva/kraken2/species_tmp/library")
-# os.makedirs("METADATA/Reference_Sequences/silva/kraken2/genus_tmp/library")
-# os.makedirs("METADATA/Reference_Sequences/silva/kraken2/species_tmp/taxonomy")
-# os.makedirs("METADATA/Reference_Sequences/silva/kraken2/genus_tmp/taxonomy")
-# os.makedirs("METADATA/Reference_Sequences/silva/krona/species")
-# os.makedirs("METADATA/Reference_Sequences/silva/krona/genus")
 
 ## LOAD DATA ##
 
@@ -111,7 +111,7 @@ df_taxlist['name'] = tmp_name
 df_taxlist['targetID_slv'] = tmp_targetID
 
 ## exclude useless names
-df_taxlist.loc[df_taxlist['name'].isin(["uncultured","Incertae Sedis","Unknown Family"]),'rank_slv'] = "no rank"
+df_taxlist.loc[df_taxlist['name'].str.contains("uncultured|unknown|metagenome|unidentified|environmental sample|bacterium enrichment culture|Incertae Sedis|Unknown Family|Unknown Genus"),'rank_slv'] = "no rank"
 
 
 ## COMPLETE SPECIES ##
@@ -148,6 +148,41 @@ df_slv.loc[df_slv['name']=="bacterium",'rank_new'] = "no rank"
 df_slv_norank = df_slv.loc[ df_slv['rank_new']=="no rank",:]
 df_slv = df_slv.loc[ df_slv['rank_new']!="no rank",:]
 
+# ## handle "no rank" targets (higher taxa) for norank species 
+# ## create data frame with taxID and rank of target
+# df_norank = pd.merge( df_slv_norank.loc[:,['taxID_slv']], df_taxlist, how='left', on='taxID_slv' )
+# ## loop until break
+# taxID_slv = []
+# # targetID_slv = []
+# # path_slv = []
+# # depth_slv = []
+# # name = []
+# while True:
+#     ## get all taxIDs whoes targetID has "no rank"
+#     idx = df_norank['rank_slv']=="no rank"
+#     ## if there are non (anymore)
+#     if sum(idx) == 0:
+#         ## return taxID and targetID
+#         taxID_slv = df_norank['taxID_slv']
+#         # targetID_slv = df_norank['targetID_slv']
+#         # path_slv = df_norank['pathname_slv']
+#         # depth_slv = df_norank['depth_slv']
+#         # name = []
+#         ## break loop
+#         break
+# 
+#     ## for all taxIDs whoes targetID has "no rank", increase the level of the target to the next higher taxon
+#     df_norank.loc[idx,'taxID_slv'] = df_norank.loc[idx,'targetID_slv']
+#     df_norank = pd.merge( df_norank.loc[:,['taxID_slv']], df_taxlist, how='left', on='taxID_slv' )
+# 
+# ## assign new values to data frame
+# df_slv_norank['taxID_slv'] = taxID_slv
+# # df_slv_norank['targetID_slv'] = targetID_slv
+# # df_slv_norank['path_slv'] = path_slv
+# # df_slv_norank['depth_slv'] = depth_slv
+# # df_slv_norank['name'] = name
+# del df_norank, taxID_slv #, targetID_slv, path_slv, depth_slv, name
+
 ## reconstruct full path with name with tailing ";" at the end
 df_slv['pathname_slv'] = df_slv['path_slv'].map(str) + df_slv['name'].map(str) + ";"
 
@@ -176,27 +211,39 @@ df_slv = pd.merge(df_slv, single_taxIDs, how='left', on=['depth_slv', 'targetID_
 ## taxID newly created taxID for used taxa
 df_slv['taxID_slv'] = df_slv['taxID_new']
 
+
 ## SILVA LIKE ##
 
 ## write sequence taxon association
-pd.concat([
+df_tmp = pd.concat([
     ## used taxons with higher taxon ID (was reassignes to targetID here)
     df_slv.loc[:,['accIDstartend','targetID_slv']].rename(columns={"targetID_slv" : "taxID_slv"}),
     ## unused taxons ("no rank") with higher taxon ID (was left as taxID here)
     df_slv_norank.loc[:,['accIDstartend','taxID_slv']]
-]).to_csv(
+])
+df_tmp.to_csv(
     ## save
     output_dict['krakseq2tax_G'], mode='w', sep='\t', header=False, index=False, quoting=0, float_format="%g"
 )
+df_tmp.to_csv(
+    ## save
+    output_dict['kronaseq2tax_G'], mode='w', sep='\t', header=False, index=False, quoting=0, float_format="%g"
+)
+
 ## write sequence taxon association FOR SPECIES
-pd.concat([
+df_tmp = pd.concat([
     ## used taxons with species taxon ID (was created as taxID here)
     df_slv.loc[:,['accIDstartend','taxID_slv']],
     ## unused taxons ("no rank") with "species" taxon ID (not actually species taxon ID, but left at higer taxID here)
     df_slv_norank.loc[:,['accIDstartend','taxID_slv']]
-]).to_csv(
+])
+df_tmp.to_csv(
     ## save
     output_dict['krakseq2tax_S'], mode='w', sep='\t', header=False, index=False, quoting=0, float_format="%g"
+)
+df_tmp.to_csv(
+    ## save
+    output_dict['kronaseq2tax_S'], mode='w', sep='\t', header=False, index=False, quoting=0, float_format="%g"
 )
 
 ## remove duplicates: many taxa have more than one accID
@@ -210,7 +257,7 @@ pd.concat([
     df_taxlist.loc[:,['pathname_slv','taxID_slv','rank_slv']]
 ]).to_csv(
     ## save
-    output_dict['taxlist_G'], mode='w', sep='\t', header=False, index=False, quoting=0, float_format="%g"
+    output_dict['kronataxlist_G'], mode='w', sep='\t', header=False, index=False, quoting=0, float_format="%g"
 )
 ## write taxlist-like file (without last columns) INCLUDING SPECIES
 pd.concat([
@@ -222,7 +269,7 @@ pd.concat([
     df_slv.loc[:,['pathname_slv','taxID_slv','rank_slv']]
 ]).to_csv(
     ## save
-    output_dict['taxlist_S'], mode='w', sep='\t', header=False, index=False, quoting=0, float_format="%g"
+    output_dict['kronataxlist_S'], mode='w', sep='\t', header=False, index=False, quoting=0, float_format="%g"
 )
 
 
@@ -236,7 +283,7 @@ pd.concat([
     df_taxlist.loc[:,['taxID_slv','depth_slv','targetID_slv','rank_slv','name']]
 ]).to_csv(
     ## save
-    output_dict['krona_G'], mode='w', sep='\t', header=False, index=False, quoting=0, float_format="%g"
+    output_dict['kronataxtab_G'], mode='w', sep='\t', header=False, index=False, quoting=0, float_format="%g"
 )
 ## write krona silva reference taxonomy INCLUDING SPECIES
 pd.concat([
@@ -248,7 +295,7 @@ pd.concat([
     df_slv.loc[:,['taxID_slv','depth_slv','targetID_slv','rank_slv','name']]
 ]).to_csv(
     ## save
-    output_dict['krona_S'], mode='w', sep='\t', header=False, index=False, quoting=0, float_format="%g"
+    output_dict['kronataxtab_S'], mode='w', sep='\t', header=False, index=False, quoting=0, float_format="%g"
 )
 
 
