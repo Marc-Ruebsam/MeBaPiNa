@@ -30,7 +30,7 @@ wildcard_constraints:
     barc="[a-zA-Z0-9_-]+", 
     run="\w+", ## is equalt to [a-zA-Z0-9_]+
     reftype="[a-zA-Z0-9]+",
-    reference="[a-zA-Z0-9_\.]+"
+    reference="[a-zA-Z0-9]+"
 
 ## METADATA AND THRESHOLDS ##
 #############################
@@ -66,10 +66,10 @@ PLOT_MAXLEN = config["filtering"]["len_max"]
 
 ## load rule set
 include: "rules/basecall.smk"
-include: "rules/plot.smk"
 include: "rules/align.smk"
 include: "rules/kmer.smk"
 include: "rules/otu.smk"
+include: "rules/plot.smk"
 include: "rules/misc.smk"
 include: "rules/report.smk"
 
@@ -109,8 +109,17 @@ rule all:
         ## ALIGNMENT ##
         
         ## general QC: per barcode, intentional downsampling
-        # "{tmp}02_analysis_results/03_alignment/{run}/{barc}/pycoqc/filtered.html",
-        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/krona/silva_species/Species.html",
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc.html",
+        ## taxonomic composition
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/align.counttaxlist",
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/krona.html",
+        
+        ## K-MER MAPPING ##
+        
+        ## taxonomic composition
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist",
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona.html",
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona_bracken.html",
         
         ## OTU
         
@@ -129,4 +138,4 @@ rule all:
         ("" if not LAM_DCS else ## "" if lam_DCS is False
         "{tmp}02_analysis_results/03_alignment/{run}_calibration_strands/lambda_pycoqc/pycoQC_report.json")
 
-        ])), tmp = config["experiments"]["tmp"], run = RUNS, barc = SAMPLES.keys())
+        ])), tmp = config["experiments"]["tmp"], run = RUNS, barc = SAMPLES.keys(), reference = config['reference']['source'], reftype = config['reference']['type'])
