@@ -69,6 +69,7 @@ include: "rules/basecall.smk"
 include: "rules/plot.smk"
 include: "rules/align.smk"
 include: "rules/kmer_mapped.smk"
+include: "rules/otu.smk"
 include: "rules/misc.smk"
 include: "rules/report.smk"
 
@@ -111,6 +112,10 @@ rule all:
         # "{tmp}02_analysis_results/03_alignment/{run}/{barc}/pycoqc/filtered.html",
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/krona/silva_species/Species.html",
         
+        ## OTU
+        
+        ## clustered reads
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_seq.qza",
         
         ## CALIBRATION STRAIN ##
         
