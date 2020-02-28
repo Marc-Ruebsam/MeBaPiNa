@@ -72,6 +72,23 @@ rule filter_aligned:
         "tee {output.sam} | "
         "samtools sort --threads $(({threads} / 2)) -o {output.bam} >> {log} 2>&1; "
         "samtools index -@ {threads} {output.bam} >> {log} 2>&1"
+        
+
+rule counttax_aligned:
+    input:
+        sam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/align_filtered.sam",
+        kronataxlist="{tmp}METADATA/Reference_Sequences/{reference}/krona/{reftype}/taxlist.txt",
+        kronaseq2tax="{tmp}METADATA/Reference_Sequences/{reference}/krona/{reftype}/seqid2taxid.map"
+    output:
+        counttaxlist="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/align.counttaxlist"
+    log:
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax.log"
+    benchmark:
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax.benchmark.tsv"
+    conda:
+        "../envs/python.yml"
+    script:
+        "../scripts/convert_sam.py" ## filters by read length and average base diversion
 
 ## CALIBRATION STRAND ##
 ########################
