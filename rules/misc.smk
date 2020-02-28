@@ -79,11 +79,12 @@ rule downsampling_seqsum: #!#
 
 rule download_reffiles:
     output:
-        fastaU="{tmp}METADATA/Reference_Sequences/silva/reference.fasta",
-        fastaT="{tmp}METADATA/Reference_Sequences/silva/reference_thymine.fasta",
+        fasta="{tmp}METADATA/Reference_Sequences/silva/reference.fasta",
+        fasta_align="{tmp}METADATA/Reference_Sequences/silva/reference_aligned.fasta",
         ncbimap="{tmp}METADATA/Reference_Sequences/silva/ncbimap.txt",
         slvmap="{tmp}METADATA/Reference_Sequences/silva/slvmap.txt",
-        taxlist="{tmp}METADATA/Reference_Sequences/silva/taxlist.txt"
+        taxlist="{tmp}METADATA/Reference_Sequences/silva/taxlist.txt",
+        taxtre="{tmp}METADATA/Reference_Sequences/silva/taxlist.tre"
     log:
         "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_reffiles.log"
     benchmark:
@@ -93,7 +94,7 @@ rule download_reffiles:
 
 rule krona_reffile:
     output:
-        directory("{tmp}METADATA/Reference_Sequences/ncbi/krona")
+        "{tmp}METADATA/Reference_Sequences/ncbi/krona/taxonomy.tab"
     log:
         "{tmp}METADATA/Reference_Sequences/ncbi/MeBaPiNa_reffiles.log"
     benchmark:
@@ -108,16 +109,26 @@ rule construct_reffiles:
         taxlist="{tmp}METADATA/Reference_Sequences/silva/taxlist.txt",
         slvmap="{tmp}METADATA/Reference_Sequences/silva/slvmap.txt",
         ncbimap="{tmp}METADATA/Reference_Sequences/silva/ncbimap.txt",
-        ncbikrona="{tmp}METADATA/Reference_Sequences/ncbi/krona"
+        ncbikrona="{tmp}METADATA/Reference_Sequences/ncbi/krona/taxonomy.tab"
     output:
-        krak_S=temp(directory("{tmp}METADATA/Reference_Sequences/silva/kraken2/species_tmp")), ## also creates sub directories
-        krak_G=temp(directory("{tmp}METADATA/Reference_Sequences/silva/kraken2/genus_tmp")),
-        krona_S=directory("{tmp}METADATA/Reference_Sequences/silva/krona/species"),
-        krona_G=directory("{tmp}METADATA/Reference_Sequences/silva/krona/genus")
+        kraknames_S="{tmp}METADATA/Reference_Sequences/silva/kraken2/species/taxonomy/names.dmp",
+        kraknodes_S="{tmp}METADATA/Reference_Sequences/silva/kraken2/species/taxonomy/nodes.dmp",
+        krakseq2tax_S="{tmp}METADATA/Reference_Sequences/silva/kraken2/species/seqid2taxid.map",
+        kraknames_G="{tmp}METADATA/Reference_Sequences/silva/kraken2/genus/taxonomy/names.dmp",
+        kraknodes_G="{tmp}METADATA/Reference_Sequences/silva/kraken2/genus/taxonomy/nodes.dmp",
+        krakseq2tax_G="{tmp}METADATA/Reference_Sequences/silva/kraken2/genus/seqid2taxid.map",
+        kronataxtab_S="{tmp}METADATA/Reference_Sequences/silva/krona/species/taxonomy.tab",
+        kronataxlist_S="{tmp}METADATA/Reference_Sequences/silva/krona/species/taxlist.txt",
+        kronaseq2tax_S="{tmp}METADATA/Reference_Sequences/silva/krona/species/seqid2taxid.map",
+        kronataxtab_G="{tmp}METADATA/Reference_Sequences/silva/krona/genus/taxonomy.tab",
+        kronataxlist_G="{tmp}METADATA/Reference_Sequences/silva/krona/genus/taxlist.txt",
+        kronaseq2tax_G="{tmp}METADATA/Reference_Sequences/silva/krona/genus/seqid2taxid.map"
     log:
         "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_reffiles.log"
     benchmark:
         "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_reffiles.benchmark.tsv"
+    conda:
+        "../envs/python.yml"
     script:
         "../scripts/construct_reffiles.py"
 
@@ -126,10 +137,17 @@ rule construct_reffiles:
 
 rule building_database_fromreffiles:
     input:
-        fastaT="{tmp}METADATA/Reference_Sequences/silva/reference_thymine.fasta",
-        krak_dir="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}_tmp"
+        fastaT="{tmp}METADATA/Reference_Sequences/{reference}/reference_thymine.fasta",
+        kraknames="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/taxonomy/names.dmp",
+        kraknodes="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/taxonomy/nodes.dmp",
+        krakseq2tax="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/seqid2taxid.map"
     output:
-        directory("{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}")
+        krakdb="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database.kraken",
+        krakhash="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/hash.k2d",
+        krakopts="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/opts.k2d",
+        kraktaxo="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/taxo.k2d",
+        brakdb="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database1451mers.kraken",
+        brakdist="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database1451mers.kmer_distrib"
     log:
         "{tmp}METADATA/Reference_Sequences/{reference}/kraken2/MeBaPiNa_{reftype}.log"
     benchmark:
@@ -137,30 +155,35 @@ rule building_database_fromreffiles:
     conda:
         "../envs/kraken2.yml"
     threads:
-        8
+        6
     params:
         "35" ## k-mer length
     shell:
-        "mkdir -p {output}; "
-        "mv {input.krak_dir}/* {output}; "
-        "cp \"{input.fastaT}\" \"{output}/library/library.fna\"; "
+        "out_dir={output.krakdb}; out_dir=\"${{out_dir/database.kraken/}}\" > {log} 2>&1; "
+        "mkdir \"${{out_dir}}library\" >> {log} 2>&1; "
+        "cp \"{input.fastaT}\" \"${{out_dir}}library/library.fna\" >> {log} 2>&1; "
         # "kraken2-build --threads {threads} --download-taxonomy --skip-maps --db {output} > {log} 2>&1; "
         # "kraken2-build --threads {threads} --download-library bacteria --no-masking --db {output} >> {log} 2>&1; "
         # # "kraken2-build --threads {threads} --download-library archaea --no-masking --db {output} >> {log} 2>&1; "
         "kraken2-build --threads {threads} --kmer-len {params} --build "
-        "--db {output} "
-        "> {log} 2>&1; "
+        "--db ${{out_dir}} "
+        ">> {log} 2>&1; "
         # "kraken2-build --clean --db {output} >> {log} 2>&1"
         # "kraken2-build --threads {threads} " ## unfortunately --kmer-len {params} is ignored by when --special is used
         # "--special {wildcards.reference} --db {output} > {log}; " ## reference can be one of "greengenes", "silva", "rdp"
         "bracken-build -t {threads} -k {params} -l 1451 " ## 1451 ismedian read length after filtering in 20191007_1559_MN31344_FAK76605_2bf006ff
-        "-d {output} "
+        "-d ${{out_dir}} "
         ">> {log} 2>&1; "
-        "kraken2-build --clean --db {output} >> {log} 2>&1"
+        "kraken2-build --clean --db ${{out_dir}} >> {log} 2>&1"
 
 rule building_database_alone:
     output:
-        directory("{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}") ## reftype has no incluence on this rule, but is used for silva species database (rule building_database_fromreffiles)
+        krakdb="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database.kraken", ## reftype wildcard has no influence on this rule, but is used for silva species database (rule building_database_fromreffiles)
+        krakhash="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/hash.k2d",
+        krakopts="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/opts.k2d",
+        kraktaxo="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/taxo.k2d",
+        brakdb="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database1451mers.kraken",
+        brakdist="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database1451mers.kmer_distrib"
     log:
         "{tmp}METADATA/Reference_Sequences/{reference}/kraken2/MeBaPiNa_{reftype}.log"
     benchmark:
@@ -168,17 +191,18 @@ rule building_database_alone:
     conda:
         "../envs/kraken2.yml"
     threads:
-        8
+        4
     params:
         "35" ## k-mer length
     shell:
+        "out_dir={output.krakdb}; out_dir=\"${{out_dir/database.kraken/}}\" > {log} 2>&1; "
         "kraken2-build --threads {threads} " ## unfortunately --kmer-len {params} is ignored by when --special is used
-        "--special {wildcards.reference} --db {output} " ## reference can be one of "greengenes", "silva", "rdp"
-        "> {log} 2>&1; "
-        "bracken-build -t {threads} -k {params} -l 1451 -d {output} " ## 1451 ismedian read length after filtering in 20191007_1559_MN31344_FAK76605_2bf006ff
+        "--special {wildcards.reference} --db ${{out_dir}} " ## reference can be one of "greengenes", "silva", "rdp"
         ">> {log} 2>&1; "
-        "rm -rf {output}/data "
-        "kraken2-build --clean --db {output} >> {log} 2>&1"
+        "bracken-build -t {threads} -k {params} -l 1451 -d ${{out_dir}} " ## 1451 ismedian read length after filtering in 20191007_1559_MN31344_FAK76605_2bf006ff
+        ">> {log} 2>&1; "
+        "rm -rf ${{out_dir}}/data "
+        "kraken2-build --clean --db ${{out_dir}} >> {log} 2>&1"
 
 ruleorder: building_database_fromreffiles > building_database_alone
 
