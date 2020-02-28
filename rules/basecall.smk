@@ -7,7 +7,7 @@
 
 rule moving_raw:
     output:
-        "{tmp}00_raw_data/{run}/fast5"
+        directory("{tmp}00_raw_data/{run}/fast5")
     shell:
         "find {wildcards.tmp}00_raw_data/ -name \"{wildcards.run}\" -print0 | xargs -0 -I {{}} mv {{}} \"{wildcards.tmp}00_raw_data/{wildcards.run}\"; "
         "find {wildcards.tmp}00_raw_data/ -depth -type d -empty -delete" #!# delete empty directories
