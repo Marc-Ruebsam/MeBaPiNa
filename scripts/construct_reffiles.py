@@ -83,6 +83,7 @@ usecols=['accID','start','end','name','taxID'])
 
 ## PER ACCID ##
 
+## the copncept in this paragraph was adapted from Mike Robeson, Little Rock, AR, michael.robeson@colorado.edu
 ## add path to accmap
 df_accmap = pd.merge(df_accmap, df_taxlist.loc[:,['pathname','taxID']], how='left', on='taxID').rename(columns={'pathname' : 'path', 'taxID' : 'taxID_old'})
 ## get long accession ID with start and stop
@@ -170,7 +171,6 @@ df_tmp.to_csv(
     output_dict['kronaseq2tax_G'], mode='w', sep='\t', header=False, index=False, quoting=0, float_format="%g"
 )
 del df_tmp
-
 ## write sequence taxon association INCLUDING SPECIES
 df_tmp = df_accmap.loc[:,['accIDstartend','taxID']] ## use new taxIDs specific for species
 df_tmp.to_csv(

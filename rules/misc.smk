@@ -79,10 +79,9 @@ rule downsampling_seqsum: #!#
 
 rule download_reffiles:
     output:
-        fasta=temp("{tmp}METADATA/Reference_Sequences/silva/reference_raw.fasta"),
-        fasta_align=temp("{tmp}METADATA/Reference_Sequences/silva/reference_aligned_raw.fasta"),
-        slvmap="{tmp}METADATA/Reference_Sequences/silva/slvmap.txt",
-        taxlist="{tmp}METADATA/Reference_Sequences/silva/taxlist.txt"
+        fasta_align=temp("{tmp}METADATA/Reference_Sequences/silva/reference_aligned.fasta"),
+        slvmap=temp("{tmp}METADATA/Reference_Sequences/silva/slvmap.txt"),
+        taxlist=temp("{tmp}METADATA/Reference_Sequences/silva/taxlist.txt")
     log:
         "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_download_reffiles.log"
     benchmark:
@@ -110,20 +109,144 @@ rule construct_reftax:
         qiimetax_S="{tmp}METADATA/Reference_Sequences/silva/qiime/species/taxonomy.tsv",
         qiimetax_G="{tmp}METADATA/Reference_Sequences/silva/qiime/genus/taxonomy.tsv"
     log:
-        "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_construct_reffiles.log"
+        "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_construct_reftax.log"
     benchmark:
-        "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_construct_reffiles.benchmark.tsv"
+        "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_construct_reftax.benchmark.tsv"
     conda:
         "../envs/python.yml"
     script:
         "../scripts/construct_reffiles.py"
+
+rule construct_refseq:
+    input:
+        refseq="{tmp}METADATA/Reference_Sequences/silva/reference_aligned.fasta",
+        primers="{tmp}METADATA/Reference_Sequences/primers/ONT_16S/primers.fasta"
+    output:
+        "{tmp}METADATA/Reference_Sequences/silva/reference.fasta"
+    log:
+        "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_construct_refseq.log"
+    benchmark:
+        "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_construct_refseq.benchmark.tsv"
+    conda:
+        "../envs/qiime2.yml"
+    threads:
+        2
+    params:
+        "--fastq_minlen " + config["filtering"]["len_min"], ## minimum length of amplicon
+        "--fastq_maxlen " + config["filtering"]["len_max"]
+    shell:
+        "python {wildcards.tmp}Pipeline/MeBaPiNa/scripts/make_SILVA_db/convert_rna_to_dna.py "
+        "--convert_to_gap "
+        "--input_fasta {input.refseq} "
+        "--output_fasta {output}_dna.fasta "
+        "> {log} 2>&1; "
+        ""
+        "head -n 500 {output}_dna.fasta > {output}_head.fasta 2>> {log}; "
+        ""
+        "mafft --thread {threads} "
+        "--addfragments {input.primers} "
+        "--mapout {output}_head.fasta  > /dev/null 2>> {log}; "
+        "rm {output}_head.fasta; "
+        ""
+        "python {wildcards.tmp}Pipeline/MeBaPiNa/scripts/make_SILVA_db/extract_alignment_region.py "
+        "--input_alignment {output}_dna.fasta "
+        "--output_alignment {output}_trim.fasta "
+        "--start_position $(awk 'BEGIN{{prnt=-1}}; />/{{prnt++}}; prnt==0{{print $3+1}}' {input.primers}.map | tail -n 1) "
+        "--end_position $(awk 'BEGIN{{prnt=-3}}; />/{{prnt++}}; prnt==0{{print $3-1}}' {input.primers}.map | head -n 3 | tail -n 1) "
+        ">> {log} 2>&1; "
+        "rm {output}_dna.fasta; "
+        "rm {input.primers}.map; "
+        ""
+        "python {wildcards.tmp}Pipeline/MeBaPiNa/scripts/make_SILVA_db/degap_fasta.py "
+        "--input_fasta {output}_trim.fasta "
+        "--output_fasta {output}_degap.fasta "
+        ">> {log} 2>&1; "
+        "rm {output}_trim.fasta; "
+        ""
+        "vsearch --fastx_filter "
+        "{output}_degap.fasta "
+        "--fastaout {output} {params} "
+        ">> {log} 2>&1; "
+        "rm {output}_degap.fasta"
+
+
+## QIIME REFERENCE ##
+#####################
+
+rule q2import_reftax:
+    input:
+        "{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/taxonomy.tsv"
+    output:
+        "{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/taxonomy.qza"
+    log:
+        "{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/MeBaPiNa_q2import_reftax.log"
+    benchmark:
+        "{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/MeBaPiNa_q2import_reftax.benchmark.tsv"
+    conda:
+        "../envs/qiime2.yml"
+    threads:
+        1
+    params:
+        "--verbose"
+    shell:
+        "qiime tools import {params} "
+        "--type FeatureData[Taxonomy] "
+        "--input-format HeaderlessTSVTaxonomyFormat "
+        "--input-path {input} "
+        "--output-path {output} "
+        "> {log} 2>&1"
+
+rule q2import_refseq:
+    input:
+        "{tmp}METADATA/Reference_Sequences/silva/reference.fasta"
+    output:
+        "{tmp}METADATA/Reference_Sequences/silva/qiime/reference.qza"
+    log:
+        "{tmp}METADATA/Reference_Sequences/silva/qiime/MeBaPiNa_q2import_refseq.log"
+    benchmark:
+        "{tmp}METADATA/Reference_Sequences/silva/qiime/MeBaPiNa_q2import_refseq.benchmark.tsv"
+    conda:
+        "../envs/qiime2.yml"
+    threads:
+        1
+    params:
+        "--verbose"
+    shell:
+        "qiime tools import {params} "
+        "--type FeatureData[Sequence] "
+        "--input-path {input} "
+        "--output-path {output} "
+        "> {log} 2>&1"
+
+rule q2train_classifyer:
+    input:
+        reftax="{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/taxonomy.qza",
+        refseq="{tmp}METADATA/Reference_Sequences/silva/qiime/reference.qza"
+    output:
+        "{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/classifyer.qza"
+    log:
+        "{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/MeBaPiNa_q2train_classifyer.log"
+    benchmark:
+        "{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/MeBaPiNa_q2train_classifyer.benchmark.tsv"
+    conda:
+        "../envs/qiime2.yml"
+    threads:
+        1
+    params:
+        "--verbose"
+    shell:
+        "qiime feature-classifier fit-classifier-naive-bayes {params} "
+        "--i-reference-reads {input.refseq} "
+        "--i-reference-taxonomy {input.reftax} "
+        "--o-classifier {output} "
+        "> {log} 2>&1"
 
 ## KRAKEN2 DATABASE ##
 ######################
 
 rule building_database:
     input:
-        fastaT="{tmp}METADATA/Reference_Sequences/{reference}/reference_thymine.fasta",
+        fasta="{tmp}METADATA/Reference_Sequences/silva/reference.fasta",
         kraknames="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/taxonomy/names.dmp",
         kraknodes="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/taxonomy/nodes.dmp",
         krakseq2tax="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/seqid2taxid.map"
@@ -147,7 +270,7 @@ rule building_database:
     shell:
         "out_dir={output.krakdb}; out_dir=\"${{out_dir/database.kraken/}}\" > {log} 2>&1; "
         "mkdir \"${{out_dir}}library\" >> {log} 2>&1; "
-        "cp \"{input.fastaT}\" \"${{out_dir}}library/library.fna\" >> {log} 2>&1; "
+        "cp \"{input.fasta}\" \"${{out_dir}}library/library.fna\" >> {log} 2>&1; "
         # "kraken2-build --threads {threads} --download-taxonomy --skip-maps --db {output} > {log} 2>&1; "
         # "kraken2-build --threads {threads} --download-library bacteria --no-masking --db {output} >> {log} 2>&1; "
         # # "kraken2-build --threads {threads} --download-library archaea --no-masking --db {output} >> {log} 2>&1; "

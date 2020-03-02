@@ -47,7 +47,7 @@ rule q2import_filtered:
         "--output-path {output} > {log} 2>&1"
 
 ################
-## PROCESSING ##
+## CLUSTERING ##
 ################
 
 rule q2derep_imported:
@@ -72,29 +72,6 @@ rule q2derep_imported:
         "--o-dereplicated-table {output.dereptable} "
         "--o-dereplicated-sequences {output.derepseq} "
         "> {log} 2>&1"
-
-################
-## CLUSTERING ##
-################
-
-rule q2import_reference:
-    input:
-        "{tmp}.tmp/Reference_Sequences/SILVA_132_QIIME_release/rep_set/rep_set_16S_only/99/silva_132_99_16S.fna"
-    output:
-        "{tmp}.tmp/Reference_Sequences/silva/qiime/reference.qza"
-    log:
-        "{tmp}.tmp/Reference_Sequences/silva/qiime/MeBaPiNa_q2import_reference.log"
-    benchmark:
-        "{tmp}.tmp/Reference_Sequences/silva/qiime/MeBaPiNa_q2import_reference.benchmark.tsv"
-    conda:
-        "../envs/qiime2.yml"
-    shell:
-        "qiime tools import "
-        "--type FeatureData[Sequence] "
-        "--input-path {input} "
-        "--output-path {output} "
-        "> {log} 2>&1"
-
 
 rule q2otupick:
     input:
@@ -125,6 +102,9 @@ rule q2otupick:
         "--o-new-reference-sequences {output.otunewref} "
         "> {log} 2>&1"
 
+################
+## PROCESSING ##
+################
 
 # qiime tools export --input-path cluster_table.qza --output-path .
 # biom summarize-table -i feature-table.biom
