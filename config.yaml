@@ -29,6 +29,8 @@ filtering:
   q_min: "7" ## deactivate quality filtering by setting it to "0"
   len_min: "1000"
   len_max: "2800"
+  min_featurereads: "3" ## minimum number of reads per cluster or taxon
+  min_readidentity: "0.85" ## minimum read identity for clustering
 
 reference:
   source: "silva"

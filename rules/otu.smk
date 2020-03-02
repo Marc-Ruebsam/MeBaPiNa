@@ -112,7 +112,7 @@ rule q2otupick:
     conda:
         "../envs/qiime2.yml"
     params:
-        "--p-perc-identity 0.85", ## The percent identity at which clustering should be performed.
+        "--p-perc-identity " + config['filtering']['min_readidentity'], ## The percent identity at which clustering should be performed.
         "--verbose"
     threads:
         16

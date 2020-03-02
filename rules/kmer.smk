@@ -44,7 +44,7 @@ rule retax_kmermap:
     conda:
         "../envs/kraken2.yml"
     params:
-        "-t 1", ## [Default = 10]:: specifies the minimum number of reads required for a classification at the specified rank. Any classifications with less than the specified threshold will not receive additional reads from higher taxonomy levels when distributing reads for abundance estimation.
+        "-t " + config['filtering']['min_featurereads'], ## [Default = 10]:: specifies the minimum number of reads required for a classification at the specified rank. Any classifications with less than the specified threshold will not receive additional reads from higher taxonomy levels when distributing reads for abundance estimation.
         "-r 1451" ## median read length after filtering in 20191007_1559_MN31344_FAK76605_2bf006ff
     shell:
         "target={input.krakdb}; target=\"${{target/database.kraken/}}\" > {log} 2>&1; "
