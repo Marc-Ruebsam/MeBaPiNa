@@ -65,7 +65,7 @@ rule downsampling_seqsum: #!#
         "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/MeBaPiNa_downsampling_seqsum.benchmark.tsv"
     shell:
         "cat {input} | (read -r; printf \"%s\\n\" \"$REPLY\"; "
-        "awk -v seed=$RANDOM 'BEGIN{{ prnt=-4; nr=100; srand(seed) }}; " ## "falsify" print flag, set nr for fraction and set random seed. Note: downsampling is a fraction here not a number of reads
+        "awk -v seed=$RANDOM 'BEGIN{{ nr=100; srand(seed) }}; " ## "falsify" print flag, set nr for fraction and set random seed. Note: downsampling is a fraction here not a number of reads
         "{{ rhundr=1+int(rand()*nr) }}; " ## get a random number between 1 and nr
         "rhundr==nr') " ## if the number is nr (by chance of 1/nr) print the line
         ">> {output} 2> {log}"
