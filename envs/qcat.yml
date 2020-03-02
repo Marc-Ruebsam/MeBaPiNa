@@ -1,3 +1,4 @@
+name: qcat
 channels:
   - bioconda
   - defaults
@@ -6,15 +7,15 @@ dependencies:
   - biopython=1.68=py27_0
   - blas=1.0=mkl
   - bzip2=1.0.8=h7b6447c_0
-  - ca-certificates=2019.11.27=0
+  - ca-certificates=2020.1.1=0
   - certifi=2019.11.28=py27_0
-  - curl=7.67.0=hbc83047_0
+  - curl=7.68.0=hbc83047_0
   - freetype=2.9.1=h8a8886c_1
   - future=0.18.2=py27_0
-  - intel-openmp=2019.4=243
+  - intel-openmp=2020.0=166
   - jpeg=9b=h024ee3a_2
-  - krb5=1.16.1=h173b8e3_7
-  - libcurl=7.67.0=h20c2e04_0
+  - krb5=1.17.1=h173b8e3_0
+  - libcurl=7.68.0=h20c2e04_0
   - libdeflate=1.0=h14c3975_1
   - libedit=3.1.20181209=hc058e9b_0
   - libffi=3.2.1=hd88cf55_4
@@ -25,17 +26,17 @@ dependencies:
   - libstdcxx-ng=9.1.0=hdf63c60_0
   - libtiff=4.1.0=h2733197_0
   - mappy=2.17=py27h84994c4_0
-  - mkl=2019.4=243
+  - mkl=2020.0=166
   - mkl-service=2.3.0=py27he904b0f_0
   - mkl_fft=1.0.15=py27ha843d7b_0
   - mkl_random=1.1.0=py27hd6b4f25_0
   - mmtf-python=1.0.2=py27_0
   - msgpack-python=0.6.1=py27hfd86e86_1
-  - ncurses=6.1=he6710b0_1
+  - ncurses=6.2=he6710b0_0
   - numpy=1.16.5=py27h7e9f1db_0
   - numpy-base=1.16.5=py27hde5b4d6_0
   - olefile=0.46=py27_0
-  - openssl=1.1.1d=h7b6447c_3
+  - openssl=1.1.1d=h7b6447c_4
   - pandas=0.24.2=py27he6710b0_0
   - parasail-python=1.1.19=py27h8b12597_0
   - pillow=6.2.1=py27h34e0f95_0
@@ -50,7 +51,7 @@ dependencies:
   - reportlab=3.5.26=py27he686d34_0
   - setuptools=42.0.2=py27_0
   - six=1.13.0=py27_0
-  - sqlite=3.30.1=h7b6447c_0
+  - sqlite=3.31.1=h7b6447c_0
   - tk=8.6.8=hbc83047_0
   - wheel=0.33.6=py27_0
   - xz=5.2.4=h14c3975_4
