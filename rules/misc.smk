@@ -11,9 +11,9 @@ rule sorting_seqsum_barc:
     output:
         "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/sequencing_summary_sorted.txt"
     log:
-        "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/MeBaPiNa_sorting.log"
+        "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/MeBaPiNa_sorting_seqsum_barc.log"
     benchmark:
-        "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/MeBaPiNa_sorting.benchmark.tsv"
+        "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/MeBaPiNa_sorting_seqsum_barc.benchmark.tsv"
     threads:
         4
     shell:
@@ -33,9 +33,9 @@ rule splitting_seqsum_barc:
     output:
         directory("{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/split")
     log:
-        "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/MeBaPiNa_splitting.log"
+        "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/MeBaPiNa_splitting_seqsum_barc.log"
     benchmark:
-        "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/MeBaPiNa_splitting.benchmark.tsv"
+        "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/MeBaPiNa_splitting_seqsum_barc.benchmark.tsv"
     shell:
         "mkdir -p {output} > {log} 2>&1; "
         "awk 'BEGIN{{cali_col=0}}; " ## falsify calibration strain column detection
@@ -60,9 +60,9 @@ rule downsampling_seqsum: #!#
     output:
         "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/sequencing_summary_downsampled.txt"
     log:
-        "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/MeBaPiNa_downsampling.log"
+        "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/MeBaPiNa_downsampling_seqsum.log"
     benchmark:
-        "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/MeBaPiNa_downsampling.benchmark.tsv"
+        "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/MeBaPiNa_downsampling_seqsum.benchmark.tsv"
     shell:
         "cat {input} | (read -r; printf \"%s\\n\" \"$REPLY\"; "
         "awk -v seed=$RANDOM 'BEGIN{{ prnt=-4; nr=100; srand(seed) }}; " ## "falsify" print flag, set nr for fraction and set random seed. Note: downsampling is a fraction here not a number of reads
@@ -84,9 +84,9 @@ rule download_reffiles:
         slvmap="{tmp}METADATA/Reference_Sequences/silva/slvmap.txt",
         taxlist="{tmp}METADATA/Reference_Sequences/silva/taxlist.txt"
     log:
-        "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_reffiles.log"
+        "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_download_reffiles.log"
     benchmark:
-        "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_reffiles.benchmark.tsv"
+        "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_download_reffiles.benchmark.tsv"
     shell:
         "bash {wildcards.tmp}Pipeline/MeBaPiNa/scripts/download_silva.sh {wildcards.tmp}METADATA/Reference_Sequences/silva > {log} 2>&1"
 
@@ -110,9 +110,9 @@ rule construct_reffiles:
         qiimetax_S="{tmp}METADATA/Reference_Sequences/silva/qiime/species/taxonomy.tsv",
         qiimetax_G="{tmp}METADATA/Reference_Sequences/silva/qiime/genus/taxonomy.tsv"
     log:
-        "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_reffiles.log"
+        "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_construct_reffiles.log"
     benchmark:
-        "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_reffiles.benchmark.tsv"
+        "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_construct_reffiles.benchmark.tsv"
     conda:
         "../envs/python.yml"
     script:
@@ -121,7 +121,7 @@ rule construct_reffiles:
 ## KRAKEN2 DATABASE ##
 ######################
 
-rule building_database_fromreffiles:
+rule building_database:
     input:
         fastaT="{tmp}METADATA/Reference_Sequences/{reference}/reference_thymine.fasta",
         kraknames="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/taxonomy/names.dmp",
@@ -135,9 +135,9 @@ rule building_database_fromreffiles:
         brakdb="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database1451mers.kraken",
         brakdist="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database1451mers.kmer_distrib"
     log:
-        "{tmp}METADATA/Reference_Sequences/{reference}/kraken2/MeBaPiNa_{reftype}.log"
+        "{tmp}METADATA/Reference_Sequences/{reference}/kraken2/MeBaPiNa_building_{reftype}_database.log"
     benchmark:
-        "{tmp}METADATA/Reference_Sequences/{reference}/kraken2/MeBaPiNa_{reftype}.benchmark.tsv"
+        "{tmp}METADATA/Reference_Sequences/{reference}/kraken2/MeBaPiNa_building_{reftype}_database.benchmark.tsv"
     conda:
         "../envs/kraken2.yml"
     threads:
@@ -162,7 +162,7 @@ rule building_database_fromreffiles:
         ">> {log} 2>&1; "
         "kraken2-build --clean --db ${{out_dir}} >> {log} 2>&1"
 
-rule building_database_alone:
+rule building_database_plain:
     output:
         krakdb="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database.kraken", ## reftype wildcard has no influence on this rule, but is used for silva species database (rule building_database_fromreffiles)
         krakhash="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/hash.k2d",
@@ -171,9 +171,9 @@ rule building_database_alone:
         brakdb="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database1451mers.kraken",
         brakdist="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database1451mers.kmer_distrib"
     log:
-        "{tmp}METADATA/Reference_Sequences/{reference}/kraken2/MeBaPiNa_{reftype}.log"
+        "{tmp}METADATA/Reference_Sequences/{reference}/kraken2/MeBaPiNa_building_{reftype}_database.log"
     benchmark:
-        "{tmp}METADATA/Reference_Sequences/{reference}/kraken2/MeBaPiNa_{reftype}.benchmark.tsv"
+        "{tmp}METADATA/Reference_Sequences/{reference}/kraken2/MeBaPiNa_building_{reftype}_database.benchmark.tsv"
     conda:
         "../envs/kraken2.yml"
     threads:
@@ -201,9 +201,9 @@ rule indexing_reference:
     output:
         "{tmp}METADATA/Reference_Sequences/{reference}/reference.mmi"
     log:
-        "{tmp}METADATA/Reference_Sequences/{reference}/MeBaPiNa_indexing.log"
+        "{tmp}METADATA/Reference_Sequences/{reference}/MeBaPiNa_indexing_reference.log"
     benchmark:
-        "{tmp}METADATA/Reference_Sequences/{reference}/MeBaPiNa_indexing.benchmark.tsv"
+        "{tmp}METADATA/Reference_Sequences/{reference}/MeBaPiNa_indexing_reference.benchmark.tsv"
     params:
         "-x map-ont" ## naopore specific
     conda:
