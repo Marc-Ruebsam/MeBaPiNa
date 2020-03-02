@@ -1,6 +1,6 @@
 ## KRAKEN2 ##
 
-rule kmer_mapping_filtered:
+rule kmermap_filtered:
     input:
         fastq="{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq", 
         krakdb="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database.kraken"
@@ -8,9 +8,9 @@ rule kmer_mapping_filtered:
         report="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kreport2",
         output="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kraken2"
     log:
-        "{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmer_mapped.log"
+        "{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_filtered.log"
     benchmark:
-        "{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmer_mapped.benchmark.tsv"
+        "{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_filtered.benchmark.tsv"
     conda:
         "../envs/kraken2.yml"
     threads:
@@ -25,7 +25,7 @@ rule kmer_mapping_filtered:
         "--report {output.report} " ## information per taxon
         "{input.fastq} >> {log} 2>&1"
 
-rule ranking_taxonomy:
+rule retax_kmermap:
     input:
         report="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kreport2",
         output="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kraken2",
@@ -38,9 +38,9 @@ rule ranking_taxonomy:
         rankF="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/Family.bracken",
         tableF="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/Family.kreport2"
     log:
-        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_ranking.log"
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_retax_kmermap.log"
     benchmark:
-        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_ranking.benchmark.tsv"
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_retax_kmermap.benchmark.tsv"
     conda:
         "../envs/kraken2.yml"
     params:
@@ -68,7 +68,7 @@ rule ranking_taxonomy:
         "-o {output.rankF} >> {log} 2>&1; "
         "mv ${{in_dir}}/filtered_bracken.kreport2 {output.tableF} >> {log} 2>&1"
 
-rule counttax_report:
+rule counttax_kmermap:
     input:
         # kreport="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kreport2", ## kraken2
         kreport="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/Species.kreport2", ## bracken
@@ -76,9 +76,9 @@ rule counttax_report:
     output:
         counttaxlist="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"
     log:
-        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax.log"
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_kmermap.log"
     benchmark:
-        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax.benchmark.tsv"
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_kmermap.benchmark.tsv"
     conda:
         "../envs/python.yml"
     script:

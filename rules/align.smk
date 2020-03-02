@@ -11,9 +11,9 @@ rule splitting_filtered: #!# only required because of low memory avaialility
     output:
         temp(directory("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/split"))
     log:
-        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering.log"
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_splitting_filtered.log"
     benchmark:
-        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering.benchmark.tsv"
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_splitting_filtered.benchmark.tsv"
     shell:
         "mkdir {output}; "
         "awk 'BEGIN{{ file_num=0 }}; " ## split output into files with <=4000 sequences each
@@ -26,11 +26,11 @@ rule aligning_filtered:
         barc_dir="{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/split", 
         target=expand("{tmp}METADATA/Reference_Sequences/{reference}/reference.mmi", tmp = config["experiments"]["tmp"], reference = config["reference"]["source"])
     output:
-        temp("{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/align.sam")
+        temp("{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/aligned.sam")
     log:
-        "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_alignment.log"
+        "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_aligning_filtered.log"
     benchmark:
-        "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_alignment.benchmark.tsv"
+        "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_aligning_filtered.benchmark.tsv"
     conda:
         "../envs/minimap2.yml"
     params:
@@ -57,9 +57,9 @@ rule filter_aligned:
         bam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/{altype}_filteredsorted.bam",
         bai="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/{altype}_filteredsorted.bam.bai"
     log:
-        "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_converting_{altype}.log"
+        "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_filter_{altype}.log"
     benchmark:
-        "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_converting_{altype}.benchmark.tsv"
+        "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_filter_{altype}.benchmark.tsv"
     conda:
         "../envs/samtools.yml"
     params:
@@ -76,15 +76,15 @@ rule filter_aligned:
 
 rule counttax_aligned:
     input:
-        sam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/align_filtered.sam",
+        sam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/aligned_filtered.sam",
         kronataxlist="{tmp}METADATA/Reference_Sequences/{reference}/krona/{reftype}/taxlist.txt",
         kronaseq2tax="{tmp}METADATA/Reference_Sequences/{reference}/krona/{reftype}/seqid2taxid.map"
     output:
-        counttaxlist="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/align.counttaxlist"
+        counttaxlist="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/aligned.counttaxlist"
     log:
-        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax.log"
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_aligned.log"
     benchmark:
-        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax.benchmark.tsv"
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_aligned.benchmark.tsv"
     conda:
         "../envs/python.yml"
     script:
@@ -93,16 +93,16 @@ rule counttax_aligned:
 ## CALIBRATION STRAND ##
 ########################
 
-rule aligning_calibration_strands:
+rule aligning_calibstr:
     input:
         calib_dir="{tmp}01_processed_data/01_basecalling/{run}/calibration_strands", 
         target="{tmp}METADATA/Reference_Sequences/lambda_3.6kb/reference.mmi"
     output:
         temp("{tmp}01_processed_data/03_alignment/{run}/{reference}/lambda/calibration.sam")
     log:
-        "{tmp}01_processed_data/03_alignment/{run}/{reference}/lambda/MeBaPiNa_alignment.log"
+        "{tmp}01_processed_data/03_alignment/{run}/{reference}/lambda/MeBaPiNa_aligning_calibstr.log"
     benchmark:
-        "{tmp}01_processed_data/03_alignment/{run}/{reference}/lambda/MeBaPiNa_alignment.benchmark.tsv"
+        "{tmp}01_processed_data/03_alignment/{run}/{reference}/lambda/MeBaPiNa_aligning_calibstr.benchmark.tsv"
     params:
         "-x map-ont", ## naopore specific
         "-a" ## possition accurate CIGAR alignment in SAM output; much slower <- maybe skip?

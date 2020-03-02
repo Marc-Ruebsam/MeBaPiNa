@@ -39,9 +39,9 @@ checkpoint basecalling_raw:
         "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary.txt"
         ]))
     log:
-        "{tmp}01_processed_data/01_basecalling/{run}/MeBaPiNa_basecalling.log"
+        "{tmp}01_processed_data/01_basecalling/{run}/MeBaPiNa_basecalling_raw.log"
     benchmark:
-        "{tmp}01_processed_data/01_basecalling/{run}/MeBaPiNa_basecalling.benchmark.tsv"
+        "{tmp}01_processed_data/01_basecalling/{run}/MeBaPiNa_basecalling_raw.benchmark.tsv"
     version:
         subprocess.check_output("guppy_basecaller --version | awk '{print $NF}'", shell=True)
     threads:
@@ -95,9 +95,9 @@ rule trimming_basecalled:
     output:
         "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/trimmed.fastq"
     log:
-        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming.log"
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming_basecalled.log"
     benchmark:
-        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming.benchmark.tsv"
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming_basecalled.benchmark.tsv"
     conda:
         "../envs/qcat.yml"
     threads:
@@ -129,9 +129,9 @@ rule filtering_trimmed:
     output:
         "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq"
     log:
-        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering.log"
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering_trimmed.log"
     benchmark:
-        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering.benchmark.tsv"
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering_trimmed.benchmark.tsv"
     conda:
         "../envs/nanopack.yml"
     params:

@@ -274,17 +274,17 @@ rule plot_fastqc_fastq_filter:
 ## ALIGN ##
 ###########
 
-rule plot_pycoqc_bam_align:
+rule plot_pycoqc_aligned:
     input:
         seqsum="{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/split", ## only folder is specified as output in splitting rule
-        bam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/align_filteredsorted.bam"
+        bam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/aligned_filteredsorted.bam"
     output:
         html="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc.html",
         json="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc.json"
     log:
-        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_pycoqc_bam.log"
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_pycoqc_aligned.log"
     benchmark:
-        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_pycoqc_bam.benchmark.tsv"
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_pycoqc_aligned.benchmark.tsv"
     conda:
         "../envs/pycoqc.yml"
     params:
@@ -301,15 +301,15 @@ rule plot_pycoqc_bam_align:
         "--html_outfile {output.html} "
         "--json_outfile {output.json} > {log} 2>&1"
 
-rule plot_krona_align_text:
+rule plot_krona_aligned_text:
     input:
-        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/align.counttaxlist"
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/aligned.counttaxlist"
     output:
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/krona.html"
     log:
-        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_krona_align.log"
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_krona_aligned.log"
     benchmark:
-        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_krona_align.benchmark.tsv"
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_krona_aligned.benchmark.tsv"
     conda:
         "../envs/krona.yml"
     params:
@@ -320,15 +320,15 @@ rule plot_krona_align_text:
 ## K-MER MAPPING ##
 ###################
 
-rule plot_krona_kmer_text:
+rule plot_krona_kmermap_text:
     input:
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"
     output:
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona_bracken.html"
     log:
-        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_krona_bracken.log"
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_krona_kmermap_bracken.log"
     benchmark:
-        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_krona_bracken.benchmark.tsv"
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_krona_kmermap_bracken.benchmark.tsv"
     conda:
         "../envs/krona.yml"
     params:
@@ -343,9 +343,9 @@ rule plot_krona_kmer_kraken:
     output:
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona.html"
     log:
-        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_krona_kraken2.log"
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_krona_kmermap.log"
     benchmark:
-        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_krona_kraken2.benchmark.tsv"
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_krona_kmermap.benchmark.tsv"
     conda:
         "../envs/krona.yml"
     params:

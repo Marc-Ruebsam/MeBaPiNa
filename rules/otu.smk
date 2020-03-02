@@ -25,15 +25,15 @@ rule generate_manifestfile:
         ## close file
         wo.close()
 
-rule q2import_fastq:
+rule q2import_filtered:
     input:
         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/samplemanifest.tsv"
     output:
         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/filtered.qza"
     log:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/MeBaPiNa_q2import.log"
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/MeBaPiNa_q2import_filtered.log"
     benchmark:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/MeBaPiNa_q2import.benchmark.tsv"
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/MeBaPiNa_q2import_filtered.benchmark.tsv"
     conda:
         "../envs/qiime2.yml"
     threads:
@@ -50,16 +50,16 @@ rule q2import_fastq:
 ## PROCESSING ##
 ################
 
-rule q2dereplicate:
+rule q2derep_imported:
     input:
         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/filtered.qza"
     output:
         derepseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/filtered_derep.qza",
         dereptable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/filtered_derep_table.qza"
     log:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/MeBaPiNa_q2derep.log"
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/MeBaPiNa_q2derep_imported.log"
     benchmark:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/MeBaPiNa_q2derep.benchmark.tsv"
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/MeBaPiNa_q2derep_imported.benchmark.tsv"
     conda:
         "../envs/qiime2.yml"
     threads:
@@ -77,15 +77,15 @@ rule q2dereplicate:
 ## CLUSTERING ##
 ################
 
-rule q2reference:
+rule q2import_reference:
     input:
         "{tmp}.tmp/Reference_Sequences/SILVA_132_QIIME_release/rep_set/rep_set_16S_only/99/silva_132_99_16S.fna"
     output:
         "{tmp}.tmp/Reference_Sequences/silva/qiime/reference.qza"
     log:
-        "{tmp}.tmp/Reference_Sequences/silva/qiime/MeBaPiNa_q2reference.log"
+        "{tmp}.tmp/Reference_Sequences/silva/qiime/MeBaPiNa_q2import_reference.log"
     benchmark:
-        "{tmp}.tmp/Reference_Sequences/silva/qiime/MeBaPiNa_q2reference.benchmark.tsv"
+        "{tmp}.tmp/Reference_Sequences/silva/qiime/MeBaPiNa_q2import_reference.benchmark.tsv"
     conda:
         "../envs/qiime2.yml"
     shell:
