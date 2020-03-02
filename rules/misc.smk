@@ -79,63 +79,21 @@ rule downsampling_seqsum: #!#
 
 rule download_reffiles:
     output:
-        fasta="{tmp}METADATA/Reference_Sequences/silva/reference.fasta",
-        fasta_align="{tmp}METADATA/Reference_Sequences/silva/reference_aligned.fasta",
-        ncbimap="{tmp}METADATA/Reference_Sequences/silva/ncbimap.txt",
+        fasta=temp("{tmp}METADATA/Reference_Sequences/silva/reference_raw.fasta"),
+        fasta_align=temp("{tmp}METADATA/Reference_Sequences/silva/reference_aligned_raw.fasta"),
         slvmap="{tmp}METADATA/Reference_Sequences/silva/slvmap.txt",
-        taxlist="{tmp}METADATA/Reference_Sequences/silva/taxlist.txt",
-        taxtre="{tmp}METADATA/Reference_Sequences/silva/taxlist.tre"
+        taxlist="{tmp}METADATA/Reference_Sequences/silva/taxlist.txt"
     log:
         "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_reffiles.log"
     benchmark:
         "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_reffiles.benchmark.tsv"
     shell:
-        "bash {wildcards.tmp}Pineline/MeBaPiNa/scripts/download_silva.sh {wildcards.tmp}METADATA/Reference_Sequences/silva > {log} 2>&1"
-
-rule krona_reffile:
-    output:
-        "{tmp}METADATA/Reference_Sequences/ncbi/krona/taxonomy.tab"
-    log:
-        "{tmp}METADATA/Reference_Sequences/ncbi/MeBaPiNa_reffiles.log"
-    benchmark:
-        "{tmp}METADATA/Reference_Sequences/ncbi/MeBaPiNa_reffiles.benchmark.tsv"
-    conda:
-        "../envs/krona.yml"
-    shell:
-        "out_dir={output}; out_dir=\"${{out_dir/taxonomy.tab/}}\" > {log} 2>&1; "
-        "ktUpdateTaxonomy.sh ${{out_dir}} >> {log} 2>&1"
-
-
-rule parse_silva_taxonomy:
-    input:
-        slvmap="{tmp}METADATA/Reference_Sequences/silva/slvmap.txt",
-        taxlist="{tmp}METADATA/Reference_Sequences/silva/taxlist.txt",
-        taxtre="{tmp}METADATA/Reference_Sequences/silva/taxlist.tre"
-    output:
-        q2tax="{tmp}METADATA/Reference_Sequences/silva/TAXONOMY.txt"
-    log:
-        "{tmp}METADATA/Reference_Sequences/silva/qiime2/MeBaPiNa_parse_silva_atxonomy.log"
-    benchmark:
-        "{tmp}METADATA/Reference_Sequences/silva/qiime2/MeBaPiNa_parse_silva_atxonomy.benchmark.tsv"
-    conda:
-        "../envs/qiime2.yml"
-    params:
-        "-s" ## include species taxa
-    shell:
-        "python {wildcards.tmp}Pineline/MeBaPiNa/scripts/make_SILVA_db/parse_silva_taxonomy.py {params} "
-        "-t {input.taxlist} "
-        "-p {input.taxtre} "
-        "-m {input.slvmap} "
-        "-o {output.q2tax}"
-
-
+        "bash {wildcards.tmp}Pipeline/MeBaPiNa/scripts/download_silva.sh {wildcards.tmp}METADATA/Reference_Sequences/silva > {log} 2>&1"
 
 rule construct_reffiles:
     input:
         taxlist="{tmp}METADATA/Reference_Sequences/silva/taxlist.txt",
-        slvmap="{tmp}METADATA/Reference_Sequences/silva/slvmap.txt",
-        ncbimap="{tmp}METADATA/Reference_Sequences/silva/ncbimap.txt",
-        ncbikrona="{tmp}METADATA/Reference_Sequences/ncbi/krona/taxonomy.tab"
+        slvmap="{tmp}METADATA/Reference_Sequences/silva/slvmap.txt"
     output:
         kraknames_S="{tmp}METADATA/Reference_Sequences/silva/kraken2/species/taxonomy/names.dmp",
         kraknodes_S="{tmp}METADATA/Reference_Sequences/silva/kraken2/species/taxonomy/nodes.dmp",
@@ -148,7 +106,9 @@ rule construct_reffiles:
         kronaseq2tax_S="{tmp}METADATA/Reference_Sequences/silva/krona/species/seqid2taxid.map",
         kronataxtab_G="{tmp}METADATA/Reference_Sequences/silva/krona/genus/taxonomy.tab",
         kronataxlist_G="{tmp}METADATA/Reference_Sequences/silva/krona/genus/taxlist.txt",
-        kronaseq2tax_G="{tmp}METADATA/Reference_Sequences/silva/krona/genus/seqid2taxid.map"
+        kronaseq2tax_G="{tmp}METADATA/Reference_Sequences/silva/krona/genus/seqid2taxid.map",
+        qiimetax_S="{tmp}METADATA/Reference_Sequences/silva/qiime/species/taxonomy.tsv",
+        qiimetax_G="{tmp}METADATA/Reference_Sequences/silva/qiime/genus/taxonomy.tsv"
     log:
         "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_reffiles.log"
     benchmark:
