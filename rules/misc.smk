@@ -90,7 +90,7 @@ rule download_reffiles:
     shell:
         "bash {wildcards.tmp}Pipeline/MeBaPiNa/scripts/download_silva.sh {wildcards.tmp}METADATA/Reference_Sequences/silva > {log} 2>&1"
 
-rule construct_reffiles:
+rule construct_reftax:
     input:
         taxlist="{tmp}METADATA/Reference_Sequences/silva/taxlist.txt",
         slvmap="{tmp}METADATA/Reference_Sequences/silva/slvmap.txt"
@@ -190,7 +190,7 @@ rule building_database_plain:
         "rm -rf ${{out_dir}}/data "
         "kraken2-build --clean --db ${{out_dir}} >> {log} 2>&1"
 
-ruleorder: building_database_fromreffiles > building_database_alone
+ruleorder: building_database > building_database_plain
 
 ## MINIMA2 INDEX ##
 ###################
