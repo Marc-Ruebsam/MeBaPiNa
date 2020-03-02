@@ -186,8 +186,6 @@ rule q2import_reftax:
         "../envs/qiime2.yml"
     threads:
         1
-    params:
-        "--verbose"
     shell:
         "qiime tools import {params} "
         "--type FeatureData[Taxonomy] "
@@ -209,8 +207,6 @@ rule q2import_refseq:
         "../envs/qiime2.yml"
     threads:
         1
-    params:
-        "--verbose"
     shell:
         "qiime tools import {params} "
         "--type FeatureData[Sequence] "
