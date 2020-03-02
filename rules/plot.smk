@@ -288,7 +288,7 @@ rule plot_pycoqc_bam_align:
     conda:
         "../envs/pycoqc.yml"
     params:
-        ("--config {tmp}Pineline/MeBaPiNa/scripts/pycoQC_config.json " if  ## use custom config (without coverage plot) for barcodes...
+        ("--config {tmp}Pipeline/MeBaPiNa/scripts/pycoQC_config.json " if  ## use custom config (without coverage plot) for barcodes...
         not config["reference"]["source"] == "zymobiomics" ## ...but not for the Zymo reference
         and not "{wildcards.barc}" == "lambda" else ""), ## or calibration strains
         "--min_pass_qual 0",
@@ -400,7 +400,7 @@ rule plot_pycoqc_bam_calib:
     conda:
         "../envs/pycoqc.yml"
     params:
-        ("--config {tmp}Pineline/MeBaPiNa/scripts/pycoQC_config.json " if  ## use custom config (without coverage plot) for barcodes...
+        ("--config {tmp}Pipeline/MeBaPiNa/scripts/pycoQC_config.json " if  ## use custom config (without coverage plot) for barcodes...
         not config["reference"]["source"] == "zymobiomics" ## ...but not for the Zymo reference
         and not "{wildcards.barc}" == "lambda" else ""), ## or calibration strains
         "--min_pass_qual 0",
