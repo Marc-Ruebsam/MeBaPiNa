@@ -5,7 +5,7 @@
 ## author:      Marc Ruebsam (marc-ruebsam@hotmail.de)
 ## version:     0.7
 ## last change: 30.01.2020
-## description: Pielpine for automated analysis of 16S metabarcoding samples.
+## description: Pipeline for automated analysis of 16S metabarcoding samples.
 
 
 ## SNAKEMAKE CONFIGURATIONS ##
