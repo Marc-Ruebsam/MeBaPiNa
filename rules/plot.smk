@@ -336,7 +336,7 @@ rule plot_krona_kmermap_text:
     shell:
         "ktImportText {params} -o {output} {input} > {log} 2>&1"
 
-rule plot_krona_kmer_kraken:
+rule plot_krona_kmermap_kraken:
     input:
         output="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kraken2",
         kronataxtab="{tmp}METADATA/Reference_Sequences/{reference}/krona/{reftype}/taxonomy.tab"

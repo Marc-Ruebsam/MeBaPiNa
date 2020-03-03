@@ -112,7 +112,7 @@ rule all:
         ## general QC: per barcode, intentional downsampling
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc.html",
         ## taxonomic composition
-        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/align.counttaxlist",
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/aligned.counttaxlist",
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/krona.html",
         
         ## K-MER MAPPING ##
