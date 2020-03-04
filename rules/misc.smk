@@ -165,9 +165,16 @@ rule construct_refseq:
         ""
         "vsearch --fastx_filter "
         "{output}_degap.fasta "
-        "--fastaout {output} {params} "
+        "--fastaout {output}_filt.fasta {params} "
         ">> {log} 2>&1; "
-        "rm {output}_degap.fasta"
+        "rm {output}_degap.fasta; "
+        ""
+        "vsearch --derep_fulllength "
+        "{output}_filt.fasta "
+        "--output {output} "
+        ">> {log} 2>&1; "
+        "rm {output}_filt.fasta"
+        
 
 
 ## QIIME REFERENCE ##
