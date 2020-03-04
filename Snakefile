@@ -4,7 +4,7 @@
 
 ## author:      Marc Ruebsam (marc-ruebsam@hotmail.de)
 ## version:     0.7
-## last change: 30.01.2020
+## last change: 2020-03-03
 ## description: Pipeline for automated analysis of 16S metabarcoding samples.
 
 
@@ -43,8 +43,6 @@ METADATA = METADATA.loc[ METADATA['Sample name'].isin(config["experiments"]["sam
 RUNS = METADATA['Run ID'].value_counts().sort_values(ascending=False).keys()[0]
 METADATA = METADATA.loc[ METADATA['Run ID'].isin([RUNS]), : ]
 ## sample barcode information
-# SAMPLES = METADATA['Sample name']
-# BARCODES = METADATA['Barcode']
 SAMPLES = pd.Series(METADATA['Sample name'].values,index=METADATA['Barcode']).to_dict()
 
 ## get run information
@@ -52,8 +50,6 @@ FLOWCELL = METADATA['Flow cell product'].unique()[0]
 SEQ_KIT = METADATA['Sequencing kit'].unique()[0]
 BAC_KIT = METADATA['Barcoding kit'].unique()[0]
 LAM_DCS = METADATA['Lambda DCS'].unique()[0]
-## set "SQK-RAB204" as default if bac_kit is ""
-# BAC_KIT = ("SQK-RAB204" if not BAC_KIT else BAC_KIT)
 
 ## sample depth for downsampling in some plots
 PLOT_SMPL = "100000"
@@ -122,7 +118,7 @@ rule all:
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona.html",
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona_bracken.html",
         
-        ## OTU
+        ## OTU ##
         
         ## clustered reads
         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_seq.qza",
