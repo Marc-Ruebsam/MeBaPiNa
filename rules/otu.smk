@@ -92,7 +92,7 @@ rule q2otupick:
         "--p-perc-identity " + config['filtering']['min_readidentity'], ## The percent identity at which clustering should be performed.
         "--verbose"
     threads:
-        16
+        16 ## job needs some tmp storage space, to many parallel jobs might break stuff!?
     shell:
         "qiime vsearch cluster-features-open-reference --p-threads {threads} {params} "
         "--i-sequences {input.derepseq} --i-table {input.dereptable} "

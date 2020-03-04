@@ -39,7 +39,7 @@ rule aligning_filtered:
         "-p 1", ## only retain multi mappings with same highest score
         "-N 1" ## one secondary alignment is enough to identify multimapping reads
     threads:
-        34
+        8
     shell:
         "minimap2 -t {threads} {params} -o {output} "
         "{input.target} "
