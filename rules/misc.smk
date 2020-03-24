@@ -106,8 +106,8 @@ rule construct_reftax:
         kronataxtab_G="{tmp}METADATA/Reference_Sequences/silva/krona/genus/taxonomy.tab",
         kronataxlist_G="{tmp}METADATA/Reference_Sequences/silva/krona/genus/taxlist.txt",
         kronaseq2tax_G="{tmp}METADATA/Reference_Sequences/silva/krona/genus/seqid2taxid.map",
-        qiimetax_S="{tmp}METADATA/Reference_Sequences/silva/qiime/species/taxonomy.tsv",
-        qiimetax_G="{tmp}METADATA/Reference_Sequences/silva/qiime/genus/taxonomy.tsv"
+        qiimetax_S=temp("{tmp}METADATA/Reference_Sequences/silva/qiime/species/taxonomy.tsv"),
+        qiimetax_G=temp("{tmp}METADATA/Reference_Sequences/silva/qiime/genus/taxonomy.tsv")
     log:
         "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_construct_reftax.log"
     benchmark:
