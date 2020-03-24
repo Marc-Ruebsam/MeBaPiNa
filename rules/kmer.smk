@@ -16,7 +16,7 @@ rule kmermap_filtered:
     threads:
         8
     params:
-        "--confidence 0.0" ## how many of the k-mers have to map to a reference to be assigned (higher taxonomies accumulate the counts of lower ones)
+        "--confidence " + config["filtering"]["min_confidence"] ## how many of the k-mers have to map to a reference to be assigned (higher taxonomies accumulate the counts of lower ones)
     shell:
         "target={input.krakdb}; target=\"${{target/database.kraken/}}\" > {log} 2>&1; "
         "kraken2 --threads {threads} {params} "

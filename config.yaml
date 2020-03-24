@@ -31,6 +31,7 @@ filtering:
   len_max: "2800"
   min_featurereads: "3" ## minimum number of reads per cluster or taxon
   min_readidentity: "0.85" ## minimum read identity for clustering
+  min_confidence: "0.0"
 
 reference:
   source: "silva"
