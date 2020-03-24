@@ -271,6 +271,53 @@ rule plot_fastqc_fastq_filter:
         "--outdir {wildcards.tmp}02_analysis_results/02_trimming_filtering/{wildcards.run}/fastqc "
         "stdin > {log} 2>&1"
 
+## OTU ##
+#########
+
+rule plot_qiime2_q2otupick:
+    input:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_ftable.qza"
+    output:
+        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2otupick/index.html"
+    log:
+        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2otupick/MeBaPiNa_qiime2_q2otupick.log"
+    benchmark:
+        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2otupick/MeBaPiNa_qiime2_q2otupick.benchmark.tsv"
+    conda:
+        "../envs/qiime2.yml"
+    shell:
+        "qiime feature-table summarize "
+        "--i-table {input} "
+        "--o-visualization {input}.qzv "
+        "--verbose > {log} 2>&1; "
+        "qiime tools export "
+        "--input-path {input}.qzv "
+        "--output-path {output} "
+        ">> {log} 2>&1; "
+        "rm {input}.qzv >> {log} 2>&1"
+
+rule plot_qiime2_q2filter:
+    input:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_ftable.qza"
+    output:
+        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2filter/index.html"
+    log:
+        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2filter/MeBaPiNa_qiime2_q2filter.log"
+    benchmark:
+        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2filter/MeBaPiNa_qiime2_q2filter.benchmark.tsv"
+    conda:
+        "../envs/qiime2.yml"
+    shell:
+        "qiime feature-table summarize "
+        "--i-table {input} "
+        "--o-visualization {input}.qzv "
+        "--verbose > {log} 2>&1; "
+        "qiime tools export "
+        "--input-path {input}.qzv "
+        "--output-path {output} "
+        ">> {log} 2>&1; "
+        "rm {input}.qzv >> {log} 2>&1"
+
 ## ALIGN ##
 ###########
 
