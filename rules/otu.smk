@@ -100,39 +100,109 @@ rule q2otupick:
 ## PROCESSING ##
 ################
 
-# qiime tools export --input-path cluster_table.qza --output-path .
-# biom summarize-table -i feature-table.biom
+rule q2uchime_otus:
+    input:
+        otuseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_centseq.qza",
+        otutable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_ftable.qza"
+    output:
+        nonchim="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/nochim_centseq.qza",
+        chimera="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/chim_centseq.qza",
+        stats="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/chim_stats.qza"
+    log:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2uchime_otus.log"
+    benchmark:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2uchime_otus.benchmark.tsv"
+    conda:
+        "../envs/qiime2.yml"
+    params:
+        "--verbose"
+    threads:
+        1
+    shell:
+        "qiime vsearch uchime-denovo {params} "
+        "--i-table {input.otutable} "
+        "--i-sequences {input.otuseq} "
+        "--o-nonchimeras {output.nonchim} "
+        "--o-chimeras {output.chimera} "
+        "--o-stats {output.stats} "
+        "> {log} 2>&1"
 
-# qiime tools import \
-#   --type 'FeatureData[Sequence]' \
-#   --input-path 85_otus.fasta \
-#   --output-path 85_otus.qza
-# 
-# qiime tools import \
-#   --type 'FeatureData[Taxonomy]' \
-#   --input-format HeaderlessTSVTaxonomyFormat \
-#   --input-path 85_otu_taxonomy.txt \
-#   --output-path ref-taxonomy.qza
+rule q2filter_uchime:
+    input:
+        otuseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_centseq.qza",
+        otutable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_ftable.qza",
+        chimera="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/chim_centseq.qza",
+        nonchim="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/nochim_centseq.qza"
+    output:
+        nochimtable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_ftable.qza",
+        nochimseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq.qza"
+    log:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2filter_uchime.log"
+    benchmark:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2filter_uchime.benchmark.tsv"
+    conda:
+        "../envs/qiime2.yml"
+    params:
+        "--p-min-frequency " + config['filtering']['min_featurereads'] ## The minimum total frequency that a feature must have to be retained.
+    threads:
+        1
+    shell:
+        "qiime feature-table filter-features " ## exclude all chimeras from feature count table
+        "--i-table {input.otutable} "
+        "--m-metadata-file {input.chimera} "
+        "--p-exclude-ids "
+        "--o-filtered-table {output.nochimtable} "
+        "--verbose {params} " ## params excludes clusters with low counts
+        "> {log} 2>&1; "
+        "qiime feature-table filter-seqs " ## retain only sequences from ids retained above
+        "--i-data {input.otuseq} "
+        "--i-table {output.nochimtable} "
+        "--p-no-exclude-ids "
+        "--o-filtered-data {output.nochimseq} "
+        "--verbose "
+        ">> {log} 2>&1"
 
-# qiime feature-classifier extract-reads \
-#   --i-sequences 85_otus.qza \
-#   --p-f-primer GTGCCAGCMGCCGCGGTAA \
-#   --p-r-primer GGACTACHVGGGTWTCTAAT \
-#   --p-trunc-len 120 \
-#   --p-min-length 100 \
-#   --p-max-length 400 \
-#   --o-reads ref-seqs.qza
+##########################
+## TAXONOMIC ASSIGNMENT ##
+##########################
 
-# qiime feature-classifier fit-classifier-naive-bayes \
-#   --i-reference-reads ref-seqs.qza \
-#   --i-reference-taxonomy ref-taxonomy.qza \
-#   --o-classifier classifier.qza
+rule q2filter_classify:
+    input:
+        nochimseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq.qza"
+        classifier="{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/classifyer.qza"
+    output:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/counttax.qza"
+    log:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2filter_classify.log"
+    benchmark:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2filter_classify.benchmark.tsv"
+    conda:
+        "../envs/qiime2.yml"
+    params:
+        "--p-confidence " + config["filtering"]["min_confidence"] ## Confidence threshold for limiting taxonomic depth. Set to "disable" to disable confidence calculation, or 0 to calculate confidence but not apply it to limit the taxonomic depth of the assignments. [default: 0.7]
+    threads:
+        8
+    shell:
+        "qiime feature-classifier classify-sklearn "
+        "--i-reads {input.nochimseq} "
+        "--i-classifier {input.classifier} "
+        "--o-classification {output} "
+        "--p-n-jobs {threads} "
+        "--verbose {params} >> {log} 2>&1"
 
-# qiime feature-classifier classify-sklearn \
-#   --i-classifier classifier.qza \
-#   --i-reads rep-seqs.qza \
-#   --o-classification taxonomy.qza
-# 
+#
 # qiime metadata tabulate \
-#   --m-input-file taxonomy.qza \
-#   --o-visualization taxonomy.qzv
+#   --m-input-file counttax.qza \
+#   --o-visualization counttax.qzv
+
+# for fl in $(find -name "*.qza")
+#   do
+#   echo ${fl}
+#   qiime tools export --input-path ${fl} --output-path "${fl/.qza/}"
+# done
+# for fl in $(find -name "*.biom")
+#   do
+#   echo ${fl}
+#   biom summarize-table -i ${fl}
+#   biom convert -i ${fl} -o ${fl/.biom/.tsv} --to-tsv
+# done
