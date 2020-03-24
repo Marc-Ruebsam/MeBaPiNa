@@ -68,7 +68,8 @@ for cigar in df_sam['CIGAR']:
 df_sam['cigar_len'] = cigar_len
 
 ## convert "Gap-compressed per-base sequence divergence" into number
-df_sam['de'] = [float(mapq[6:]) for mapq in df_sam['de']]
+df_sam['de'] = df_sam['de'].str.extract(r'de:f:([\d.]+)', expand=False).astype('float')
+#seems broken# df_sam['de'] = [float(mapq[6:]) for mapq in df_sam['de']]
 
 ## filter by aligned segment length
 df_sam = df_sam.loc[((df_sam['cigar_len'] > int(snakemake.config['filtering']['len_min'])) & 
