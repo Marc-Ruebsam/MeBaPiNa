@@ -171,11 +171,11 @@ rule q2filter_classify:
         nochimseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq.qza",
         classifier="{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/classifyer.qza"
     output:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/counttax.qza"
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/counttax.qza"
     log:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2filter_classify.log"
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_q2filter_classify.log"
     benchmark:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2filter_classify.benchmark.tsv"
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_q2filter_classify.benchmark.tsv"
     conda:
         "../envs/qiime2.yml"
     params:
