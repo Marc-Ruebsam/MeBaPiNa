@@ -174,7 +174,7 @@ rule construct_refseq:
         "--output {output} "
         ">> {log} 2>&1; "
         "rm {output}_filt.fasta"
-        
+
 
 
 ## QIIME REFERENCE ##

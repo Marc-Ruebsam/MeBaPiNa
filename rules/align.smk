@@ -23,7 +23,7 @@ rule splitting_filtered: #!# only required because of low memory avaialility
 
 rule aligning_filtered:
     input:
-        barc_dir="{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/split", 
+        barc_dir="{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/split",
         target=expand("{tmp}METADATA/Reference_Sequences/{reference}/reference.mmi", tmp = config["experiments"]["tmp"], reference = config["reference"]["source"])
     output:
         temp("{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/aligned.sam")
@@ -72,7 +72,7 @@ rule filter_aligned:
         "tee {output.sam} | "
         "samtools sort --threads $(({threads} / 2)) -o {output.bam} >> {log} 2>&1; "
         "samtools index -@ {threads} {output.bam} >> {log} 2>&1"
-        
+
 
 rule counttax_aligned:
     input:
@@ -95,7 +95,7 @@ rule counttax_aligned:
 
 rule aligning_calibstr:
     input:
-        calib_dir="{tmp}01_processed_data/01_basecalling/{run}/calibration_strands", 
+        calib_dir="{tmp}01_processed_data/01_basecalling/{run}/calibration_strands",
         target="{tmp}METADATA/Reference_Sequences/lambda_3.6kb/reference.mmi"
     output:
         temp("{tmp}01_processed_data/03_alignment/{run}/{reference}/lambda/calibration.sam")

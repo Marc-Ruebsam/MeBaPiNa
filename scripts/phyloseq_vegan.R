@@ -41,7 +41,7 @@ sample_lst <- sapply(sample_files, function(input){
     ## get number of rows and columns in file
     cols <- as.numeric(system(paste0( "awk -F '\\t' 'BEGIN{numb=0; OFS = \"\\n\"}; {if (NF>numb){numb=NF}}; END{print numb,NR}' ", input ), intern = TRUE))
     ## table might be empty
-    if( cols[2] == 0 ){ 
+    if( cols[2] == 0 ){
         return( list( character(0), numeric(0), data.frame(
         depth1=character(0),depth2=character(0),depth3=character(0),depth4=character(0),depth5=character(0),depth6=character(0),depth7=character(0),
         stringsAsFactors=FALSE ), character(0) ) )

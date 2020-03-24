@@ -30,13 +30,13 @@ output_dict = {
 ## LOAD DATA ##
 
 ## list with path and taxID
-df_taxlist = pd.read_csv(input_dict['kronataxlist'], sep='\t', 
-names=['pathname_slv','taxID_slv','rank_slv'], 
+df_taxlist = pd.read_csv(input_dict['kronataxlist'], sep='\t',
+names=['pathname_slv','taxID_slv','rank_slv'],
 usecols=['pathname_slv','taxID_slv'])
 
 ## results from taxonomic classification
-df_kreport = pd.read_csv(input_dict['kreport'], sep='\t', 
-names=['percent','reads_cum','reads_here','rank_krak','taxID_slv','name'], 
+df_kreport = pd.read_csv(input_dict['kreport'], sep='\t',
+names=['percent','reads_cum','reads_here','rank_krak','taxID_slv','name'],
 usecols=['reads_here','taxID_slv'])
 ## exclude unclassified reads
 df_kreport = df_kreport.loc[df_kreport['reads_here'] != 0,:]

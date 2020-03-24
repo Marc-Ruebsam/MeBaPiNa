@@ -61,11 +61,11 @@ checkpoint basecalling_raw:
         "--qscore_filtering",
         ("--min_qscore " + config["filtering"]["q_min"]),
         ("--device cuda:all:100% "
-        + "--gpu_runners_per_device 6 " 
-        + "--chunks_per_runner 1536 " 
-        + "--chunk_size 1000 " 
-        + "--chunks_per_caller 10000 " 
-        + "--num_barcode_threads 8" 
+        + "--gpu_runners_per_device 6 "
+        + "--chunks_per_runner 1536 "
+        + "--chunk_size 1000 "
+        + "--chunks_per_caller 10000 "
+        + "--num_barcode_threads 8"
         if config["workstation"]["gpu"] else ""),
         # "--compress_fastq",
         "--fast5_out", #!#

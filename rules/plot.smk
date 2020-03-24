@@ -103,7 +103,7 @@ rule plot_fastq_pipe_basecall:
         "NR%4==1{{ " ## for every fourth line -> all headers
         "rhundr=1+int(rand()*nr); " ## get a random number between 1 and nr
         "if(rhundr==nr)" ## if the number is nr (by chance of 1/nr)
-        "{{ prnt=NR }} " ## set prnt flag to current line number to... 
+        "{{ prnt=NR }} " ## set prnt flag to current line number to...
         "}}; "
         "NR<prnt+4' " ## ...print this and the next three lines
         ">> {output} 2> {log}"
@@ -221,10 +221,10 @@ rule plot_fastq_pipe_filter:
     shell:
         "cat {input} |" ## concatenate all fastq files
         "awk -v seed=$RANDOM 'BEGIN{{ prnt=-4; nr=100; srand(seed) }}; " ## "falsify" print flag, set nr for fraction and set random seed. Note: downsampling is a fraction here not a number of reads
-        "NR%4==1{{ " #!# downsampling: for every fourth line -> all headers 
+        "NR%4==1{{ " #!# downsampling: for every fourth line -> all headers
         "rhundr=1+int(rand()*nr); " ## get a random number between 1 and nr
         "if(rhundr==nr)" ## if the number is nr (by chance of 1/nr)
-        "{{ prnt=NR }} " ## set prnt flag to current line number to... 
+        "{{ prnt=NR }} " ## set prnt flag to current line number to...
         "}}; "
         "NR<prnt+4' " ## ...print this and the next three lines
         ">> {output} 2> {log}"

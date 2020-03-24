@@ -27,7 +27,7 @@ workdir: config["experiments"]["project"]
 
 ## prevent unwanted extension of wildcards
 wildcard_constraints:
-    barc="[a-zA-Z0-9_-]+", 
+    barc="[a-zA-Z0-9_-]+",
     run="\w+", ## is equalt to [a-zA-Z0-9_]+
     reftype="[a-zA-Z0-9]+",
     reference="[a-zA-Z0-9]+"
@@ -85,50 +85,50 @@ rule all:
         "{tmp}02_analysis_results/01_basecalling/{run}/nanoqc/nanoQC.html",
         ## read QC: all passed reads
         "{tmp}02_analysis_results/01_basecalling/{run}/fastqc/stdin_fastqc.html",
-        
+
         ## barcode QC: per barcode
         ("" if not BAC_KIT else ## "" if bac_kit is ""
         "{tmp}02_analysis_results/01_basecalling/{run}/nanocomp/NanoStats.txt"),
-        
+
         ## TRIM AND FILTER ##
-        
+
         ## general QC: trimed and filtered barcoded reads, intentional downsampling
         "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoplot/NanoStats.txt",
         ## per base QC: trimed and filtered barcoded reads, forced downsampling
         "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoqc/nanoQC.html",
         ## read QC: trimed and filtered barcoded reads
         "{tmp}02_analysis_results/02_trimming_filtering/{run}/fastqc/stdin_fastqc.html",
-        
+
         ## barcode QC: trimed and filtered barcoded reads
         ("" if not BAC_KIT else ## "" if bac_kit is ""
         "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanocomp/NanoStats.txt"),
-        
+
         ## ALIGNMENT ##
-        
+
         ## general QC: per barcode, intentional downsampling
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc.html",
         ## taxonomic composition
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/aligned.counttaxlist",
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/krona.html",
-        
+
         ## K-MER MAPPING ##
-        
+
         ## taxonomic composition
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist",
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona.html",
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona_bracken.html",
-        
+
         ## OTU ##
-        
+
         ## clustered reads
         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_seq.qza",
         
         ## CALIBRATION STRAIN ##
-        
+
         ## calibration QC: only calinration strands
         ("" if not LAM_DCS else ## "" if lam_DCS is False
         "{tmp}02_analysis_results/01_basecalling/{run}_calibration_strands/nanoplot/NanoStats.txt"),
-        
+
         ## calibration QC: only calinration strands
         ("" if not LAM_DCS else ## "" if lam_DCS is False
         "{tmp}02_analysis_results/03_alignment/{run}_calibration_strands/lambda_nanoplot/NanoStats.txt"),

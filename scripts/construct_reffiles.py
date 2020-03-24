@@ -70,12 +70,12 @@ output_dict = {
 ## LOAD DATA ##
 
 ## load taxID list
-df_taxlist = pd.read_csv(input_dict['taxlist'], sep='\t', 
-names=['pathname','taxID','rank','remark','release'], 
+df_taxlist = pd.read_csv(input_dict['taxlist'], sep='\t',
+names=['pathname','taxID','rank','remark','release'],
 usecols=['pathname','taxID','rank'])
 
 ## load SILVA taxIDs w/o species classification
-df_accmap = pd.read_csv(input_dict['slvmap'], sep='\t', 
+df_accmap = pd.read_csv(input_dict['slvmap'], sep='\t',
 skiprows=1,
 names=['accID','start','end','path','name','taxID'],
 usecols=['accID','start','end','name','taxID'])
@@ -287,13 +287,13 @@ pd.concat([
 ## EXPORT QIIME ##
 
 ## write qiime accID to path FOR HIGHER TAXA
-df_tmp = df_pathname[6].str.replace("\s","_").str.split(";") 
+df_tmp = df_pathname[6].str.replace("\s","_").str.split(";")
 df_save = (
-    "d__" + df_tmp.str[0] + 
-    "; p__" + df_tmp.str[1] + 
-    "; c__" + df_tmp.str[2] + 
-    "; o__" + df_tmp.str[3] + 
-    "; f__" + df_tmp.str[4] + 
+    "d__" + df_tmp.str[0] +
+    "; p__" + df_tmp.str[1] +
+    "; c__" + df_tmp.str[2] +
+    "; o__" + df_tmp.str[3] +
+    "; f__" + df_tmp.str[4] +
     "; g__" + df_tmp.str[5]
 )
 df_save.reset_index().to_csv(
@@ -302,7 +302,7 @@ df_save.reset_index().to_csv(
 )
 ## write qiime accID to path INCLUDING SPECIES
 (
-    df_save + 
+    df_save +
     "; s__" + df_tmp.str[6]
 ).reset_index().to_csv(
     ## save

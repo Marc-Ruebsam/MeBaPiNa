@@ -35,19 +35,19 @@ output_dict = {
 ## LOAD DATA ##
 
 ## list with path and taxID
-df_taxlist = pd.read_csv(input_dict['kronataxlist'], sep='\t', 
-names=['pathname_slv','taxID_slv','rank_slv'], 
+df_taxlist = pd.read_csv(input_dict['kronataxlist'], sep='\t',
+names=['pathname_slv','taxID_slv','rank_slv'],
 usecols=['pathname_slv','taxID_slv'])
 
 ## list with accID and taxID
-df_seq2tax = pd.read_csv(input_dict['kronaseq2tax'], sep='\t', 
+df_seq2tax = pd.read_csv(input_dict['kronaseq2tax'], sep='\t',
 names=['accID','taxID_slv'])
 
 ## number of sam header lines
 n_sam_header = int(subprocess.check_output(("awk 'BEGIN{count=0}; $1~/^@/{count++}; $1~!/^@/{exit}; END{print count}' " + input_dict['sam']),shell=True).decode("utf-8").rstrip())
 ## results from alignment
-df_sam = pd.read_csv(input_dict['sam'], sep='\t', 
-names=['QNAME','FLAG','RNAME','POS','MAPQ','CIGAR','RNEXT','PNEXT','TLEN','SEQ','QUAL','NM','ms','AS','nn','tp','cm','s1','s2','de','rl'], 
+df_sam = pd.read_csv(input_dict['sam'], sep='\t',
+names=['QNAME','FLAG','RNAME','POS','MAPQ','CIGAR','RNEXT','PNEXT','TLEN','SEQ','QUAL','NM','ms','AS','nn','tp','cm','s1','s2','de','rl'],
 usecols=['QNAME','RNAME','POS','MAPQ','CIGAR','SEQ','NM','ms','de'],
 skiprows=n_sam_header)
 
@@ -72,7 +72,7 @@ df_sam['de'] = df_sam['de'].str.extract(r'de:f:([\d.]+)', expand=False).astype('
 #seems broken# df_sam['de'] = [float(mapq[6:]) for mapq in df_sam['de']]
 
 ## filter by aligned segment length
-df_sam = df_sam.loc[((df_sam['cigar_len'] > int(snakemake.config['filtering']['len_min'])) & 
+df_sam = df_sam.loc[((df_sam['cigar_len'] > int(snakemake.config['filtering']['len_min'])) &
 (df_sam['cigar_len'] < int(snakemake.config['filtering']['len_max']))),:]
 # df_sam = df_sam.loc[((df_sam['cigar_len'] > 1000) & (df_sam['cigar_len'] < 2800)),:]
 
