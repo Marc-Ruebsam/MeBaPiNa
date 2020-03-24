@@ -121,8 +121,10 @@ rule all:
         ## OTU ##
 
         ## clustered reads
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_seq.qza",
-        
+        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2otupick/index.html",
+        ## filtered reads
+        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2filter/index.html",
+
         ## CALIBRATION STRAIN ##
 
         ## calibration QC: only calinration strands
