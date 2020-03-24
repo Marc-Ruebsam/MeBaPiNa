@@ -168,7 +168,7 @@ rule q2filter_uchime:
 
 rule q2filter_classify:
     input:
-        nochimseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq.qza"
+        nochimseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq.qza",
         classifier="{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/classifyer.qza"
     output:
         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/counttax.qza"

@@ -124,6 +124,8 @@ rule all:
         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2otupick/index.html",
         ## filtered reads
         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2filter/index.html",
+        ## classified taxa
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/counttax.qza",
 
         ## CALIBRATION STRAIN ##
 
