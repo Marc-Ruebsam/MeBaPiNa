@@ -24,7 +24,7 @@ rule plot_nanoplot_seqsum_basecall:
         "--maxlength " + PLOT_MAXLEN, ## to keep it consistent with other plots
         "--drop_outliers",
         "--plots kde hex dot",
-        "--format svg",
+        "--format png",
         "--colormap viridis",
         "--color black", ## use NanoPlot --listcolors to get list of valid colors
         "--downsample " + PLOT_SMPL, ## downlsampling
@@ -79,7 +79,7 @@ rule plot_nanocomp_seqsum_basecall:
         "--maxlength " + PLOT_MAXLEN,
         "--barcoded",
         "--plot violin", ## violin,box,ridge
-        "--format svg",
+        "--format png",
         "--verbose" ## or nothing to log
     shell:
         "NanoComp --threads {threads} {params} "
@@ -170,7 +170,7 @@ rule plot_nanoplot_fastq_filter:
         2
     params:
         "--plots kde hex dot",
-        "--format svg",
+        "--format png",
         "--colormap viridis",
         "--color black", ## use NanoPlot --listcolors to get list of valid colors
         # "--raw", ## store "sequencing_summary"-like data
@@ -199,7 +199,7 @@ rule plot_nanocomp_fastq_filter:
     params:
         "--maxlength " + PLOT_MAXLEN,
         "--plot violin", ## violin,box,ridge
-        "--format svg",
+        "--format png",
         "--verbose", ## or nothing to log
         "--names " + " ".join(SAMPLES.values())
     shell:
@@ -376,7 +376,7 @@ rule plot_nanoplot_seqsum_calib:
     params:
         "--drop_outliers", ## other functions use "--maxlength 10000", to keep it consistent with other plots
         "--plots kde hex dot",
-        "--format svg",
+        "--format png",
         "--colormap viridis",
         "--color black", ## use NanoPlot --listcolors to get list of valid colors
         "--downsample " + PLOT_SMPL, ## downlsampling
