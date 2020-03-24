@@ -12,16 +12,10 @@ rule generate_manifestfile:
         import re
         ## open file for writing
         wo = open(output[0], "w")
-        
         ## write header
         null = wo.write("sample-id\tabsolute-filepath\n")
         ## write samples
-        # for barc in SAMPLES:
-        #     ## get input_file
-        #     coorect_input_file = list(filter(lambda input_file: barc in input_file, input))[0]
-        #     wo.write(SAMPLES[barc] + "\t" + "$PWD/" + coorect_input_file + "\n")
         wo.write(SAMPLES[wildcards.barc] + "\t" + "$PWD/" + input[0] + "\n")
-        
         ## close file
         wo.close()
 
@@ -77,11 +71,11 @@ rule q2otupick:
     input:
         derepseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/filtered_derep.qza",
         dereptable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/filtered_derep_table.qza",
-        q2ref="{tmp}.tmp/Reference_Sequences/{reference}/qiime/reference.qza"
+        q2ref="{tmp}METADATA/Reference_Sequences/{reference}/qiime/reference.qza"
     output:
-        otuseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_seq.qza",
-        otutable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_table.qza",
-        otunewref="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_newref.qza" ## The new reference sequences. This can be used for subsequent runs of open-reference clustering for consistent definitions of features across open-reference feature tables.
+        otuseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_centseq.qza", ## FeatureData[Sequence]
+        otutable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_ftable.qza", ## FeatureTable[Frequency]
+        otunewref="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_newrefseq.qza" ## The new reference sequences. This can be used for subsequent runs of open-reference clustering for consistent definitions of features across open-reference feature tables.
     log:
         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2otupick.log"
     benchmark:
