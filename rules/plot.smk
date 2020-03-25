@@ -320,6 +320,11 @@ rule plot_qiime2_q2filter:
         ">> {log} 2>&1; "
         "rm {input}.qzv >> {log} 2>&1"
 
+## for assignment with classifyer
+# qiime metadata tabulate \
+#   --m-input-file counttax.qza \
+#   --o-visualization counttax.qzv
+
 ## ALIGN ##
 ###########
 

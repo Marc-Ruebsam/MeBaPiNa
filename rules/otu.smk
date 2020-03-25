@@ -192,10 +192,7 @@ rule q2filter_classify:
         "--p-n-jobs {threads} "
         "--verbose {params} >> {log} 2>&1"
 
-#
-# qiime metadata tabulate \
-#   --m-input-file counttax.qza \
-#   --o-visualization counttax.qzv
+
 
 # for fl in $(find -name "*.qza")
 #   do
