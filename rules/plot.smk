@@ -201,7 +201,7 @@ rule plot_nanocomp_fastq_filter:
         "--plot violin", ## violin,box,ridge
         "--format png",
         "--verbose" ## or nothing to log
-        # "--names " + " ".join(SAMPLES.values()) ## works only with short names
+        "--names " + " ".join(SAMPLES.keys()) ## join(SAMPLES.values()) works only with short names
     shell:
         "NanoComp --threads {threads} {params} "
         "--outdir {wildcards.tmp}02_analysis_results/02_trimming_filtering/{wildcards.run}/nanocomp "
