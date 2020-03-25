@@ -191,6 +191,33 @@ rule q2filter_classify:
         "--p-n-jobs {threads} "
         "--verbose {params} >> {log} 2>&1"
 
+rule kmermap_q2:
+    input:
+        centseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq.qza",
+        krakdb="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database.kraken"
+    output:
+        report="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/filtered.kreport2",
+        output="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/filtered.kraken2"
+    log:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_filtered.log"
+    benchmark:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_filtered.benchmark.tsv"
+    conda:
+        "../envs/kraken2.yml"
+    threads:
+        8
+    params:
+        "--confidence " + config["filtering"]["min_confidence"] ## how many of the k-mers have to map to a reference to be assigned (higher taxonomies accumulate the counts of lower ones)
+    shell:
+        "centseq={input.centseq}; centseq=\"${{centseq/.qza/}}\" > {log} 2>&1; "
+        "target={input.krakdb}; target=\"${{target/database.kraken/}}\" >> {log} 2>&1; "
+        "qiime tools export --input-path \"${{centseq}}.qza\" --output-path \"${{centseq}}/\" >> {log} 2>&1; "
+        "kraken2 --threads {threads} {params} "
+        "--db ${{target}} "
+        "--output {output.output} " ## information per sequence
+        "--report {output.report} " ## information per taxon
+        "\"${{centseq}}/dna-sequences.fasta\" >> {log} 2>&1"
+
 
 
 # for fl in $(find -name "*.qza")
