@@ -200,7 +200,7 @@ rule plot_nanocomp_fastq_filter:
         "--maxlength " + PLOT_MAXLEN,
         "--plot violin", ## violin,box,ridge
         "--format png",
-        "--verbose" ## or nothing to log
+        "--verbose", ## or nothing to log
         "--names " + " ".join(SAMPLES.keys()) ## join(SAMPLES.values()) works only with short names
     shell:
         "NanoComp --threads {threads} {params} "
