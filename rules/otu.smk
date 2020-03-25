@@ -239,7 +239,22 @@ rule kmermap_q2converted:
         "--report {output.report} " ## information per taxon
         "{input.centseq} >> {log} 2>&1"
 
-
+rule rereplicate_q2kmermap:
+    input:
+        ftable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_ftable/feature-table.tsv",
+        output="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/filtered.kraken2"
+    output:
+        rerep="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/rerep.kraken2"
+    log:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_rereplicate_q2kmermap.log"
+    benchmark:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_rereplicate_q2kmermap.benchmark.tsv"
+    threads:
+        1
+    shell:
+        "awk 'FNR==NR&&!/^#/{{featcount[$1]=$2}}; "
+        "FNR!=NR{{for(i=0;i<featcount[$2];i++){{print $0}}}}' "
+        "{input.ftable} {input.output} > {output.rerep} 2> {log}"
 
 # for fl in $(find -name "*.qza")
 #   do

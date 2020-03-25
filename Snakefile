@@ -125,7 +125,7 @@ rule all:
         ## filtered reads
         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2filter/index.html",
         ## classified taxa
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/filtered.kraken2",
+        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/krona.html",
 
         ## CALIBRATION STRAIN ##
 

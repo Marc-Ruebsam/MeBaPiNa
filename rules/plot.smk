@@ -320,6 +320,27 @@ rule plot_qiime2_q2filter:
         ">> {log} 2>&1; "
         "rm {input}.qzv >> {log} 2>&1"
 
+rule plot_krona_q2rerep:
+    input:
+        output="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/rerep.kraken2",
+        kronataxtab="{tmp}METADATA/Reference_Sequences/{reference}/krona/{reftype}/taxonomy.tab"
+    output:
+        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/krona.html"
+    log:
+        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_krona_q2rerep.log"
+    benchmark:
+        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_krona_q2rerep.benchmark.tsv"
+    conda:
+        "../envs/krona.yml"
+    params:
+        "-i", ## Include a wedge for queries with no hits.
+        # "-q 2", ## Column of input files to use as query ID. Required if magnitude files are specified. [Default: '1']
+        "-t 3", ## Column of input files to use as taxonomy ID. [Default: '2']
+        "-d 7" ## Maximum depth of wedges to include in the chart.
+    shell:
+        "reference={input.kronataxtab}; reference=\"${{reference/taxonomy.tab/}}\" > {log} 2>&1; "
+        "ktImportTaxonomy {params} -tax  ${{reference}} {input.output} -o {output} > {log} 2>&1"
+
 ## for assignment with classifyer
 # qiime metadata tabulate \
 #   --m-input-file counttax.qza \
