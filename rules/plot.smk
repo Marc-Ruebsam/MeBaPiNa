@@ -290,9 +290,10 @@ rule plot_qiime2_q2otupick:
         "--i-table {input} "
         "--o-visualization {input}.qzv "
         "--verbose > {log} 2>&1; "
+        "out_dir={output}; out_dir=\"${{out_dir/index.html/}}\" > {log} 2>&1; "
         "qiime tools export "
         "--input-path {input}.qzv "
-        "--output-path {output} "
+        "--output-path ${{out_dir}} "
         ">> {log} 2>&1; "
         "rm {input}.qzv >> {log} 2>&1"
 
@@ -312,9 +313,10 @@ rule plot_qiime2_q2filter:
         "--i-table {input} "
         "--o-visualization {input}.qzv "
         "--verbose > {log} 2>&1; "
+        "out_dir={output}; out_dir=\"${{out_dir/index.html/}}\" > {log} 2>&1; "
         "qiime tools export "
         "--input-path {input}.qzv "
-        "--output-path {output} "
+        "--output-path ${{out_dir}} "
         ">> {log} 2>&1; "
         "rm {input}.qzv >> {log} 2>&1"
 
