@@ -191,17 +191,42 @@ rule q2filter_classify:
         "--p-n-jobs {threads} "
         "--verbose {params} >> {log} 2>&1"
 
-rule kmermap_q2:
+rule convert_q2filter:
     input:
-        centseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq.qza",
+        ftable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_ftable.qza",
+        centseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq.qza"
+    output:
+        ftable=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_ftable/feature-table.tsv"),
+        ftablebiom=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_ftable/feature-table.biom"),
+        centseq=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq/dna-sequences.fasta")
+    log:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_convert_q2filter.log"
+    benchmark:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_convert_q2filter.benchmark.tsv"
+    conda:
+        "../envs/qiime2.yml"
+    params:
+        "--p-confidence " + config["filtering"]["min_confidence"] ## Confidence threshold for limiting taxonomic depth. Set to "disable" to disable confidence calculation, or 0 to calculate confidence but not apply it to limit the taxonomic depth of the assignments. [default: 0.7]
+    threads:
+        8
+    shell:
+        "centseq={input.centseq}; centseq=\"${{centseq/.qza/}}\" > {log} 2>&1; "
+        "ftable={input.ftable}; ftable=\"${{ftable/.qza/}}\" >> {log} 2>&1; "
+        "qiime tools export --input-path \"${{centseq}}.qza\" --output-path \"${{centseq}}/\" >> {log} 2>&1; "
+        "qiime tools export --input-path \"${{ftable}}.qza\" --output-path \"${{ftable}}/\" >> {log} 2>&1; "
+        "biom convert --input-fp {output.ftablebiom} --output-fp {output.ftable} --to-tsv >> {log} 2>&1"
+
+rule kmermap_q2converted:
+    input:
+        centseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq/dna-sequences.fasta,"
         krakdb="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database.kraken"
     output:
         report="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/filtered.kreport2",
         output="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/filtered.kraken2"
     log:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_filtered.log"
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_q2converted.log"
     benchmark:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_filtered.benchmark.tsv"
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_q2converted.benchmark.tsv"
     conda:
         "../envs/kraken2.yml"
     threads:
