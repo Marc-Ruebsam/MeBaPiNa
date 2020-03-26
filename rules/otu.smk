@@ -255,7 +255,7 @@ rule kmermap_q2converted:
         "--db ${{target}} "
         "--output {output.output} " ## information per sequence
         "--report {output.report} " ## information per taxon
-        "{input.centseq} >> {log} 2>&1"
+        "{input.rerep} >> {log} 2>&1"
 
 # for fl in $(find -name "*.qza")
 #   do
