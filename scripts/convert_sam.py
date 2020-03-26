@@ -92,6 +92,10 @@ counts_acc = pd.merge(counts_acc, df_seq2tax, how='left', on='accID').sort_value
 counts_acc.set_index(['taxID_slv', 'accID'], inplace=True)
 df_combi = counts_acc.sum(level='taxID_slv').reset_index()
 
+## filter reads below minimum required coverage
+df_combi = df_combi.loc[(df_combi['reads_here'] >= int(snakemake.config['filtering']['min_featurereads'])),:]
+# df_combi = df_combi.loc[(df_combi['reads_here'] >= 3),:]
+
 ## add path information
 df_combi = pd.merge(df_combi, df_taxlist, how='left', on='taxID_slv')
 
