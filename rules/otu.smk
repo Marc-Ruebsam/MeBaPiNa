@@ -229,7 +229,7 @@ rule rereplicate_q2kmermap:
     shell:
         "awk 'FNR==NR&&!/^#/{{featcount[$1]=$2}}; "
         "FNR!=NR{{for(i=0;i<featcount[$2];i++){{print $0}}}}' "
-        "{input.ftable} {input.output} > {output.rerep} 2> {log}"
+        "{input.ftable} {input.centseq} > {output.rerep} 2> {log}"
 
 rule kmermap_q2converted:
     input:
