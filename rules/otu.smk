@@ -228,8 +228,8 @@ rule rereplicate_q2filter:
         1
     shell:
         "awk 'FNR==NR&&!/^#/{{featcount[$1]=$2}}; " ## get number of reads per featureID from ftable
-        "FNR!=NR&&NR%2==1{{cur_id=substr($1,2)}}; " ## get current featureIF in fasta
-        "FNR!=NR&&NR%2==0{{for(i=0;i<featcount[cur_id];i++){{print \">\"cur_id\" \"i\"\\n\"$0}}}}' " ## for current featureID: print featureID and sequene times the number of reads
+        "FNR!=NR&&/^>/{{cur_id=substr($1,2)}}; " ## get current featureIF in fasta
+        "FNR!=NR&&!/^>/{{for(i=0;i<featcount[cur_id];i++){{print \">\"cur_id\" \"i\"\\n\"$0}}}}' " ## for current featureID: print featureID and sequene times the number of reads
         "{input.ftable} {input.centseq} > {output.rerep} 2> {log}"
 
 rule kmermap_q2rereplicate:
