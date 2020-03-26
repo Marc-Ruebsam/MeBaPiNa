@@ -221,9 +221,9 @@ rule rereplicate_q2kmermap:
     output:
         rerep="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq/dna-sequences-rerep.fasta"
     log:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_rereplicate_q2kmermap.log"
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_rereplicate_q2kmermap.log"
     benchmark:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_rereplicate_q2kmermap.benchmark.tsv"
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_rereplicate_q2kmermap.benchmark.tsv"
     threads:
         1
     shell:
