@@ -214,16 +214,16 @@ rule convert_q2filter:
         "qiime tools export --input-path \"${{ftable}}.qza\" --output-path \"${{ftable}}/\" >> {log} 2>&1; "
         "biom convert --input-fp {output.ftablebiom} --output-fp {output.ftable} --to-tsv >> {log} 2>&1"
 
-rule rereplicate_q2kmermap:
+rule rereplicate_q2filter:
     input:
         ftable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_ftable/feature-table.tsv",
         centseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq/dna-sequences.fasta"
     output:
         rerep="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq/dna-sequences-rerep.fasta"
     log:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_rereplicate_q2kmermap.log"
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_rereplicate_q2filter.log"
     benchmark:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_rereplicate_q2kmermap.benchmark.tsv"
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_rereplicate_q2filter.benchmark.tsv"
     threads:
         1
     shell:
@@ -232,7 +232,7 @@ rule rereplicate_q2kmermap:
         "FNR!=NR&&NR%2==0{{for(i=0;i<featcount[cur_id];i++){{print \">\"cur_id\" \"i\"\\n\"$0}}}}' " ## for current featureID: print featureID and sequene times the number of reads
         "{input.ftable} {input.centseq} > {output.rerep} 2> {log}"
 
-rule kmermap_q2converted:
+rule kmermap_q2rereplicate:
     input:
         rerep="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq/dna-sequences-rerep.fasta",
         krakdb="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database.kraken"
@@ -240,9 +240,9 @@ rule kmermap_q2converted:
         report="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/filtered.kreport2",
         output="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/filtered.kraken2"
     log:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_q2converted.log"
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_q2rereplicate.log"
     benchmark:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_q2converted.benchmark.tsv"
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_q2rereplicate.benchmark.tsv"
     conda:
         "../envs/kraken2.yml"
     threads:
