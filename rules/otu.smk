@@ -214,9 +214,26 @@ rule convert_q2filter:
         "qiime tools export --input-path \"${{ftable}}.qza\" --output-path \"${{ftable}}/\" >> {log} 2>&1; "
         "biom convert --input-fp {output.ftablebiom} --output-fp {output.ftable} --to-tsv >> {log} 2>&1"
 
+rule rereplicate_q2kmermap:
+    input:
+        ftable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_ftable/feature-table.tsv",
+        centseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq/dna-sequences.fasta"
+    output:
+        rerep="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq/dna-sequences-rerep.fasta"
+    log:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_rereplicate_q2kmermap.log"
+    benchmark:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_rereplicate_q2kmermap.benchmark.tsv"
+    threads:
+        1
+    shell:
+        "awk 'FNR==NR&&!/^#/{{featcount[$1]=$2}}; "
+        "FNR!=NR{{for(i=0;i<featcount[$2];i++){{print $0}}}}' "
+        "{input.ftable} {input.output} > {output.rerep} 2> {log}"
+
 rule kmermap_q2converted:
     input:
-        centseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq/dna-sequences.fasta",
+        rerep="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq/dna-sequences-rerep.fasta",
         krakdb="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database.kraken"
     output:
         report="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/filtered.kreport2",
@@ -238,23 +255,6 @@ rule kmermap_q2converted:
         "--output {output.output} " ## information per sequence
         "--report {output.report} " ## information per taxon
         "{input.centseq} >> {log} 2>&1"
-
-rule rereplicate_q2kmermap:
-    input:
-        ftable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_ftable/feature-table.tsv",
-        output="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/filtered.kraken2"
-    output:
-        rerep="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/rerep.kraken2"
-    log:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_rereplicate_q2kmermap.log"
-    benchmark:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_rereplicate_q2kmermap.benchmark.tsv"
-    threads:
-        1
-    shell:
-        "awk 'FNR==NR&&!/^#/{{featcount[$1]=$2}}; "
-        "FNR!=NR{{for(i=0;i<featcount[$2];i++){{print $0}}}}' "
-        "{input.ftable} {input.output} > {output.rerep} 2> {log}"
 
 # for fl in $(find -name "*.qza")
 #   do

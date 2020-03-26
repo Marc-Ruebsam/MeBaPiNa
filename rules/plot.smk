@@ -322,7 +322,7 @@ rule plot_qiime2_q2filter:
 
 rule plot_krona_q2rerep:
     input:
-        output="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/rerep.kraken2",
+        output="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/filtered.kraken2",
         kronataxtab="{tmp}METADATA/Reference_Sequences/{reference}/krona/{reftype}/taxonomy.tab"
     output:
         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/krona.html"
