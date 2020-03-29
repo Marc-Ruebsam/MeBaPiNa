@@ -257,14 +257,17 @@ rule kmermap_q2rereplicate:
         "--report {output.report} " ## information per taxon
         "{input.rerep} >> {log} 2>&1"
 
-# for fl in $(find -name "*.qza")
-#   do
-#   echo ${fl}
-#   qiime tools export --input-path ${fl} --output-path "${fl/.qza/}"
-# done
-# for fl in $(find -name "*.biom")
-#   do
-#   echo ${fl}
-#   biom summarize-table -i ${fl}
-#   biom convert -i ${fl} -o ${fl/.biom/.tsv} --to-tsv
-# done
+rule counttax_q2kmermap:
+    input:
+        report="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/filtered.kreport2",
+        kronataxlist="{tmp}METADATA/Reference_Sequences/{reference}/krona/{reftype}/taxlist.txt"
+    output:
+        counttaxlist="{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"
+    log:
+        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_q2kmermap.log"
+    benchmark:
+        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_q2kmermap.benchmark.tsv"
+    conda:
+        "../envs/python.yml"
+    script:
+        "../scripts/convert_kreport.py"
