@@ -1,7 +1,7 @@
 ## INPUT ##
 
 library("phyloseq")
-library("DESeq2")
+#library("DESeq2")
 library("vegan")
 
 
@@ -14,19 +14,46 @@ meta_files <- c(
 )
 
 ## sample data
+## k-mer
 sample_files <- c(
-    "01_processed_data/03_kmer_mapping/20191007_1559_MN31344_FAK76605_2bf006ff/barcode01/silva_species/filtered.ktaxlist",
-    "01_processed_data/03_kmer_mapping/20191007_1559_MN31344_FAK76605_2bf006ff/barcode02/silva_species/filtered.ktaxlist",
-    "01_processed_data/03_kmer_mapping/20191007_1559_MN31344_FAK76605_2bf006ff/barcode03/silva_species/filtered.ktaxlist",
-    "01_processed_data/03_kmer_mapping/20191007_1559_MN31344_FAK76605_2bf006ff/barcode04/silva_species/filtered.ktaxlist",
-    "01_processed_data/03_kmer_mapping/20191007_1559_MN31344_FAK76605_2bf006ff/barcode05/silva_species/filtered.ktaxlist",
-    "01_processed_data/03_kmer_mapping/20191007_1559_MN31344_FAK76605_2bf006ff/barcode06/silva_species/filtered.ktaxlist",
-    "01_processed_data/03_kmer_mapping/20191007_1559_MN31344_FAK76605_2bf006ff/barcode07/silva_species/filtered.ktaxlist",
-    "01_processed_data/03_kmer_mapping/20191007_1559_MN31344_FAK76605_2bf006ff/barcode08/silva_species/filtered.ktaxlist",
-    "01_processed_data/03_kmer_mapping/20191007_1559_MN31344_FAK76605_2bf006ff/barcode09/silva_species/filtered.ktaxlist",
-    "01_processed_data/03_kmer_mapping/20191007_1559_MN31344_FAK76605_2bf006ff/barcode10/silva_species/filtered.ktaxlist",
-    "01_processed_data/03_kmer_mapping/20191007_1559_MN31344_FAK76605_2bf006ff/barcode11/silva_species/filtered.ktaxlist",
-    "01_processed_data/03_kmer_mapping/20191007_1559_MN31344_FAK76605_2bf006ff/barcode12/silva_species/filtered.ktaxlist"
+    "02_analysis_results/03_kmer_mapping/20191007_1559_MN31344_FAK76605_2bf006ff/barcode03/silva_species/kmer.counttaxlist",
+    "02_analysis_results/03_kmer_mapping/20191007_1559_MN31344_FAK76605_2bf006ff/barcode04/silva_species/kmer.counttaxlist",
+    "02_analysis_results/03_kmer_mapping/20191205_1807_MN31344_FAK73557_303059af/barcode03/silva_species/kmer.counttaxlist"
+)
+
+## alignment
+sample_files <- c(
+    "02_analysis_results/03_alignment/20191007_1559_MN31344_FAK76605_2bf006ff/barcode01/silva_species/aligned.counttaxlist",
+    "02_analysis_results/03_alignment/20191007_1559_MN31344_FAK76605_2bf006ff/barcode02/silva_species/aligned.counttaxlist",
+    "02_analysis_results/03_alignment/20191007_1559_MN31344_FAK76605_2bf006ff/barcode03/silva_species/aligned.counttaxlist",
+    "02_analysis_results/03_alignment/20191007_1559_MN31344_FAK76605_2bf006ff/barcode04/silva_species/aligned.counttaxlist",
+    "02_analysis_results/03_alignment/20191007_1559_MN31344_FAK76605_2bf006ff/barcode05/silva_species/aligned.counttaxlist",
+    "02_analysis_results/03_alignment/20191007_1559_MN31344_FAK76605_2bf006ff/barcode06/silva_species/aligned.counttaxlist",
+    "02_analysis_results/03_alignment/20191007_1559_MN31344_FAK76605_2bf006ff/barcode07/silva_species/aligned.counttaxlist",
+    "02_analysis_results/03_alignment/20191007_1559_MN31344_FAK76605_2bf006ff/barcode08/silva_species/aligned.counttaxlist",
+    "02_analysis_results/03_alignment/20191007_1559_MN31344_FAK76605_2bf006ff/barcode09/silva_species/aligned.counttaxlist",
+    "02_analysis_results/03_alignment/20191007_1559_MN31344_FAK76605_2bf006ff/barcode10/silva_species/aligned.counttaxlist",
+    "02_analysis_results/03_alignment/20191007_1559_MN31344_FAK76605_2bf006ff/barcode11/silva_species/aligned.counttaxlist",
+    "02_analysis_results/03_alignment/20191007_1559_MN31344_FAK76605_2bf006ff/barcode12/silva_species/aligned.counttaxlist",
+    "02_analysis_results/03_alignment/20191205_1807_MN31344_FAK73557_303059af/barcode01/silva_species/aligned.counttaxlist",
+    "02_analysis_results/03_alignment/20191205_1807_MN31344_FAK73557_303059af/barcode02/silva_species/aligned.counttaxlist",
+    "02_analysis_results/03_alignment/20191205_1807_MN31344_FAK73557_303059af/barcode03/silva_species/aligned.counttaxlist",
+    "02_analysis_results/03_alignment/20191205_1807_MN31344_FAK73557_303059af/barcode04/silva_species/aligned.counttaxlist",
+    "02_analysis_results/03_alignment/20191205_1807_MN31344_FAK73557_303059af/barcode05/silva_species/aligned.counttaxlist",
+    "02_analysis_results/03_alignment/20191205_1807_MN31344_FAK73557_303059af/barcode06/silva_species/aligned.counttaxlist",
+    "02_analysis_results/03_alignment/20191205_1807_MN31344_FAK73557_303059af/barcode07/silva_species/aligned.counttaxlist",
+    "02_analysis_results/03_alignment/20191205_1807_MN31344_FAK73557_303059af/barcode08/silva_species/aligned.counttaxlist",
+    "02_analysis_results/03_alignment/20191205_1807_MN31344_FAK73557_303059af/barcode09/silva_species/aligned.counttaxlist",
+    "02_analysis_results/03_alignment/20191205_1807_MN31344_FAK73557_303059af/barcode10/silva_species/aligned.counttaxlist",
+    "02_analysis_results/03_alignment/20191205_1807_MN31344_FAK73557_303059af/barcode11/silva_species/aligned.counttaxlist",
+    "02_analysis_results/03_alignment/20191205_1807_MN31344_FAK73557_303059af/barcode12/silva_species/aligned.counttaxlist"
+)
+
+## otu
+sample_files <- c(
+    "02_analysis_results/03_otu_picking/20191007_1559_MN31344_FAK76605_2bf006ff/barcode03/silva_species/kmer.counttaxlist",
+    "02_analysis_results/03_otu_picking/20191007_1559_MN31344_FAK76605_2bf006ff/barcode04/silva_species/kmer.counttaxlist",
+    "02_analysis_results/03_otu_picking/20191205_1807_MN31344_FAK73557_303059af/barcode03/silva_species/kmer.counttaxlist"
 )
 
 ## load meta data
@@ -57,16 +84,21 @@ sample_lst <- sapply(sample_files, function(input){
     input_df[input_df == ""] <- NA
     input_df <- input_df[input_df$counts != 0,]
 
+    ## name of last rank should all be species
     specs_name <- apply( input_df, 1, function(row){ row[max(which(!is.na(row)))] } )
     attr(specs_name,"names") <- NULL
+    ## split counts and taxonomic paths (path list)
     counts <- input_df[,"counts"]
     specs_path_lst <- input_df[,which(!colnames(input_df) %in% "counts")]
+    ## collapse path to single string
     specs_path <- paste0(apply( specs_path_lst, 1, function(specs){
         specs <- specs[!is.na(specs)]
         paste(specs,  sep = "", collapse = ";")
     } ),";")
+    ## reverse order of ranks in path list
     specs_path_lst <- specs_path_lst[,rev(colnames(specs_path_lst))]
 
+    ## return single species name array, counts array, path dataframe starting with species, collapsed paths ending with species
     list( specs_name, counts, specs_path_lst, specs_path )
 })
 dimnames(sample_lst) <- list(NULL,sapply(strsplit(dimnames(sample_lst)[[2]],"/"),"[",4)) #!#
@@ -74,16 +106,23 @@ dimnames(sample_lst) <- list(NULL,sapply(strsplit(dimnames(sample_lst)[[2]],"/")
 ## initialize count table for all species and all samples
 counts_df <- as.data.frame(matrix( data = 0, nrow = ncol(sample_lst), ncol = nrow(meta_df), dimnames = list( dimnames(sample_lst)[[2]], meta_df[,"path"] ) ),stringsAsFactors=FALSE)
 ## fill count table with read counts
-null <- sapply( dimnames(sample_lst)[[2]], function(sample_name){
-    name_lst <- sample_lst[,sample_name]
-    if( length(name_lst[[1]]) == 0 ){ return(sample_name) }
-    counts_df[sample_name, match( name_lst[[4]], colnames(counts_df) )] <<- name_lst[[2]]
-    sample_name
+null <- sapply( 1:ncol(sample_lst), function(sample_idx){
+    name_lst <- sample_lst[,sample_idx]
+    if( length(name_lst[[1]]) == 0 ){ return(sample_idx) }
+    counts_df[sample_idx, match( name_lst[[4]], colnames(counts_df) )] <<- name_lst[[2]]
+    sample_idx
 } )
 ## remove species not present in the samples
 idx <- colSums(counts_df) != 0
 counts_df <- counts_df[,idx]
 meta_df <- meta_df[idx,]
+
+## reference
+n_reads = 1000 #0.5*10^6 ## simulate reads
+reference <- data.frame(matrix(  c(4.2,9.9,10.1,10.4,14.1,15.5,17.4,18.4) * n_reads,  nrow=1,
+dimnames=list(c("reference"),c("P. aeruginosa","E. faecalis","E. coli","S. enterica","L. monocytogenes","S. aureus","B. subtilis","L. fermentum"))))
+
+
 
 ## DIVERSITY INDICES ##
 
@@ -92,9 +131,11 @@ meta_df <- meta_df[idx,]
 sample_div <- data.frame(richness_S = specnumber(counts_df))
 
 ## Shannon–Weaver
+## The Shannon entropy quantifies the uncertainty in predicting the species identity of an individual that is taken at random from the dataset.
 sample_div[,"shannon_H"] <- diversity(counts_df, index = "shannon", base = exp(1))
 sample_div[,"shannon_base2"] <- diversity(counts_df, index = "shannon", base = 2)
 ## Simpson
+## The measure equals the probability that two entities taken at random from the dataset of interest represent the same type
 sample_div[,"simp"] <- diversity(counts_df, index = "simpson")
 ## inverse Simpson
 sample_div[,"simp_iverse"] <- diversity(counts_df, index = "invsimpson")
@@ -108,20 +149,18 @@ sample_div[,"evenness_J"] <- sample_div[,"shannon_H"]/log(sample_div[,"richness_
 ## alpha parameter of Fisher’s log-series
 sample_div[,"alpha"] <- fisher.alpha(counts_df)
 
+## for reference
+ref_div <- data.frame(richness_S = specnumber(reference))
+ref_div[,"shannon_H"] <- diversity(reference, index = "shannon", base = exp(1))
+ref_div[,"shannon_base2"] <- diversity(reference, index = "shannon", base = 2)
+ref_div[,"simp"] <- diversity(reference, index = "simpson")
+ref_div[,"simp_iverse"] <- diversity(reference, index = "invsimpson")
+ref_div[,"simp_unbias"] <- rarefy(reference, 2) - 1
+ref_div[,"evenness_J"] <- ref_div[,"shannon_H"]/log(ref_div[,"richness_S"])
+ref_div[,"alpha"] <- fisher.alpha(reference)
+
 
 ## TAXONOMIC DIVERSITY ##
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

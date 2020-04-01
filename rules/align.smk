@@ -53,7 +53,7 @@ rule filter_aligned:
     input:
         "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/{altype}.sam"
     output:
-        sam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/{altype}_filtered.sam",
+        sam=temp("{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/{altype}_filtered.sam"),
         bam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/{altype}_filteredsorted.bam",
         bai="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/{altype}_filteredsorted.bam.bai"
     log:
@@ -73,6 +73,22 @@ rule filter_aligned:
         "samtools sort --threads $(({threads} / 2)) -o {output.bam} >> {log} 2>&1; "
         "samtools index -@ {threads} {output.bam} >> {log} 2>&1"
 
+rule convert_bambacktosam:
+    input:
+        bam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/{altype}_filteredsorted.bam"
+    output:
+        sam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/{altype}_filtered.sam"
+    log:
+        "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_filter_{altype}.log"
+    benchmark:
+        "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_filter_{altype}.benchmark.tsv"
+    conda:
+        "../envs/samtools.yml"
+    threads:
+        1
+    shell:
+        "samtools view -h -@ $(({threads} / 2)) {params} -o {output} {input} > {log} 2>&1"
+ruleorder: convert_bambacktosam > filter_aligned
 
 rule counttax_aligned:
     input:

@@ -105,11 +105,11 @@ rule trimming_basecalled:
     params:
         "--min-score 70", ## Minimum barcode score. Barcode calls with a lower score will be discarded. Must be between 0 and 100. (default: 60)
         "--detect-middle", #!# Search for adapters in the whole read
-        "--min-read-length " + config["filtering"]["len_min"], ## Reads short than <min-read-length> after trimming will be discarded.
+        # "--min-read-length " + config["filtering"]["len_min"], ## Reads short than <min-read-length> after trimming will be discarded.
         "--trim", ## Remove adapter and barcode sequences from reads.
         ("--kit RAB204" if BAC_KIT == "SQK-RAB204" else "--kit Auto") #!#
     shell:
-        "barc_folder={wildcards.tmp}01_processed_data/02_trimming_filtering/{wildcards.run}/{wildcards.barc}; " ## directory name of barcode currently processed
+        "barc_folder={wildcards.tmp}01_processed_data/02_trimming_filtering/{wildcards.run}/{wildcards.barc}; " #!# directory name of barcode currently processed
         "find {input} -type f -name \"*.fastq\" -exec cat {{}} \\; | "
         "qcat --threads {threads} {params} "
         "--barcode_dir $barc_folder "

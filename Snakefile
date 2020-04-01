@@ -3,8 +3,6 @@
 #####################################################
 
 ## author:      Marc Ruebsam (marc-ruebsam@hotmail.de)
-## version:     0.7
-## last change: 2020-03-03
 ## description: Pipeline for automated analysis of 16S metabarcoding samples.
 
 
@@ -36,7 +34,7 @@ wildcard_constraints:
 #############################
 
 ## load run information
-METADATA = pd.read_excel( config["experiments"]["tmp"] + "METADATA/EXPERIMENT_SEQUENCING.xlsx", header = 1 )
+METADATA = pd.read_excel( config["experiments"]["meta"], header = 1 )
 ## find meta data for required samples
 METADATA = METADATA.loc[ METADATA['Sample name'].isin(config["experiments"]["samples"]), : ]
 #!# currently only one single run analysis is supported. Use run with most sample overlaps
@@ -140,4 +138,4 @@ rule all:
         ("" if not LAM_DCS else ## "" if lam_DCS is False
         "{tmp}02_analysis_results/03_alignment/{run}_calibration_strands/lambda_pycoqc/pycoQC_report.json")
 
-        ])), tmp = config["experiments"]["tmp"], run = RUNS, barc = SAMPLES.keys(), reference = config['reference']['source'], reftype = config['reference']['type'])
+        ])), tmp = config["experiments"]["tmp"], run = RUNS, barc = SAMPLES.keys(), reference = config['reference']['source'], reftype = config['reference']['rank'])

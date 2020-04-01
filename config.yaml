@@ -6,6 +6,8 @@ experiments:
   ## path to directory containing main folders (00_raw_data, 01_processed_data, ...)
   project: "/mnt/ag-halama/PROMISE/.tmp" # "/mnt/Nanopore/Nanopore_Projects/Internal/NCT/PROMISE/Microbiome/16S_Metabarcoding/"
   tmp: "16S_Metabarcoding/"
+  ## path to the excel file containing the metadata
+  meta: "16S_Metabarcoding/METADATA/EXPERIMENT_SEQUENCING.xlsx"
   ## samples to analyze, matching "Sample name"s in EXPERIMENT_SEQUENCING.xlsx #!# currently only one single run analysis is supported
   samples:
     ["NTC",
@@ -20,6 +22,18 @@ experiments:
     "PROM-01-0004-MS-T1T2",
     "PROM-01-0005-MS-T1T2",
     "PROM-01-0002-MS-T2ERW"]
+    # ["NTC",
+    # "Extraction-control",
+    # "ZymoDNA",
+    # "Lu5",
+    # "Lu13",
+    # "Lu18",
+    # "Extraction-control-enriched",
+    # "Lu5-enriched",
+    # "Lu13-enriched",
+    # "Lu18-enriched",
+    # "Lu5",
+    # "Ov85"]
 
 methodologie:
   "kmer" ## one of "kmer", "align", "otu", "asv"
