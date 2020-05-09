@@ -30,6 +30,7 @@ wildcard_constraints:
     reftype="[a-zA-Z0-9]+",
     reference="[a-zA-Z0-9]+"
 
+
 ## METADATA AND THRESHOLDS ##
 #############################
 
@@ -103,31 +104,38 @@ rule all:
 
         ## ALIGNMENT ##
 
-        ("" if not "align" in config["methodologie"] else ## ""
         ## general QC: per barcode, intentional downsampling
-        ("{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc.html",
+        ("" if not "align" in config["methodologie"] else ## ""
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc.html"),
         ## taxonomic composition
-        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/aligned.counttaxlist",
-        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/krona.html")),
+        ("" if not "align" in config["methodologie"] else ## ""
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/aligned.counttaxlist"),
+        ("" if not "align" in config["methodologie"] else ## ""
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/krona.html"),
 
         ## K-MER MAPPING ##
 
-        ("" if not "kmer" in config["methodologie"] else ## ""
         ## taxonomic composition
-        ("{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist",
-        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona.html",
-        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona_bracken.html")),
+        ("" if not "kmer" in config["methodologie"] else ## ""
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"),
+        ("" if not "kmer" in config["methodologie"] else ## ""
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona.html"),
+        ("" if not "kmer" in config["methodologie"] else ## ""
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona_bracken.html"),
 
         ## OTU ##
 
-        ("" if not "otu" in config["methodologie"] else ## ""
         ## clustered reads
-        ("{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2otupick/index.html",
+        ("" if not "otu" in config["methodologie"] else ## ""
+        ("{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2otupick/index.html"),
         ## filtered reads
-        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2filter/index.html",
+        ("" if not "otu" in config["methodologie"] else ## ""
+        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2filter/index.html"),
         ## classified taxa
-        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist",
-        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/krona.html")),
+        ("" if not "otu" in config["methodologie"] else ## ""
+        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"),
+        ("" if not "otu" in config["methodologie"] else ## ""
+        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/krona.html"),
 
         ## CALIBRATION STRAIN ##
 
@@ -141,4 +149,8 @@ rule all:
         ("" if not LAM_DCS else ## "" if lam_DCS is False
         "{tmp}02_analysis_results/03_alignment/{run}_calibration_strands/lambda_pycoqc/pycoQC_report.json")
 
-        ])), tmp = config["experiments"]["tmp"], run = RUNS, barc = SAMPLES.keys(), reference = config['reference']['source'], reftype = config['reference']['rank'])
+        ])), tmp = config["experiments"]["tmp"],
+             run = RUNS,
+             barc = SAMPLES.keys(),
+             reference = config['reference']['source'],
+             reftype = config['reference']['rank'])
