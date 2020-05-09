@@ -79,7 +79,7 @@ rule downsampling_seqsum: #!#
 
 rule download_reffiles:
     output:
-        fasta_align=temp("{tmp}METADATA/Reference_Sequences/silva/reference_aligned.fasta"),
+        fasta_align=temp("{tmp}METADATA/Reference_Sequences/silva/reference_aligned.fasta"), ## uses the non-redundant (99% clustering) file
         slvmap=temp("{tmp}METADATA/Reference_Sequences/silva/slvmap.txt"),
         taxlist=temp("{tmp}METADATA/Reference_Sequences/silva/taxlist.txt")
     log:
@@ -135,19 +135,20 @@ rule construct_refseq:
         "--fastq_minlen " + config["filtering"]["len_min"], ## minimum length of amplicon
         "--fastq_maxlen " + config["filtering"]["len_max"]
     shell:
+        ## convert sequences to DNA with gaps
         "python {wildcards.tmp}Pipeline/MeBaPiNa/scripts/make_SILVA_db/convert_rna_to_dna.py "
         "--convert_to_gap "
         "--input_fasta {input.refseq} "
         "--output_fasta {output}_dna.fasta "
         "> {log} 2>&1; "
-        ""
+        ## extract first 500 sequences
         "head -n 500 {output}_dna.fasta > {output}_head.fasta 2>> {log}; "
-        ""
+        ## align primers to first 500 sequences (aka add primer sequences to multiple alignment)
         "mafft --thread {threads} "
         "--addfragments {input.primers} "
         "--mapout {output}_head.fasta  > /dev/null 2>> {log}; "
         "rm {output}_head.fasta; "
-        ""
+        ## trim ALL sequences to region of primer match
         "python {wildcards.tmp}Pipeline/MeBaPiNa/scripts/make_SILVA_db/extract_alignment_region.py "
         "--input_alignment {output}_dna.fasta "
         "--output_alignment {output}_trim.fasta "
@@ -156,24 +157,24 @@ rule construct_refseq:
         ">> {log} 2>&1; "
         "rm {output}_dna.fasta; "
         "rm {input.primers}.map; "
-        ""
+        ## remove gaps
         "python {wildcards.tmp}Pipeline/MeBaPiNa/scripts/make_SILVA_db/degap_fasta.py "
         "--input_fasta {output}_trim.fasta "
         "--output_fasta {output}_degap.fasta "
         ">> {log} 2>&1; "
         "rm {output}_trim.fasta; "
-        ""
+        ## exclude sequences above or below the thresholds
         "vsearch --fastx_filter "
         "{output}_degap.fasta "
-        "--fastaout {output}_filt.fasta {params} "
+        "--fastaout {output} {params} "
         ">> {log} 2>&1; "
-        "rm {output}_degap.fasta; "
-        ""
-        "vsearch --derep_fulllength "
-        "{output}_filt.fasta "
-        "--output {output} "
-        ">> {log} 2>&1; "
-        "rm {output}_filt.fasta"
+        "rm {output}_degap.fasta"
+        ## remove replicates
+        # "vsearch --derep_fulllength "
+        # "{output}_filt.fasta "
+        # "--output {output} "
+        # ">> {log} 2>&1; "
+        # "rm {output}_filt.fasta"
 
 
 
