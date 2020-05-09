@@ -56,6 +56,10 @@ PLOT_MAXLEN = config["filtering"]["len_max"]
 
 print( config["methodologie"] )
 print( "not" if not "kmer" in config["methodologie"] else "kmer" )
+print(RUNS)
+print(SAMPLES.keys())
+print(config['reference']['source'])
+print(config['reference']['rank'])
 
 
 ## PIELINE RULES AND END POINTS ##
@@ -113,13 +117,13 @@ rule all:
         # "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/aligned.counttaxlist",
         # "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/krona.html")),
 
-        ## K-MER MAPPING ##
+        # K-MER MAPPING ##
 
-        # ("" if not "kmer" in config["methodologie"] else ## ""
-        # ## taxonomic composition
-        # ("{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist",
-        # "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona.html",
-        # "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona_bracken.html")),
+        ("" if not "kmer" in config["methodologie"] else ## ""
+        ## taxonomic composition
+        ("{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist",
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona.html",
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona_bracken.html")),
 
         ## OTU ##
 
