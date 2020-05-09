@@ -36,7 +36,7 @@ experiments:
     # "Ov85"]
 
 methodologie:
-  ["kmer"] ## one of "kmer", "align" or "otu". The "asv" mehtodolgie is not supported
+  ["kmer"] ## one (or multiple of ) ["kmer", "align", "otu"]. The "asv" mehtodolgie is not supported.
 
 workstation:
   gpu: True
