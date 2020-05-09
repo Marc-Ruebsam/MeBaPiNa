@@ -36,7 +36,7 @@ experiments:
     # "Ov85"]
 
 methodologie:
-  "kmer" ## one of "kmer", "align", "otu", "asv"
+  "kmer" ## one of "kmer", "align" or "otu". The "asv" mehtodolgie is not supported
 
 workstation:
   gpu: True
@@ -52,4 +52,4 @@ filtering:
 
 reference:
   source: "silva"
-  type: "species" ## one of "default", "species", "genus"; species and genus only in conjuction with source: "silva"
+  rank: "species" ## one of "default", "species", "genus"; species and genus only in conjuction with source: "silva"
