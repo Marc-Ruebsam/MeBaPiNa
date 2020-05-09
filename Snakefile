@@ -55,13 +55,6 @@ PLOT_SMPL = "100000"
 ## max read lengths in some plots
 PLOT_MAXLEN = config["filtering"]["len_max"]
 
-print( config["methodologie"] )
-print( "not" if not "kmer" in config["methodologie"] else "kmer" )
-print(RUNS)
-print(SAMPLES.keys())
-print(config['reference']['source'])
-print(config['reference']['rank'])
-
 
 ## PIELINE RULES AND END POINTS ##
 ##################################
