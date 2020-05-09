@@ -55,6 +55,13 @@ PLOT_SMPL = "100000"
 ## max read lengths in some plots
 PLOT_MAXLEN = config["filtering"]["len_max"]
 
+print( config["methodologie"] )
+print( "not" if not "kmer" in config["methodologie"] else "kmer" )
+print(RUNS)
+print(SAMPLES.keys())
+print(config['reference']['source'])
+print(config['reference']['rank'])
+
 
 ## PIELINE RULES AND END POINTS ##
 ##################################
@@ -113,7 +120,7 @@ rule all:
         ("" if not "align" in config["methodologie"] else ## ""
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/krona.html"),
 
-        ## K-MER MAPPING ##
+        # K-MER MAPPING ##
 
         ## taxonomic composition
         ("" if not "kmer" in config["methodologie"] else ## ""
