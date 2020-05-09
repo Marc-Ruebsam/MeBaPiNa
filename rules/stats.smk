@@ -13,6 +13,16 @@ rule stat_refseq_lendist:
         "samtools faidx {input}; "
         "cut -f 2 {input}.fai | sort -n | uniq -c | awk '{{print $1\"\t\"$2}}' > {output}"
 
+sort -nk2 reference.fasta.fai | awk 'BEGIN{c=0};
+    {cnt_sort[c++]=$2};
+    END{
+        sm = 0;
+        for(key in cnt_sort){ sm = sm + cnt_sort[key] };
+        men = sm / c;
+        if((c % 2) == 1){ medn = cnt_sort[ int(c/2) ];
+        }else{ medn = ( cnt_sort[c/2] + cnt_sort[c/2-1] ) / 2 };
+        print medn"\t"men }'
+
 ## taxonomic ranks and frequency
 # cut -f 3 taxlist.txt | sort | uniq -c | sort -nr | egrep " root| domain| phylum| class| order| family| genus| species";
 # cut -f 3 taxlist.txt | sort | uniq -c | sort -nr | egrep -v " root| domain| phylum| class| order| family| genus| species" | awk 'BEGIN{cnt=0};{cnt=cnt+$1};END{print cnt" other"}'
