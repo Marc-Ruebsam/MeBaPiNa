@@ -166,16 +166,23 @@ rule construct_refseq:
         ## exclude sequences above or below the thresholds
         "vsearch --fastx_filter "
         "{output}_degap.fasta "
-        "--fastaout {output} {params} "
+        "--fastaout {output}_filt.fasta {params} "
         ">> {log} 2>&1; "
-        "rm {output}_degap.fasta"
+        "rm {output}_degap.fasta; "
+        ## extract ids of duplicates
+        "sed -e '/^>/s/$/@/' -e 's/^>/#/' {output}_filt.fasta | "
+        "tr -d '\\n' | tr \"#\" \"\\n\" | tr \"@\" \"\\t\" | "
+        "awk '{{ occur[$2]++; ids[$2] = ids[$2]$1\";\" }}; "
+        "END{{ for( sqnc in occur ){{ "
+        "if( occur[sqnc] > 1 ){{ "
+        "print ids[sqnc] }} }} }}' > {output}.dups "
+        "2>> {log}; "
         ## remove replicates
-        # "vsearch --derep_fulllength "
-        # "{output}_filt.fasta "
-        # "--output {output} "
-        # ">> {log} 2>&1; "
-        # "rm {output}_filt.fasta"
-
+        "vsearch --derep_fulllength "
+        "{output}_filt.fasta "
+        "--output {output} "
+        ">> {log} 2>&1; "
+        "rm {output}_filt.fasta"
 
 
 ## QIIME REFERENCE ##
