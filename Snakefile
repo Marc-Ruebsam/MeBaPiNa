@@ -119,11 +119,11 @@ rule all:
 
         # K-MER MAPPING ##
 
-        ("" if not "kmer" in config["methodologie"] else ## ""
+        # ("" if not "kmer" in config["methodologie"] else ## ""
         ## taxonomic composition
         ("{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist",
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona.html",
-        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona_bracken.html")),
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona_bracken.html"),
 
         ## OTU ##
 
