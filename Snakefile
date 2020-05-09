@@ -134,7 +134,7 @@ rule all:
 
         ## clustered reads
         ("" if not "otu" in config["methodologie"] else ## "" if "otu" is not selected
-        ("{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2otupick/index.html"),
+        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2otupick/index.html"),
         ## filtered reads
         ("" if not "otu" in config["methodologie"] else ## "" if "otu" is not selected
         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2filter/index.html"),
