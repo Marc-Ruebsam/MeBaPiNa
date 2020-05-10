@@ -10,7 +10,9 @@ sys.stderr = open(snakemake.log[0], 'w')
 ## input files
 input_dict = {
     'taxlist' : snakemake.input['taxlist'],
-    'slvmap' : snakemake.input['slvmap']
+    'slvmap' : snakemake.input['slvmap'],
+    'dups' : snakemake.input['dups'],
+
 }
 
 ## output files
@@ -33,7 +35,8 @@ output_dict = {
 
 # input_dict = {
 #     'slvmap' : "METADATA/Reference_Sequences/silva/slvmap.txt",
-#     'taxlist' : "METADATA/Reference_Sequences/silva/taxlist.txt"
+#     'taxlist' : "METADATA/Reference_Sequences/silva/taxlist.txt",
+#     'dups' : "METADATA/Reference_Sequences/silva/reference.dups"
 # }
 # output_dict = {
 #     'kraknames_S' : "METADATA/Reference_Sequences/silva/kraken2/species/taxonomy/names.dmp",
@@ -83,7 +86,7 @@ usecols=['accID','start','end','name','taxID'])
 
 ## PER ACCID ##
 
-## the copncept in this paragraph was adapted from Mike Robeson, Little Rock, AR, michael.robeson@colorado.edu
+## the concept of this paragraph was adapted from Mike Robeson, Little Rock, AR, michael.robeson@colorado.edu
 ## add path to accmap
 df_accmap = pd.merge(df_accmap, df_taxlist.loc[:,['pathname','taxID']], how='left', on='taxID').rename(columns={'pathname' : 'path', 'taxID' : 'taxID_old'})
 ## get long accession ID with start and stop
@@ -115,9 +118,6 @@ df_pathname = df_pathname + ";"
 ## combine names to paths
 for n in range(1,len(df_pathname.columns)):
     df_pathname[n] = df_pathname[n-1] + df_pathname[n]
-
-## set accIDstartend back to column of accmap
-df_accmap.reset_index(inplace=True)
 
 
 ## PER TAXID ##
@@ -156,6 +156,51 @@ df_taxlist.reset_index(inplace=True)
 df_taxlist['depth'] = df_taxlist['pathname'].str.split(";").str.len()-1
 ## add name to taxlist
 df_taxlist['name'] = df_taxlist['pathname'].str.split(";").str[-2]
+
+
+## DUPLICATES ##
+
+## set pathname to index of taxlist
+df_taxlist.set_index('pathname',inplace=True)
+
+## add column to mark duplicates for removal
+df_accmap['dups_del'] = True
+
+## open duplication taxids for reading
+dups_r = open(input_dict['dups'], "r")
+
+## loop over lines with duplicate accIDs
+for dups in dups_r:
+    ## convert to array
+    dups_ids = dups.split(";")
+    del dups_ids[-1]
+
+    ## keep first (or only) accID
+    df_accmap.loc[dups_ids[0],'dups_del'] = False
+
+    ## if all accIDs come from same taxID (or is not a duplicate at all), continue with next accID
+    if df_accmap.loc[dups_ids,'taxID'].unique().size == 1:
+        continue
+
+    ## otherwise, iterate over higher ranks to find lowest common taxon
+    for rnk in reversed(range(0,6)): ## not 7, since species identity was covered above
+        ## get current "unique" taxon
+        rnk_tax = df_pathname.loc[dups_ids,rnk].unique()
+        ## if current taxon is unique, set taxID of retained accID to the higher rank taxID
+        if rnk_tax.size == 1:
+            df_accmap.loc[dups_ids[0],'taxID'] = df_taxlist.loc[rnk_tax,'taxID'][0]
+            break
+
+## closing duplication taxids
+dups_r.close()
+
+## remove duplicate accIDs
+df_accmap = df_accmap.loc[~df_accmap['dups_del'],:] ## Note: '~' means not
+
+## set accIDstartend back to column of accmap
+df_accmap.reset_index(inplace=True)
+## set pathname back to column of taxlist
+df_taxlist.reset_index(inplace=True)
 
 
 ## EXPORT ACCID-TAXID ASSOCIATION ##
