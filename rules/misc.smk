@@ -89,35 +89,6 @@ rule download_reffiles:
     shell:
         "bash {wildcards.tmp}Pipeline/MeBaPiNa/scripts/download_silva.sh {wildcards.tmp}METADATA/Reference_Sequences/silva > {log} 2>&1"
 
-rule construct_reftax:
-    input:
-        taxlist="{tmp}METADATA/Reference_Sequences/silva/taxlist.txt",
-        slvmap="{tmp}METADATA/Reference_Sequences/silva/slvmap.txt",
-        dups="{tmp}METADATA/Reference_Sequences/silva/reference.dups"
-    output:
-        kraknames_S="{tmp}METADATA/Reference_Sequences/silva/kraken2/species/taxonomy/names.dmp",
-        kraknodes_S="{tmp}METADATA/Reference_Sequences/silva/kraken2/species/taxonomy/nodes.dmp",
-        krakseq2tax_S="{tmp}METADATA/Reference_Sequences/silva/kraken2/species/seqid2taxid.map",
-        kraknames_G="{tmp}METADATA/Reference_Sequences/silva/kraken2/genus/taxonomy/names.dmp",
-        kraknodes_G="{tmp}METADATA/Reference_Sequences/silva/kraken2/genus/taxonomy/nodes.dmp",
-        krakseq2tax_G="{tmp}METADATA/Reference_Sequences/silva/kraken2/genus/seqid2taxid.map",
-        kronataxtab_S="{tmp}METADATA/Reference_Sequences/silva/krona/species/taxonomy.tab",
-        kronataxlist_S="{tmp}METADATA/Reference_Sequences/silva/krona/species/taxlist.txt",
-        kronaseq2tax_S="{tmp}METADATA/Reference_Sequences/silva/krona/species/seqid2taxid.map",
-        kronataxtab_G="{tmp}METADATA/Reference_Sequences/silva/krona/genus/taxonomy.tab",
-        kronataxlist_G="{tmp}METADATA/Reference_Sequences/silva/krona/genus/taxlist.txt",
-        kronaseq2tax_G="{tmp}METADATA/Reference_Sequences/silva/krona/genus/seqid2taxid.map",
-        qiimetax_S=temp("{tmp}METADATA/Reference_Sequences/silva/qiime/species/taxonomy.tsv"),
-        qiimetax_G=temp("{tmp}METADATA/Reference_Sequences/silva/qiime/genus/taxonomy.tsv")
-    log:
-        "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_construct_reftax.log"
-    benchmark:
-        "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_construct_reftax.benchmark.tsv"
-    conda:
-        "../envs/python.yml"
-    script:
-        "../scripts/construct_reffiles.py"
-
 rule construct_refseq:
     input:
         refseq="{tmp}METADATA/Reference_Sequences/silva/reference_aligned.fasta",
@@ -185,6 +156,35 @@ rule construct_refseq:
         "--output {output.refseq} "
         ">> {log} 2>&1; "
         "rm {output.refseq}_filt.fasta"
+
+rule construct_reftax:
+    input:
+        taxlist="{tmp}METADATA/Reference_Sequences/silva/taxlist.txt",
+        slvmap="{tmp}METADATA/Reference_Sequences/silva/slvmap.txt",
+        dups="{tmp}METADATA/Reference_Sequences/silva/reference.dups"
+    output:
+        kraknames_S="{tmp}METADATA/Reference_Sequences/silva/kraken2/species/taxonomy/names.dmp",
+        kraknodes_S="{tmp}METADATA/Reference_Sequences/silva/kraken2/species/taxonomy/nodes.dmp",
+        krakseq2tax_S="{tmp}METADATA/Reference_Sequences/silva/kraken2/species/seqid2taxid.map",
+        kraknames_G="{tmp}METADATA/Reference_Sequences/silva/kraken2/genus/taxonomy/names.dmp",
+        kraknodes_G="{tmp}METADATA/Reference_Sequences/silva/kraken2/genus/taxonomy/nodes.dmp",
+        krakseq2tax_G="{tmp}METADATA/Reference_Sequences/silva/kraken2/genus/seqid2taxid.map",
+        kronataxtab_S="{tmp}METADATA/Reference_Sequences/silva/krona/species/taxonomy.tab",
+        kronataxlist_S="{tmp}METADATA/Reference_Sequences/silva/krona/species/taxlist.txt",
+        kronaseq2tax_S="{tmp}METADATA/Reference_Sequences/silva/krona/species/seqid2taxid.map",
+        kronataxtab_G="{tmp}METADATA/Reference_Sequences/silva/krona/genus/taxonomy.tab",
+        kronataxlist_G="{tmp}METADATA/Reference_Sequences/silva/krona/genus/taxlist.txt",
+        kronaseq2tax_G="{tmp}METADATA/Reference_Sequences/silva/krona/genus/seqid2taxid.map",
+        qiimetax_S=temp("{tmp}METADATA/Reference_Sequences/silva/qiime/species/taxonomy.tsv"),
+        qiimetax_G=temp("{tmp}METADATA/Reference_Sequences/silva/qiime/genus/taxonomy.tsv")
+    log:
+        "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_construct_reftax.log"
+    benchmark:
+        "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_construct_reftax.benchmark.tsv"
+    conda:
+        "../envs/python.yml"
+    script:
+        "../scripts/construct_reffiles.py"
 
 ## QIIME REFERENCE ##
 #####################
