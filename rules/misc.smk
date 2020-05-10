@@ -143,8 +143,11 @@ rule construct_refseq:
         ">> {log} 2>&1; "
         "rm {output.refseq}_degap.fasta; "
         ## extract ids and group duplicates (first id is the one kept after deduplication)
-        "sed -e '/^>/s/$/@/' -e 's/^>/#/' {output.refseq}_filt.fasta | "
-        "tr -d '\\n' | tr \"#\" \"\\n\" | tr \"@\" \"\\t\" | "
+        "awk 'BEGIN{{init=0}}; "
+        "/^>/&&init==0{{ accID = $0; init++; next }}; "
+        "/^>/{{ accID = substr(accID,2); print accID\"\\t\"sqnc; "
+        "accID = $0; snce = \"\"; next }}; "
+        "{{ sqnc = sqnc$0 }}' {output.refseq}_filt.fasta | "
         "awk '{{ ids[$2] = ids[$2]$1\";\" }}; "
         "END{{ for( sqnc in ids ){{ "
         "print ids[sqnc] }} }}' > {output.dups} "
