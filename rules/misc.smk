@@ -92,7 +92,8 @@ rule download_reffiles:
 rule construct_reftax:
     input:
         taxlist="{tmp}METADATA/Reference_Sequences/silva/taxlist.txt",
-        slvmap="{tmp}METADATA/Reference_Sequences/silva/slvmap.txt"
+        slvmap="{tmp}METADATA/Reference_Sequences/silva/slvmap.txt",
+        dups="{tmp}METADATA/Reference_Sequences/silva/reference.dups"
     output:
         kraknames_S="{tmp}METADATA/Reference_Sequences/silva/kraken2/species/taxonomy/names.dmp",
         kraknodes_S="{tmp}METADATA/Reference_Sequences/silva/kraken2/species/taxonomy/nodes.dmp",
@@ -122,7 +123,8 @@ rule construct_refseq:
         refseq="{tmp}METADATA/Reference_Sequences/silva/reference_aligned.fasta",
         primers="{tmp}METADATA/Reference_Sequences/primers/ONT_16S/primers.fasta"
     output:
-        "{tmp}METADATA/Reference_Sequences/silva/reference.fasta"
+        refseq="{tmp}METADATA/Reference_Sequences/silva/reference.fasta",
+        dups=temp("{tmp}METADATA/Reference_Sequences/silva/reference.dups")
     log:
         "{tmp}METADATA/Reference_Sequences/silva/MeBaPiNa_construct_refseq.log"
     benchmark:
@@ -139,51 +141,50 @@ rule construct_refseq:
         "python {wildcards.tmp}Pipeline/MeBaPiNa/scripts/make_SILVA_db/convert_rna_to_dna.py "
         "--convert_to_gap "
         "--input_fasta {input.refseq} "
-        "--output_fasta {output}_dna.fasta "
+        "--output_fasta {output.refseq}_dna.fasta "
         "> {log} 2>&1; "
         ## extract first 500 sequences
-        "head -n 500 {output}_dna.fasta > {output}_head.fasta 2>> {log}; "
+        "head -n 500 {output.refseq}_dna.fasta > {output.refseq}_head.fasta 2>> {log}; "
         ## align primers to first 500 sequences (aka add primer sequences to multiple alignment)
         "mafft --thread {threads} "
         "--addfragments {input.primers} "
-        "--mapout {output}_head.fasta  > /dev/null 2>> {log}; "
-        "rm {output}_head.fasta; "
+        "--mapout {output.refseq}_head.fasta  > /dev/null 2>> {log}; "
+        "rm {output.refseq}_head.fasta; "
         ## trim ALL sequences to region of primer match
         "python {wildcards.tmp}Pipeline/MeBaPiNa/scripts/make_SILVA_db/extract_alignment_region.py "
-        "--input_alignment {output}_dna.fasta "
-        "--output_alignment {output}_trim.fasta "
+        "--input_alignment {output.refseq}_dna.fasta "
+        "--output_alignment {output.refseq}_trim.fasta "
         "--start_position $(awk 'BEGIN{{prnt=-1}}; />/{{prnt++}}; prnt==0{{print $3+1}}' {input.primers}.map | tail -n 1) "
         "--end_position $(awk 'BEGIN{{prnt=-3}}; />/{{prnt++}}; prnt==0{{print $3-1}}' {input.primers}.map | head -n 3 | tail -n 1) "
         ">> {log} 2>&1; "
-        "rm {output}_dna.fasta; "
+        "rm {output.refseq}_dna.fasta; "
         "rm {input.primers}.map; "
         ## remove gaps
         "python {wildcards.tmp}Pipeline/MeBaPiNa/scripts/make_SILVA_db/degap_fasta.py "
-        "--input_fasta {output}_trim.fasta "
-        "--output_fasta {output}_degap.fasta "
+        "--input_fasta {output.refseq}_trim.fasta "
+        "--output_fasta {output.refseq}_degap.fasta "
         ">> {log} 2>&1; "
-        "rm {output}_trim.fasta; "
+        "rm {output.refseq}_trim.fasta; "
         ## exclude sequences above or below the thresholds
         "vsearch --fastx_filter "
-        "{output}_degap.fasta "
-        "--fastaout {output}_filt.fasta {params} "
+        "{output.refseq}_degap.fasta "
+        "--fastaout {output.refseq}_filt.fasta {params} "
         ">> {log} 2>&1; "
-        "rm {output}_degap.fasta; "
-        ## extract ids of duplicates
-        "sed -e '/^>/s/$/@/' -e 's/^>/#/' {output}_filt.fasta | "
+        "rm {output.refseq}_degap.fasta; "
+        ## extract ids of duplicates (first id is the one kept after deduplication)
+        "sed -e '/^>/s/$/@/' -e 's/^>/#/' {output.refseq}_filt.fasta | "
         "tr -d '\\n' | tr \"#\" \"\\n\" | tr \"@\" \"\\t\" | "
         "awk '{{ occur[$2]++; ids[$2] = ids[$2]$1\";\" }}; "
         "END{{ for( sqnc in occur ){{ "
         "if( occur[sqnc] > 1 ){{ "
-        "print ids[sqnc] }} }} }}' > {output}.dups "
+        "print ids[sqnc] }} }} }}' > {output.dups} "
         "2>> {log}; "
-        ## remove replicates
+        ## remove replicates (deduplication)
         "vsearch --derep_fulllength "
-        "{output}_filt.fasta "
-        "--output {output} "
+        "{output.refseq}_filt.fasta "
+        "--output {output.refseq} "
         ">> {log} 2>&1; "
-        "rm {output}_filt.fasta"
-
+        "rm {output.refseq}_filt.fasta"
 
 ## QIIME REFERENCE ##
 #####################
