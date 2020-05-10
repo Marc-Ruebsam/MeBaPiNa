@@ -142,13 +142,12 @@ rule construct_refseq:
         "--fastaout {output.refseq}_filt.fasta {params} "
         ">> {log} 2>&1; "
         "rm {output.refseq}_degap.fasta; "
-        ## extract ids of duplicates (first id is the one kept after deduplication)
+        ## extract ids and group duplicates (first id is the one kept after deduplication)
         "sed -e '/^>/s/$/@/' -e 's/^>/#/' {output.refseq}_filt.fasta | "
         "tr -d '\\n' | tr \"#\" \"\\n\" | tr \"@\" \"\\t\" | "
-        "awk '{{ occur[$2]++; ids[$2] = ids[$2]$1\";\" }}; "
-        "END{{ for( sqnc in occur ){{ "
-        "if( occur[sqnc] > 1 ){{ "
-        "print ids[sqnc] }} }} }}' > {output.dups} "
+        "awk '{{ ids[$2] = ids[$2]$1\";\" }}; "
+        "END{{ for( sqnc in ids ){{ "
+        "print ids[sqnc] }} }}' > {output.dups} "
         "2>> {log}; "
         ## remove replicates (deduplication)
         "vsearch --derep_fulllength "
