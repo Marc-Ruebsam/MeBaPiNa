@@ -196,6 +196,11 @@ dups_r.close()
 
 ## remove duplicate accIDs
 df_accmap = df_accmap.loc[~df_accmap['dups_del'],:] ## Note: '~' means not
+## also remove from df_pathname
+df_pathname = df_pathname.loc[df_accmap.index,:]
+
+## check for species taxa whithout associated accIDs after deduplication
+df_taxlist = df_taxlist.loc[~((~df_taxlist.loc[:,'taxID'].isin( df_accmap.loc[:,'taxID'] )) & (df_taxlist.loc[:,'rank'] == "species")), : ]
 
 ## set accIDstartend back to column of accmap
 df_accmap.reset_index(inplace=True)
