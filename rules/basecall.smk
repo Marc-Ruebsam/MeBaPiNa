@@ -115,7 +115,7 @@ rule trimming_basecalled:
         "--barcode_dir $barc_folder "
         "> {log} 2>&1; "
         "mv $barc_folder/{wildcards.barc}.fastq {output} >> {log} 2>&1; " ## rename barcode fastq to "trimmed.fastq"
-        "mkdir $barc_folder/others >> {log} 2>&1; " ## create folder for all other barcode files sorted out during demultiplexing
+        "mkdir -p $barc_folder/others >> {log} 2>&1; " ## create folder for all other barcode files sorted out during demultiplexing
         "find $barc_folder -type f \( -name \"*barcode*\" -o -name \"*none*\" \) " ## move other barcodes to "others" directory
         "-exec mv {{}} $barc_folder/others \; >> {log} 2>&1"
 

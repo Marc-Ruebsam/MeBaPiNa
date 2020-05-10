@@ -15,7 +15,7 @@ rule splitting_filtered: #!# only required because of low memory avaialility
     benchmark:
         "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_splitting_filtered.benchmark.tsv"
     shell:
-        "mkdir {output}; "
+        "mkdir -p {output}; "
         "awk 'BEGIN{{ file_num=0 }}; " ## split output into files with <=4000 sequences each
         "NR%16000==1{{ file_num++ }}; "
         "{{ print $0 > \"{output}/\" file_num \".fastq\" }}' {input} "

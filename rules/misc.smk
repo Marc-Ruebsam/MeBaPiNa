@@ -283,7 +283,7 @@ rule building_database:
         "35" ## k-mer length
     shell:
         "out_dir={output.krakdb}; out_dir=\"${{out_dir/database.kraken/}}\" > {log} 2>&1; "
-        "mkdir \"${{out_dir}}library\" >> {log} 2>&1; "
+        "mkdir -p \"${{out_dir}}library\" >> {log} 2>&1; "
         "cp \"{input.fasta}\" \"${{out_dir}}library/library.fna\" >> {log} 2>&1; "
         # "kraken2-build --threads {threads} --download-taxonomy --skip-maps --db {output} > {log} 2>&1; "
         # "kraken2-build --threads {threads} --download-library bacteria --no-masking --db {output} >> {log} 2>&1; "
