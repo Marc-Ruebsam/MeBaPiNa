@@ -1,3 +1,37 @@
+##########
+## LOGS ##
+##########
+
+## basecalling
+
+rule moving_raw_basecalling:
+    input:
+        "{tmp}00_raw_data/{run}/fast5"
+    output:
+        "test.test"
+    params:
+        SAMPELS
+    shell:
+        "{params}"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ############################
 ## CHECKPOINT AGGREGATION ##
 ############################
