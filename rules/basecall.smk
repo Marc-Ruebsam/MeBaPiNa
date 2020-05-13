@@ -94,18 +94,8 @@ checkpoint basecalling_raw:
 ## TRIMM DEMULTIPLEX ##
 #######################
 
-def basecalls_per_barcode(wildcards):
-    ## get "pass" directory and trigger checkpoint (this way we can specify output inside the checkpoints output directory "pass" without direct rule association)
-    pass_dir = checkpoints.basecalling_raw.get(run=wildcards.run,tmp=wildcards.tmp).output[0]
-    ## get barcode for sample
-    sample_barcode = wildcards.barc
-    ## create file name for barcode
-    barc_input = pass_dir + "/" + sample_barcode
-    return barc_input
-
 rule trimming_basecalled:
-    input:
-        basecalls_per_barcode
+    ## input is handled by the all_barc rule
     output:
         "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/trimmed.fastq"
     log:
