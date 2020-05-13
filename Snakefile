@@ -80,9 +80,7 @@ include: "rules/report.smk"
 def input_barc(wildcards):
     from os import listdir
     ## get "pass" directory
-    print("I was here")
     basecall_dir = checkpoints.basecalling_raw.get(tmp=config["experiments"]["tmp"],run=RUNS).output[0]
-    print(basecall_dir)
     ## get barcode directory names within "pass" directory
     all_barcs = listdir(basecall_dir)
     ## retain only folders containing one of the selected barcodes
@@ -93,7 +91,8 @@ def input_barc(wildcards):
         run=RUNS,
         barc=all_barcs)
     barc_input.sort()
-    return input
+    ## return
+    return barc_input
 
 rule all_barc:
     input:
