@@ -9,20 +9,9 @@ rule moving_raw:
     output:
         directory("{tmp}00_raw_data/{run}/fast5")
     shell:
-        "find {wildcards.tmp}00_raw_data/ -name \"{wildcards.run}\" -print0 | xargs -0 -I {{}} mv {{}} \"{wildcards.tmp}00_raw_data/{wildcards.run}\"; "
+        "long_path=$(find {wildcards.tmp}00_raw_data/ -name \"{wildcards.run}\"); "
+        "mv ${{long_path}} \"{wildcards.tmp}00_raw_data/{wildcards.run}\"; "
         "find {wildcards.tmp}00_raw_data/ -depth -type d -empty -delete" #!# delete empty directories
-
-rule compressing_raw: ## after basecalling, removes uncompressed fast5
-    input:
-        fast5="{tmp}00_raw_data/{run}/fast5",
-        dummy_basecalling="{tmp}01_processed_data/01_basecalling/{run}/pass" ## dummy to run only after basecalling
-    output:
-        fast5="{tmp}00_raw_data/{run}/fast5.tar.gz",
-        md5="{tmp}00_raw_data/{run}/md5checksum.txt"
-    shell:
-        "tar -cvzf {output.fast5} {input.fast5}; "
-        "find {wildcards.tmp}00_raw_data/{wildcards.run} -maxdepth 1 -type f -exec md5sum {{}} >> {output.md5} \;; "
-        "rm {input.fast5}"
 
 rule report_moving_raw:
     input:
@@ -39,6 +28,15 @@ rule report_basecalling_raw:
         temp("{tmp}00_raw_data/{run}/MeBaPiNa_basecalling_raw.report")
     shell:
         "echo MeBaPiNa_basecalling_raw.report"
+
+rule report_trimming_basecalled:
+    input:
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/trimmed.fastq"
+    output:
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming_basecalled.report"
+    shell:
+        "echo MeBaPiNa_trimming_basecalled.report"
+
 
 ## BASECALL DEMULTIPLEX ##
 ##########################

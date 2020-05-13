@@ -77,48 +77,28 @@ rule all:
         "{tmp}00_raw_data/{run}/MeBaPiNa_basecalling_raw.report"
         ])), tmp = config["experiments"]["tmp"], run = RUNS)
 
+def input_barc(wildcards):
+    from os import listdir
+    ## get "pass" directory
+    basecall_dir = checkpoints.basecalling_raw.get(tmp=wildcards.tmp,run=wildcards.run).output[0]
+    ## get barcode directory names within "pass" directory
+    all_barcs = listdir(basecall_dir)
+    ## retain only strings containing "barcode"
+    all_barcs = [barc for barc in all_barcs if "barcode" in barc]
+    ## create file names with barcodes
+    barc_input = expand("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming_basecalled.report",
+        tmp=wildcards.tmp,
+        run=wildcards.run,
+        barc=all_barcs)
+    barc_input.sort()
+    return input
+
+rule all_barc:
+    input:
+        input_barc
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# def input_aggregate(wildcards):
-#     from os import listdir
-#     ## "pass" directory
-#     basecall_dir = checkpoints.guppy.get(run=wildcards.run,tmp=wildcards.tmp).output[0]
-#     ## directory names within "pass" directory
-#     all_barcs = listdir(basecall_dir)
-#     ## retain only strings containing "barcode"
-#     all_barcs = [barc for barc in all_barcs if "barcode" in barc]
-#     ## create file names with barcodes
-#     barc_input = expand("{tmp}02_analysis_results/03_alignment/{run}/{barc}_pycoqc/pycoQC_report.json",
-#         run=wildcards.run,
-#         barc=all_barcs)
-#     barc_input.sort()
-#     return input
-#
-#
 # def basecalls_per_barcode(wildcards):
 #     ## get "pass" directory and trigger checkpoint (this way we can specify output inside the checkpoints output directory "pass" without direct rule association)
 #     pass_dir = checkpoints.basecalling_raw.get(run=wildcards.run,tmp=wildcards.tmp).output[0]
