@@ -10,7 +10,7 @@ rule moving_raw_basecalling:
     output:
         "test.test"
     params:
-        SAMPELS
+        SAMPLES
     shell:
         "{params}"
 
