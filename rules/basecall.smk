@@ -22,7 +22,7 @@ rule report_moving_raw:
         " ".join(SAMPLES.values())
     shell:
         "all_IDs=( $(echo \"{params}\") ); "
-        "for id in ${{all_IDs[@]}}; do cat \""
+        "for id in ${{all_IDs[@]}}; do echo \""
         "${{id}};"
         "NA;"
         "{input};"
