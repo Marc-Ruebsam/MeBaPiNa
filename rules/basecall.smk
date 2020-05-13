@@ -30,7 +30,7 @@ rule report_moving_raw:
     output:
         temp("{tmp}00_raw_data/{run}/MeBaPiNa_moving_raw.report")
     params:
-        SAMPLES.keys
+        SAMPLES
     shell:
         "{params}"
 
