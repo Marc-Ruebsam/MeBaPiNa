@@ -32,8 +32,6 @@ rule report_moving_raw:
         "Moved raw fast5 files to path ready for analysis."
         "\" >> {output}; done"
 
-Sample name;Input file/directory;Output file/directory;Completion date;Checksum;Performed by;Description
-
 rule report_basecalling_raw:
     input:
         "{tmp}00_raw_data/{run}/fast5"
