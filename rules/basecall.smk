@@ -27,7 +27,7 @@ rule compressing_raw: ## after basecalling, removes uncompressed fast5
 rule report_moving_raw:
     input:
         "{tmp}00_raw_data/{run}/fast5"
-    outout:
+    output:
         "{tmp}00_raw_data/{run}/fast5/MeBaPiNa_moving_raw.report"
     params:
         SAMPLES.keys
