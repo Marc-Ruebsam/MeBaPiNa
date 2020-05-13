@@ -150,3 +150,10 @@ rule all:
         "{tmp}02_analysis_results/03_alignment/{run}_calibration_strands/lambda_pycoqc/pycoQC_report.json")
 
         ])), tmp = config["experiments"]["tmp"], run = RUNS, barc = SAMPLES.keys(), reference = config['reference']['source'], reftype = config['reference']['rank'])
+
+## REPORT ##
+############
+
+rule report:
+    input:
+        "{tmp}00_raw_data/{run}/fast5/MeBaPiNa_moving_raw.report"

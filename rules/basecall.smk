@@ -24,6 +24,16 @@ rule compressing_raw: ## after basecalling, removes uncompressed fast5
         "find {wildcards.tmp}00_raw_data/{wildcards.run} -maxdepth 1 -type f -exec md5sum {{}} >> {output.md5} \;; "
         "rm {input.fast5}"
 
+rule report_moving_raw:
+    input:
+        "{tmp}00_raw_data/{run}/fast5"
+    outout:
+        "{tmp}00_raw_data/{run}/fast5/MeBaPiNa_moving_raw.report"
+    params:
+        SAMPLES.keys
+    shell:
+        "{params}"
+
 ## BASECALL DEMULTIPLEX ##
 ##########################
 
