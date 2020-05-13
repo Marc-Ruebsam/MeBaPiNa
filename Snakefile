@@ -159,7 +159,7 @@ rule all:
 
 rule report:
     input:
-        "{tmp}00_raw_data/{run}/fast5/MeBaPiNa_moving_raw.report"
+        "{tmp}00_raw_data/{run}/MeBaPiNa_moving_raw.report"
     output:
         temp("{tmp}00_raw_data/{run}_ANALYSIS_PROGRESS_MANAGEMENT.csv")
     shell:
