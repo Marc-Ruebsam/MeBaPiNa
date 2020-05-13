@@ -8,7 +8,7 @@ rule moving_raw_basecalling:
     input:
         "{tmp}00_raw_data/{run}/fast5"
     output:
-        "test.test"
+        "{tmp}00_raw_data/{run}/test.test"
     params:
         SAMPLES
     shell:
