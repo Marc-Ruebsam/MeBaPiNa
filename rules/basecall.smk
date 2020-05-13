@@ -113,15 +113,16 @@ rule trimming_basecalled:
         "--trim", ## Remove adapter and barcode sequences from reads.
         ("--kit RAB204" if BAC_KIT == "SQK-RAB204" else "--kit Auto") #!#
     shell:
-        "barc_folder={wildcards.tmp}01_processed_data/02_trimming_filtering/{wildcards.run}/{wildcards.barc}; " #!# directory name of barcode currently processed
-        "find {input} -type f -name \"*.fastq\" -exec cat {{}} \\; | "
+        "input_folder={wildcards.tmp}01_processed_data/01_basecalling/{wildcards.run}/pass; " #!# directory name of barcode currently processed
+        "output_folder={wildcards.tmp}01_processed_data/02_trimming_filtering/{wildcards.run}/{wildcards.barc}; " #!# directory name of barcode currently processed
+        "find ${{input_folder}} -type f -name \"*.fastq\" -exec cat {{}} \\; | "
         "qcat --threads {threads} {params} "
-        "--barcode_dir $barc_folder "
+        "--barcode_dir ${{output_folder}} "
         "> {log} 2>&1; "
-        "mv $barc_folder/{wildcards.barc}.fastq {output} >> {log} 2>&1; " ## rename barcode fastq to "trimmed.fastq"
-        "mkdir -p $barc_folder/others >> {log} 2>&1; " ## create folder for all other barcode files sorted out during demultiplexing
-        "find $barc_folder -type f \( -name \"*barcode*\" -o -name \"*none*\" \) " ## move other barcodes to "others" directory
-        "-exec mv {{}} $barc_folder/others \; >> {log} 2>&1"
+        "mv ${{output_folder}}/{wildcards.barc}.fastq {output} >> {log} 2>&1; " ## rename barcode fastq to "trimmed.fastq"
+        "mkdir -p ${{output_folder}}/others >> {log} 2>&1; " ## create folder for all other barcode files sorted out during demultiplexing
+        "find ${{output_folder}} -type f \( -name \"*barcode*\" -o -name \"*none*\" \) " ## move other barcodes to "others" directory
+        "-exec mv {{}} ${{output_folder}}/others \; >> {log} 2>&1"
 
 ## FILTER ##
 ############
