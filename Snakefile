@@ -72,8 +72,10 @@ include: "rules/report.smk"
 ## target output rule (the default end/output of the pipeline)
 rule all:
     input:
+        expand(list(filter(None,[
         "{tmp}00_raw_data/{run}/MeBaPiNa_moving_raw.report",
         "{tmp}00_raw_data/{run}/MeBaPiNa_basecalling_raw.report"
+        ])), tmp = config["experiments"]["tmp"], run = RUNS)
 
 
 
