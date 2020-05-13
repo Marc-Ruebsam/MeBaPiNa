@@ -70,13 +70,6 @@ include: "rules/misc.smk"
 include: "rules/report.smk"
 
 ## target output rule (the default end/output of the pipeline)
-# rule all:
-#     input:
-#         expand(list(filter(None,[
-#         "{tmp}00_raw_data/{run}/MeBaPiNa_moving_raw.report",
-#         "{tmp}00_raw_data/{run}/MeBaPiNa_basecalling_raw.report"
-#         ])), tmp = config["experiments"]["tmp"], run = RUNS)
-
 def input_barc(wildcards):
     from os import listdir
     ## get "pass" directory
@@ -86,7 +79,11 @@ def input_barc(wildcards):
     ## retain only folders containing one of the selected barcodes
     all_barcs = [barc for barc in all_barcs if barc in SAMPLES.keys()]
     ## create file names with barcodes
-    barc_input = expand("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming_basecalled.report",
+    barc_input = expand(list(filter(None,[
+        "{tmp}00_raw_data/{run}/MeBaPiNa_moving_raw.report",
+        "{tmp}00_raw_data/{run}/MeBaPiNa_basecalling_raw.report",
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming_basecalled.report"
+    ])),
         tmp=config["experiments"]["tmp"],
         run=RUNS,
         barc=all_barcs)

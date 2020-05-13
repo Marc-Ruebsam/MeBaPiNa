@@ -33,7 +33,7 @@ rule report_trimming_basecalled:
     input:
         "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/trimmed.fastq"
     output:
-        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming_basecalled.report"
+        temp("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming_basecalled.report")
     shell:
         "echo MeBaPiNa_trimming_basecalled.report"
 
