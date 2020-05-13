@@ -29,10 +29,16 @@ rule report_moving_raw:
         "{tmp}00_raw_data/{run}/fast5"
     output:
         temp("{tmp}00_raw_data/{run}/MeBaPiNa_moving_raw.report")
-    params:
-        SAMPLES
     shell:
-        "{params}"
+        "echo MeBaPiNa_moving_raw.report"
+
+rule report_basecalling_raw:
+    input:
+        "{tmp}00_raw_data/{run}/fast5"
+    output:
+        temp("{tmp}00_raw_data/{run}/MeBaPiNa_basecalling_raw.report")
+    shell:
+        "echo MeBaPiNa_basecalling_raw.report"
 
 ## BASECALL DEMULTIPLEX ##
 ##########################

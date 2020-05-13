@@ -72,95 +72,151 @@ include: "rules/report.smk"
 ## target output rule (the default end/output of the pipeline)
 rule all:
     input:
-        expand(list(filter(None,[
+        "{tmp}00_raw_data/{run}/MeBaPiNa_moving_raw.report",
+        "{tmp}00_raw_data/{run}/MeBaPiNa_basecalling_raw.report"
 
-        ## BASECALL ##
 
-        ## general QC: all reads, including calibtation strads, intentional downsampling
-        "{tmp}02_analysis_results/01_basecalling/{run}/nanoplot/NanoStats.txt",
-        ## general QC: all reads, forced downsampling
-        "{tmp}02_analysis_results/01_basecalling/{run}/pycoqc/pycoQC_report.json",
-        ## per base QC: all reads, forced downsampling
-        "{tmp}02_analysis_results/01_basecalling/{run}/nanoqc/nanoQC.html",
-        ## read QC: all passed reads
-        "{tmp}02_analysis_results/01_basecalling/{run}/fastqc/stdin_fastqc.html",
 
-        ## barcode QC: per barcode
-        ("" if not BAC_KIT else ## "" if bac_kit is ""
-        "{tmp}02_analysis_results/01_basecalling/{run}/nanocomp/NanoStats.txt"),
 
-        ## TRIM AND FILTER ##
 
-        ## general QC: trimed and filtered barcoded reads, intentional downsampling
-        "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoplot/NanoStats.txt",
-        ## per base QC: trimed and filtered barcoded reads, forced downsampling
-        "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoqc/nanoQC.html",
-        ## read QC: trimed and filtered barcoded reads
-        "{tmp}02_analysis_results/02_trimming_filtering/{run}/fastqc/stdin_fastqc.html",
 
-        ## barcode QC: trimed and filtered barcoded reads
-        ("" if not BAC_KIT else ## "" if bac_kit is ""
-        "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanocomp/NanoStats.txt"),
 
-        ## ALIGNMENT ##
 
-        ## general QC: per barcode, intentional downsampling
-        ("" if not "align" in config["methodologie"] else ## "" if "align" is not selected
-        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc.html"),
-        ## taxonomic composition
-        ("" if not "align" in config["methodologie"] else ## "" if "align" is not selected
-        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/aligned.counttaxlist"),
-        ("" if not "align" in config["methodologie"] else ## "" if "align" is not selected
-        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/krona.html"),
 
-        # K-MER MAPPING ##
 
-        ## taxonomic composition
-        ("" if not "kmer" in config["methodologie"] else ## "" if "kmer" is not selected
-        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"),
-        ("" if not "kmer" in config["methodologie"] else ## "" if "kmer" is not selected
-        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona.html"),
-        ("" if not "kmer" in config["methodologie"] else ## "" if "kmer" is not selected
-        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona_bracken.html"),
 
-        ## OTU ##
 
-        ## clustered reads
-        ("" if not "otu" in config["methodologie"] else ## "" if "otu" is not selected
-        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2otupick/index.html"),
-        ## filtered reads
-        ("" if not "otu" in config["methodologie"] else ## "" if "otu" is not selected
-        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2filter/index.html"),
-        ## classified taxa
-        ("" if not "otu" in config["methodologie"] else ## "" if "otu" is not selected
-        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"),
-        ("" if not "otu" in config["methodologie"] else ## "" if "otu" is not selected
-        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/krona.html"),
 
-        ## CALIBRATION STRAIN ##
 
-        ## calibration QC: only calinration strands
-        ("" if not LAM_DCS else ## "" if lam_DCS is False
-        "{tmp}02_analysis_results/01_basecalling/{run}_calibration_strands/nanoplot/NanoStats.txt"),
 
-        ## calibration QC: only calinration strands
-        ("" if not LAM_DCS else ## "" if lam_DCS is False
-        "{tmp}02_analysis_results/03_alignment/{run}_calibration_strands/lambda_nanoplot/NanoStats.txt"),
-        ("" if not LAM_DCS else ## "" if lam_DCS is False
-        "{tmp}02_analysis_results/03_alignment/{run}_calibration_strands/lambda_pycoqc/pycoQC_report.json"),
 
-        ## REPORT ##
-        "{tmp}00_raw_data/{run}_ANALYSIS_PROGRESS_MANAGEMENT.csv"
 
-        ])), tmp = config["experiments"]["tmp"], run = RUNS, barc = SAMPLES.keys(), reference = config['reference']['source'], reftype = config['reference']['rank'])
 
-## REPORT ##
-############
 
-rule report:
-    input:
-        "{tmp}00_raw_data/{run}/MeBaPiNa_moving_raw.report"
-    output:
-        temp("{tmp}00_raw_data/{run}_ANALYSIS_PROGRESS_MANAGEMENT.csv")
-    shell:
-        "{output}"
+
+
+
+
+
+
+
+
+# def input_aggregate(wildcards):
+#     from os import listdir
+#     ## "pass" directory
+#     basecall_dir = checkpoints.guppy.get(run=wildcards.run,tmp=wildcards.tmp).output[0]
+#     ## directory names within "pass" directory
+#     all_barcs = listdir(basecall_dir)
+#     ## retain only strings containing "barcode"
+#     all_barcs = [barc for barc in all_barcs if "barcode" in barc]
+#     ## create file names with barcodes
+#     barc_input = expand("{tmp}02_analysis_results/03_alignment/{run}/{barc}_pycoqc/pycoQC_report.json",
+#         run=wildcards.run,
+#         barc=all_barcs)
+#     barc_input.sort()
+#     return input
+#
+#
+# def basecalls_per_barcode(wildcards):
+#     ## get "pass" directory and trigger checkpoint (this way we can specify output inside the checkpoints output directory "pass" without direct rule association)
+#     pass_dir = checkpoints.basecalling_raw.get(run=wildcards.run,tmp=wildcards.tmp).output[0]
+#     ## get barcode for sample
+#     sample_barcode = wildcards.barc
+#     ## create file name for barcode
+#     barc_input = pass_dir + "/" + sample_barcode
+#     return barc_input
+#
+# rule all:
+#     input:
+#         expand(list(filter(None,[
+#
+#         ## BASECALL ##
+#
+#         ## general QC: all reads, including calibtation strads, intentional downsampling
+#         "{tmp}02_analysis_results/01_basecalling/{run}/nanoplot/NanoStats.txt",
+#         ## general QC: all reads, forced downsampling
+#         "{tmp}02_analysis_results/01_basecalling/{run}/pycoqc/pycoQC_report.json",
+#         ## per base QC: all reads, forced downsampling
+#         "{tmp}02_analysis_results/01_basecalling/{run}/nanoqc/nanoQC.html",
+#         ## read QC: all passed reads
+#         "{tmp}02_analysis_results/01_basecalling/{run}/fastqc/stdin_fastqc.html",
+#
+#         ## barcode QC: per barcode
+#         ("" if not BAC_KIT else ## "" if bac_kit is ""
+#         "{tmp}02_analysis_results/01_basecalling/{run}/nanocomp/NanoStats.txt"),
+#
+#         ## TRIM AND FILTER ##
+#
+#         ## general QC: trimed and filtered barcoded reads, intentional downsampling
+#         "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoplot/NanoStats.txt",
+#         ## per base QC: trimed and filtered barcoded reads, forced downsampling
+#         "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoqc/nanoQC.html",
+#         ## read QC: trimed and filtered barcoded reads
+#         "{tmp}02_analysis_results/02_trimming_filtering/{run}/fastqc/stdin_fastqc.html",
+#
+#         ## barcode QC: trimed and filtered barcoded reads
+#         ("" if not BAC_KIT else ## "" if bac_kit is ""
+#         "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanocomp/NanoStats.txt"),
+#
+#         ## ALIGNMENT ##
+#
+#         ## general QC: per barcode, intentional downsampling
+#         ("" if not "align" in config["methodologie"] else ## "" if "align" is not selected
+#         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc.html"),
+#         ## taxonomic composition
+#         ("" if not "align" in config["methodologie"] else ## "" if "align" is not selected
+#         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/aligned.counttaxlist"),
+#         ("" if not "align" in config["methodologie"] else ## "" if "align" is not selected
+#         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/krona.html"),
+#
+#         # K-MER MAPPING ##
+#
+#         ## taxonomic composition
+#         ("" if not "kmer" in config["methodologie"] else ## "" if "kmer" is not selected
+#         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"),
+#         ("" if not "kmer" in config["methodologie"] else ## "" if "kmer" is not selected
+#         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona.html"),
+#         ("" if not "kmer" in config["methodologie"] else ## "" if "kmer" is not selected
+#         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona_bracken.html"),
+#
+#         ## OTU ##
+#
+#         ## clustered reads
+#         ("" if not "otu" in config["methodologie"] else ## "" if "otu" is not selected
+#         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2otupick/index.html"),
+#         ## filtered reads
+#         ("" if not "otu" in config["methodologie"] else ## "" if "otu" is not selected
+#         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2filter/index.html"),
+#         ## classified taxa
+#         ("" if not "otu" in config["methodologie"] else ## "" if "otu" is not selected
+#         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"),
+#         ("" if not "otu" in config["methodologie"] else ## "" if "otu" is not selected
+#         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/krona.html"),
+#
+#         ## CALIBRATION STRAIN ##
+#
+#         ## calibration QC: only calinration strands
+#         ("" if not LAM_DCS else ## "" if lam_DCS is False
+#         "{tmp}02_analysis_results/01_basecalling/{run}_calibration_strands/nanoplot/NanoStats.txt"),
+#
+#         ## calibration QC: only calinration strands
+#         ("" if not LAM_DCS else ## "" if lam_DCS is False
+#         "{tmp}02_analysis_results/03_alignment/{run}_calibration_strands/lambda_nanoplot/NanoStats.txt"),
+#         ("" if not LAM_DCS else ## "" if lam_DCS is False
+#         "{tmp}02_analysis_results/03_alignment/{run}_calibration_strands/lambda_pycoqc/pycoQC_report.json"),
+#
+#         ## REPORT ##
+#         "{tmp}00_raw_data/{run}_ANALYSIS_PROGRESS_MANAGEMENT.csv"
+#
+#         ])), tmp = config["experiments"]["tmp"], run = RUNS, barc = SAMPLES.keys(), reference = config['reference']['source'], reftype = config['reference']['rank'])
+#
+# ## REPORT ##
+# ############
+#
+# rule report:
+#     input:
+#         "{tmp}00_raw_data/{run}/MeBaPiNa_moving_raw.report"
+#     output:
+#         temp("{tmp}00_raw_data/{run}_ANALYSIS_PROGRESS_MANAGEMENT.csv")
+#     shell:
+#         "{output}"

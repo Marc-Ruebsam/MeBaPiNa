@@ -4,8 +4,8 @@
 
 experiments:
   ## path to directory containing main folders (00_raw_data, 01_processed_data, ...)
-  project: "/mnt/ag-halama/PROMISE/.tmp" # "/mnt/Nanopore/Nanopore_Projects/Internal/NCT/PROMISE/Microbiome/16S_Metabarcoding/"
-  tmp: "16S_Metabarcoding/"
+  project: "/mnt/ag-halama/PROMISE/.tmp" #!# "/mnt/Nanopore/Nanopore_Projects/Internal/NCT/PROMISE/Microbiome/16S_Metabarcoding/"
+  tmp: "16S_Metabarcoding/" #!# was required because snakemake does not work when located on the NAS (links are broken). Hence the paths above could not be used, but the execution has to be performed from the base directory (e.g. 16s_Metabarcoding)
   ## path to the excel file containing the metadata
   meta: "16S_Metabarcoding/METADATA/EXPERIMENT_SEQUENCING.xlsx"
   ## samples to analyze, matching "Sample name"s in EXPERIMENT_SEQUENCING.xlsx #!# currently only one single run analysis is supported
