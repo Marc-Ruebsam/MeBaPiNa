@@ -92,7 +92,7 @@ def input_barc(wildcards):
     ## return
     return barc_input
 
-rule all_barc:
+rule all:
     input:
         input_barc
     shell:
