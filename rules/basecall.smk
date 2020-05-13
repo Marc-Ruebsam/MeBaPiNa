@@ -19,7 +19,7 @@ rule report_moving_raw:
     output:
         temp("{tmp}00_raw_data/{run}/MeBaPiNa_moving_raw.report")
     shell:
-        "echo {input}"
+        "touch {input}"
 
 rule report_basecalling_raw:
     input:
@@ -27,7 +27,7 @@ rule report_basecalling_raw:
     output:
         temp("{tmp}00_raw_data/{run}/MeBaPiNa_basecalling_raw.report")
     shell:
-        "echo {input}"
+        "touch {input}"
 
 rule report_trimming_basecalled:
     input:
@@ -35,7 +35,7 @@ rule report_trimming_basecalled:
     output:
         temp("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming_basecalled.report")
     shell:
-        "echo {input}"
+        "touch {input}"
 
 rule report_filtering_trimmed:
     input:
@@ -43,7 +43,7 @@ rule report_filtering_trimmed:
     output:
         temp("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering_trimmed.report")
     shell:
-        "echo {input}"
+        "touch {input}"
 
 
 ## BASECALL DEMULTIPLEX ##
@@ -101,7 +101,7 @@ checkpoint basecalling_raw:
 #######################
 
 rule trimming_basecalled:
-    ## input is handled by the all rule
+    ## input dependency is handled by the all rule
     output:
         "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/trimmed.fastq"
     log:
@@ -119,9 +119,9 @@ rule trimming_basecalled:
         "--trim", ## Remove adapter and barcode sequences from reads.
         ("--kit RAB204" if BAC_KIT == "SQK-RAB204" else "--kit Auto") #!#
     shell:
-        "input_folder={wildcards.tmp}01_processed_data/01_basecalling/{wildcards.run}/pass; " #!# directory name of barcode currently processed
-        "output_folder={wildcards.tmp}01_processed_data/02_trimming_filtering/{wildcards.run}/{wildcards.barc}; " #!# directory name of barcode currently processed
-        "find ${{input_folder}} -type f -name \"*.fastq\" -exec cat {{}} \\; | "
+        "input_folder={wildcards.tmp}01_processed_data/01_basecalling/{wildcards.run}/pass; " ## input dependency is handled by the all rule
+        "output_folder={wildcards.tmp}01_processed_data/02_trimming_filtering/{wildcards.run}/{wildcards.barc}; " ## directory name of barcode
+        "find ${{input_folder}} -type f -name \"*.fastq\" -exec cat {{}} \\; | " ## paste whole read content of all fast files to std-in of qcat
         "qcat --threads {threads} {params} "
         "--barcode_dir ${{output_folder}} "
         "> {log} 2>&1; "
