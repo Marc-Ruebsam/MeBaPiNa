@@ -19,7 +19,7 @@ rule report_moving_raw:
     output:
         temp("{tmp}00_raw_data/{run}/MeBaPiNa_moving_raw.report")
     shell:
-        "echo MeBaPiNa_moving_raw.report"
+        "echo {input}"
 
 rule report_basecalling_raw:
     input:
@@ -27,7 +27,7 @@ rule report_basecalling_raw:
     output:
         temp("{tmp}00_raw_data/{run}/MeBaPiNa_basecalling_raw.report")
     shell:
-        "echo MeBaPiNa_basecalling_raw.report"
+        "echo {input}"
 
 rule report_trimming_basecalled:
     input:
@@ -35,7 +35,15 @@ rule report_trimming_basecalled:
     output:
         temp("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming_basecalled.report")
     shell:
-        "echo MeBaPiNa_trimming_basecalled.report"
+        "echo {input}"
+
+rule report_filtering_trimmed:
+    input:
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq"
+    output:
+        temp("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering_trimmed.report")
+    shell:
+        "echo {input}"
 
 
 ## BASECALL DEMULTIPLEX ##
@@ -46,11 +54,9 @@ checkpoint basecalling_raw:
         "{tmp}00_raw_data/{run}/fast5"
     output:
         list(filter(None,[
+        "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary.txt",
         directory("{tmp}01_processed_data/01_basecalling/{run}/pass"),
-        ## evaluation of Lambda calibration strands only when specified
-        (directory("{tmp}01_processed_data/01_basecalling/{run}/calibration_strands")
-        if LAM_DCS else ""),
-        "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary.txt"
+        (directory("{tmp}01_processed_data/01_basecalling/{run}/calibration_strands") if LAM_DCS else "") ## evaluation of Lambda calibration strands only when specified
         ]))
     log:
         "{tmp}01_processed_data/01_basecalling/{run}/MeBaPiNa_basecalling_raw.log"
@@ -65,7 +71,7 @@ checkpoint basecalling_raw:
         "--kit " + SEQ_KIT,
         "--barcode_kits " + BAC_KIT, ## always includes demultiplexing (all reads marked as unclassified if no barcodes were used)
         ("--calib_detect" if LAM_DCS else ""), ## includes detection of lambda clibration strands
-        # "--min_score 75", ## minimum score for barcode match
+        # "--min_score 75", ## minimum score for barcode match (default 60)
         # # "--require_barcodes_both_ends", ## very stringent
         # # "--detect_mid_strand_barcodes", ## very slow
         # # "--min_score_mid_barcodes 70"
@@ -95,7 +101,7 @@ checkpoint basecalling_raw:
 #######################
 
 rule trimming_basecalled:
-    ## input is handled by the all_barc rule
+    ## input is handled by the all rule
     output:
         "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/trimmed.fastq"
     log:

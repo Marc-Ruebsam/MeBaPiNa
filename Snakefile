@@ -82,7 +82,8 @@ def input_barc(wildcards):
     barc_input = expand(list(filter(None,[
         "{tmp}00_raw_data/{run}/MeBaPiNa_moving_raw.report",
         "{tmp}00_raw_data/{run}/MeBaPiNa_basecalling_raw.report",
-        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming_basecalled.report"
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming_basecalled.report",
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering_trimmed.report"
     ])),
         tmp=config["experiments"]["tmp"],
         run=RUNS,
@@ -94,6 +95,8 @@ def input_barc(wildcards):
 rule all_barc:
     input:
         input_barc
+    shell:
+        "echo {input}"
 
 
 
