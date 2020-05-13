@@ -28,7 +28,7 @@ rule report_moving_raw:
     input:
         "{tmp}00_raw_data/{run}/fast5"
     output:
-        "{tmp}00_raw_data/{run}/fast5/MeBaPiNa_moving_raw.report"
+        temp("{tmp}00_raw_data/{run}/fast5/MeBaPiNa_moving_raw.report")
     params:
         SAMPLES.keys
     shell:

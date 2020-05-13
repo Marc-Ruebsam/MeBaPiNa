@@ -147,7 +147,10 @@ rule all:
         ("" if not LAM_DCS else ## "" if lam_DCS is False
         "{tmp}02_analysis_results/03_alignment/{run}_calibration_strands/lambda_nanoplot/NanoStats.txt"),
         ("" if not LAM_DCS else ## "" if lam_DCS is False
-        "{tmp}02_analysis_results/03_alignment/{run}_calibration_strands/lambda_pycoqc/pycoQC_report.json")
+        "{tmp}02_analysis_results/03_alignment/{run}_calibration_strands/lambda_pycoqc/pycoQC_report.json"),
+
+        ## REPORT ##
+        "{tmp}00_raw_data/{run}_ANALYSIS_PROGRESS_MANAGEMENT.csv"
 
         ])), tmp = config["experiments"]["tmp"], run = RUNS, barc = SAMPLES.keys(), reference = config['reference']['source'], reftype = config['reference']['rank'])
 
@@ -157,3 +160,7 @@ rule all:
 rule report:
     input:
         "{tmp}00_raw_data/{run}/fast5/MeBaPiNa_moving_raw.report"
+    output:
+        temp("{tmp}00_raw_data/{run}_ANALYSIS_PROGRESS_MANAGEMENT.csv")
+    shell:
+        "{output}"
