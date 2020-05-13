@@ -19,7 +19,7 @@ rule report_moving_raw:
     output:
         temp("{tmp}00_raw_data/{run}/MeBaPiNa_moving_raw.report")
     shell:
-        "touch {input}"
+        "touch {output}"
 
 rule report_basecalling_raw:
     input:
@@ -27,7 +27,7 @@ rule report_basecalling_raw:
     output:
         temp("{tmp}00_raw_data/{run}/MeBaPiNa_basecalling_raw.report")
     shell:
-        "touch {input}"
+        "touch {output}"
 
 rule report_trimming_basecalled:
     input:
@@ -35,7 +35,7 @@ rule report_trimming_basecalled:
     output:
         temp("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming_basecalled.report")
     shell:
-        "touch {input}"
+        "touch {output}"
 
 rule report_filtering_trimmed:
     input:
@@ -43,7 +43,7 @@ rule report_filtering_trimmed:
     output:
         temp("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering_trimmed.report")
     shell:
-        "touch {input}"
+        "touch {output}"
 
 
 ## BASECALL DEMULTIPLEX ##
