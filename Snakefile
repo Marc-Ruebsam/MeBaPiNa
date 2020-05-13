@@ -88,7 +88,7 @@ def input_barc(wildcards):
     ## create file names with barcodes
     barc_input = expand("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming_basecalled.report",
         tmp=config["experiments"]["tmp"],
-        run=wildcards.RUNS,
+        run=RUNS,
         barc=all_barcs)
     barc_input.sort()
     return input
