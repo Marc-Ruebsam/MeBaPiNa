@@ -18,8 +18,21 @@ rule report_moving_raw:
         "{tmp}00_raw_data/{run}/fast5"
     output:
         temp("{tmp}00_raw_data/{run}/MeBaPiNa_moving_raw.report")
+    params:
+        " ".join(SAMPLES.values())
     shell:
-        "touch {output}"
+        "all_IDs=( $(echo \"{params}\") ); "
+        "for id in ${{all_IDs[@]}}; do cat \""
+        "${{id}};"
+        "NA;"
+        "{input};"
+        "$(stat -c %y {input});"
+        "NA;"
+        "MeBaPiNa;"
+        "Moved raw fast5 files to path ready for analysis."
+        "\" >> {output}; done"
+
+Sample name;Input file/directory;Output file/directory;Completion date;Checksum;Performed by;Description
 
 rule report_basecalling_raw:
     input:
