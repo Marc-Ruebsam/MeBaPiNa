@@ -95,8 +95,14 @@ def input_barc(wildcards):
 rule all:
     input:
         input_barc
+    params:
+        config["experiments"]["tmp"] + "/METADATA/ANALYSIS_PROGRESS_MANAGEMENT.csv"
     shell:
+        "report_file={params}; "
+        "if [[ ! -f ${{report_file}} ]]; then "
+        "cat \"Sample name;Input file/directory;Output file/directory;Completion date;Checksum;Performed by;Description\" > ${{report_file}}; fi; "
         "echo {input}"
+
 
 
 
