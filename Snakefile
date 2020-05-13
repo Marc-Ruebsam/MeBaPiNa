@@ -94,7 +94,9 @@ include: "rules/report.smk"
 #     return input
 
 def input_barc(wildcards):
-    return(wildcards)
+    print(wildcards)
+    print(SAMPLES)
+    print(config)
 
 rule all_barc:
     input:
