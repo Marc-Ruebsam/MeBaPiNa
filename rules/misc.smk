@@ -255,6 +255,27 @@ rule q2train_classifyer:
         "--o-classifier {output} "
         "> {log} 2>&1"
 
+## MINIMAP2 INDEX ##
+###################
+
+rule indexing_reference:
+    input:
+        "{tmp}METADATA/Reference_Sequences/{reference}/reference.fasta"
+    output:
+        "{tmp}METADATA/Reference_Sequences/{reference}/reference.mmi"
+    log:
+        "{tmp}METADATA/Reference_Sequences/{reference}/MeBaPiNa_indexing_reference.log"
+    benchmark:
+        "{tmp}METADATA/Reference_Sequences/{reference}/MeBaPiNa_indexing_reference.benchmark.tsv"
+    params:
+        "-x map-ont" ## naopore specific
+    conda:
+        "../envs/minimap2.yml"
+    threads:
+        2
+    shell:
+        "minimap2 -t {threads} {params} -d {output} {input} > {log} 2>&1"
+
 ## KRAKEN2 DATABASE ##
 ######################
 
@@ -328,24 +349,3 @@ rule building_database_plain:
         "kraken2-build --clean --db ${{out_dir}} >> {log} 2>&1"
 
 ruleorder: building_database > building_database_plain
-
-## MINIMA2 INDEX ##
-###################
-
-rule indexing_reference:
-    input:
-        "{tmp}METADATA/Reference_Sequences/{reference}/reference.fasta"
-    output:
-        "{tmp}METADATA/Reference_Sequences/{reference}/reference.mmi"
-    log:
-        "{tmp}METADATA/Reference_Sequences/{reference}/MeBaPiNa_indexing_reference.log"
-    benchmark:
-        "{tmp}METADATA/Reference_Sequences/{reference}/MeBaPiNa_indexing_reference.benchmark.tsv"
-    params:
-        "-x map-ont" ## naopore specific
-    conda:
-        "../envs/minimap2.yml"
-    threads:
-        2
-    shell:
-        "minimap2 -t {threads} {params} -d {output} {input} > {log} 2>&1"

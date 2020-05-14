@@ -77,6 +77,42 @@ rule report_filtering_trimmed:
 ## OTU ##
 #########
 
+rule report_q2filter_uchime:
+    input:
+        nochimtable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_ftable.qza",
+        nochimseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq.qza"
+    output:
+        temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2filter_uchime.report")
+    params:
+        "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
+        "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
+    shell:
+        "{params}"
+        "id=${{all_IDs[$(for i in \"${{!all_barcs[@]}}\"; do "
+        "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; "
+        "done)]}}; echo "
+        ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
+        "\"${{id}};{input};$(stat -c %y {input[0]});NA;MeBaPiNa;OTU: open reference clustering, chimera removal and filtering.\" "
+        ">> {output}"
+
+rule report_kmermap_q2rereplicate:
+    input:
+        report="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/filtered.kreport2",
+        output="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/filtered.kraken2"
+    output:
+        temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_q2rereplicate.report")
+    params:
+        "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
+        "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
+    shell:
+        "{params}"
+        "id=${{all_IDs[$(for i in \"${{!all_barcs[@]}}\"; do "
+        "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; "
+        "done)]}}; echo "
+        ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
+        "\"${{id}};{input};$(stat -c %y {input[0]});NA;MeBaPiNa;OTU: taxonomic classification.\" "
+        ">> {output}"
+
 ## ALIGN ##
 ###########
 
