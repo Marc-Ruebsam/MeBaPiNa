@@ -97,7 +97,12 @@ def input_barc(wildcards):
         ["{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2filter_uchime.report",
         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_q2rereplicate.report"])
 
-    )), tmp=config["experiments"]["tmp"], run=RUNS, barc=all_barcs )
+    )),
+    tmp = config["experiments"]["tmp"],
+    run = RUNS,
+    barc = all_barcs, 
+    reference = config['reference']['source'],
+    reftype = config['reference']['rank'] )
     ## return
     return input_list
 
