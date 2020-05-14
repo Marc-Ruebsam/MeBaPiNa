@@ -79,18 +79,27 @@ def input_barc(wildcards):
     ## retain only folders containing one of the selected barcodes
     all_barcs = [barc for barc in all_barcs if barc in SAMPLES.keys()]
     ## create file names with barcodes
-    barc_input = expand(list(filter(None,[
-        "{tmp}00_raw_data/{run}/MeBaPiNa_moving_raw.report",
-        "{tmp}00_raw_data/{run}/MeBaPiNa_basecalling_raw.report",
-        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming_basecalled.report",
-        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering_trimmed.report"
-    ])),
-        tmp=config["experiments"]["tmp"],
-        run=RUNS,
-        barc=all_barcs)
-    barc_input.sort()
+    input_list = expand(list(filter(None,
+
+        ## BASECALL ##
+
+        ["{tmp}00_raw_data/{run}/MeBaPiNa_moving_raw.report",
+        "{tmp}00_raw_data/{run}/MeBaPiNa_basecalling_raw.report"] +
+
+        ## TRIM AND FILTER ##
+
+        ["{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming_basecalled.report",
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering_trimmed.report"] +
+
+        ## OTU ##
+
+        ([""] if not "otu" in config["methodologie"] else ## "" if "otu" is not selected
+        ["{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2filter_uchime.report",
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_q2rereplicate.report"])
+
+    )), tmp=config["experiments"]["tmp"], run=RUNS, barc=all_barcs )
     ## return
-    return barc_input
+    return input_list
 
 rule all:
     input:
