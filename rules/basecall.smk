@@ -55,7 +55,7 @@ rule report_trimming_basecalled:
         "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
         "{params}"
-        "id = ${{all_IDs[$(for i in \"${{!all_barcs[@]}}\"; do "
+        "id=${{all_IDs[$(for i in \"${{!all_barcs[@]}}\"; do "
         "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; "
         "done)]}}; echo "
         ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
@@ -67,10 +67,16 @@ rule report_filtering_trimmed:
         "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq"
     output:
         temp("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering_trimmed.report")
+    params:
+        "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
+        "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
-        "echo "
+        "{params}"
+        "id=${{all_IDs[$(for i in \"${{!all_barcs[@]}}\"; do "
+        "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; "
+        "done)]}}; echo "
         ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
-        "\"{wildcards.barc};{input};$(stat -c %y {input});NA;MeBaPiNa;Length and quality filtered reads.\" "
+        "\"${{id}};{input};$(stat -c %y {input});NA;MeBaPiNa;Length and quality filtered reads.\" "
         ">> {output}"
 
 
