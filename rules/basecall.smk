@@ -37,9 +37,9 @@ rule report_basecalling_raw:
     output:
         temp("{tmp}00_raw_data/{run}/MeBaPiNa_basecalling_raw.report")
     params:
-        " ".join(SAMPLES.values())
+        "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); "
     shell:
-        "all_IDs=( $(echo \"{params}\") ); "
+        "{params}"
         "for id in ${{all_IDs[@]}}; do echo "
         ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
         "\"${{id}};{input};$(stat -c %y {input[0]});NA;MeBaPiNa;Basecalled and demultiplexed raw fast5 files into fastq.\" "
@@ -51,11 +51,15 @@ rule report_trimming_basecalled:
     output:
         temp("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming_basecalled.report")
     params:
-        wildcards.barc
+        "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
+        "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); ",
     shell:
-        "echo "
+        "{params}"
+        "id = ${{all_IDs[$(for i in \"${{!all_barcs[@]}}\"; do "
+        "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; "
+        "done)]}}; echo "
         ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
-        "\"{params};{input};$(stat -c %y {input});NA;MeBaPiNa;Trimmed adapters and barcodes from reads and demultiplexed a second time.\" "
+        "\"${{id}};{input};$(stat -c %y {input});NA;MeBaPiNa;Trimmed adapters and barcodes from reads and demultiplexed a second time.\" "
         ">> {output}"
 
 rule report_filtering_trimmed:
