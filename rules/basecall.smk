@@ -50,10 +50,12 @@ rule report_trimming_basecalled:
         "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/trimmed.fastq"
     output:
         temp("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming_basecalled.report")
+    params:
+        wildcards.barc
     shell:
         "echo "
         ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
-        "\"{wildcards.barc};{input};$(stat -c %y {input});NA;MeBaPiNa;Trimmed adapters and barcodes from reads and demultiplexed a second time.\" "
+        "\"{params};{input};$(stat -c %y {input});NA;MeBaPiNa;Trimmed adapters and barcodes from reads and demultiplexed a second time.\" "
         ">> {output}"
 
 rule report_filtering_trimmed:
