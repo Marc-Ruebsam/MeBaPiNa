@@ -52,7 +52,7 @@ rule report_trimming_basecalled:
         temp("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming_basecalled.report")
     params:
         "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
-        "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); ",
+        "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
         "{params}"
         "id = ${{all_IDs[$(for i in \"${{!all_barcs[@]}}\"; do "
