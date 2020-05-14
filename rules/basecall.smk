@@ -22,23 +22,28 @@ rule report_moving_raw:
         " ".join(SAMPLES.values())
     shell:
         "all_IDs=( $(echo \"{params}\") ); "
-        "for id in ${{all_IDs[@]}}; do echo \""
-        "${{id}};"
-        "NA;"
-        "{input};"
-        "$(stat -c %y {input});"
-        "NA;"
-        "MeBaPiNa;"
-        "Moved raw fast5 files to path ready for analysis."
-        "\" >> {output}; done"
+        "for id in ${{all_IDs[@]}}; do echo "
+        ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
+        "\"${{id}};{input};$(stat -c %y {input});NA;MeBaPiNa;Moved raw fast5 files to path ready for analysis.\" "
+        ">> {output}; done"
 
 rule report_basecalling_raw:
     input:
-        "{tmp}00_raw_data/{run}/fast5"
+        list(filter(None,[
+        "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary.txt",
+        directory("{tmp}01_processed_data/01_basecalling/{run}/pass"),
+        (directory("{tmp}01_processed_data/01_basecalling/{run}/calibration_strands") if LAM_DCS else "") ## evaluation of Lambda calibration strands only when specified
+        ]))
     output:
         temp("{tmp}00_raw_data/{run}/MeBaPiNa_basecalling_raw.report")
+    params:
+        " ".join(SAMPLES.values())
     shell:
-        "touch {output}"
+        "all_IDs=( $(echo \"{params}\") ); "
+        "for id in ${{all_IDs[@]}}; do echo "
+        ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
+        "\"${{id}};{input};$(stat -c %y {input[0]});NA;MeBaPiNa;Basecalled and demultiplexed raw fast5 files into fastq.\" "
+        ">> {output}; done"
 
 rule report_trimming_basecalled:
     input:
@@ -46,7 +51,10 @@ rule report_trimming_basecalled:
     output:
         temp("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming_basecalled.report")
     shell:
-        "touch {output}"
+        "echo "
+        ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
+        "\"{wildcards.barc};{input};$(stat -c %y {input});NA;MeBaPiNa;Trimmed adapters and barcodes from reads and demultiplexed a second time.\" "
+        ">> {output}"
 
 rule report_filtering_trimmed:
     input:
@@ -54,7 +62,10 @@ rule report_filtering_trimmed:
     output:
         temp("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering_trimmed.report")
     shell:
-        "touch {output}"
+        "echo "
+        ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
+        "\"{wildcards.barc};{input};$(stat -c %y {input});NA;MeBaPiNa;Length and quality filtered reads.\" "
+        ">> {output}"
 
 
 ## BASECALL DEMULTIPLEX ##

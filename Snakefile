@@ -100,7 +100,7 @@ rule all:
     shell:
         "report_file={params}; "
         "if [[ ! -f ${{report_file}} ]]; then "
-        "echo \"Sample name;Input file/directory;Output file/directory;Completion date;Checksum;Performed by;Description\" > ${{report_file}}; fi; "
+        "echo \"Sample name;File/directory;Completion date;Checksum;Performed by;Description\" > ${{report_file}}; fi; "
         "indiv_reports=( $(echo \"{input}\") ); "
         "for rprt in ${{indiv_reports[@]}}; do cat ${{rprt}} >> ${{report_file}}; done"
 
