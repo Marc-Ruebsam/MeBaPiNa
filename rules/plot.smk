@@ -352,7 +352,7 @@ rule plot_krona_q2rerep:
 rule plot_pycoqc_aligned:
     input:
         seqsum="{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/split", ## only folder is specified as output in splitting rule
-        bam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/aligned_filteredsorted.bam"
+        bam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/filteredsorted.bam"
     output:
         html="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc.html",
         json="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc.json"
@@ -464,7 +464,7 @@ rule plot_nanoplot_seqsum_calib:
 rule plot_pycoqc_bam_calib:
     input:
         seqsum="{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/split", ## only folder is specified as output in splitting rule
-        bam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/calibration_filteredsorted.bam"
+        bam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/lambda/filteredsorted.bam"
     output:
         html="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc/calibration.html",
         json="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc/calibration.json"

@@ -1,6 +1,6 @@
-##############
-## PLOTTING ##
-##############
+#############
+## REPORTS ##
+#############
 
 ## BASECALLING ##
 #################
@@ -21,11 +21,8 @@ rule report_moving_raw:
 
 rule report_basecalling_raw:
     input:
-        list(filter(None,[
         "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary.txt",
-        directory("{tmp}01_processed_data/01_basecalling/{run}/pass"),
-        (directory("{tmp}01_processed_data/01_basecalling/{run}/calibration_strands") if LAM_DCS else "") ## evaluation of Lambda calibration strands only when specified
-        ]))
+        "{tmp}01_processed_data/01_basecalling/{run}/pass"
     output:
         temp("{tmp}00_raw_data/{run}/MeBaPiNa_basecalling_raw.report")
     params:
@@ -92,15 +89,14 @@ rule report_q2filter_uchime:
         "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; "
         "done)]}}; echo "
         ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
-        "\"${{id}};{input};$(stat -c %y {input[0]});NA;MeBaPiNa;OTU: open reference clustering, chimera removal and filtering.\" "
+        "\"${{id}};{input};$(stat -c %y {input[0]});NA;MeBaPiNa;OTU: dereplication, open-reference clustering, chimera removal and filtering.\" "
         ">> {output}"
 
-rule report_kmermap_q2rereplicate:
+rule report_counttax_q2kmermap:
     input:
-        report="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/filtered.kreport2",
-        output="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/filtered.kraken2"
+        counttaxlist="{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"
     output:
-        temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_q2rereplicate.report")
+        temp("{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_q2kmermap.report")
     params:
         "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
         "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
@@ -110,14 +106,102 @@ rule report_kmermap_q2rereplicate:
         "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; "
         "done)]}}; echo "
         ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
-        "\"${{id}};{input};$(stat -c %y {input[0]});NA;MeBaPiNa;OTU: taxonomic classification.\" "
+        "\"${{id}};{input};$(stat -c %y {input[0]});NA;MeBaPiNa;OTU: taxonomic classification and file conversion.\" "
         ">> {output}"
 
 ## ALIGN ##
 ###########
 
+rule report_filter_aligned:
+    input:
+        bam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/filteredsorted.bam",
+        bai="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/filteredsorted.bam.bai"
+    output:
+        temp("{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_filter_aligned.report")
+    params:
+        "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
+        "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
+    shell:
+        "{params}"
+        "id=${{all_IDs[$(for i in \"${{!all_barcs[@]}}\"; do "
+        "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; "
+        "done)]}}; echo "
+        ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
+        "\"${{id}};{input};$(stat -c %y {input[0]});NA;MeBaPiNa;Alignment: alignment, extraction of uniquely aligned reads (not fully filtered).\" "
+        ">> {output}"
+
+rule report_counttax_aligned:
+    input:
+        counttaxlist="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/aligned.counttaxlist"
+    output:
+        temp("{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_aligned.report")
+    params:
+        "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
+        "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
+    shell:
+        "{params}"
+        "id=${{all_IDs[$(for i in \"${{!all_barcs[@]}}\"; do "
+        "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; "
+        "done)]}}; echo "
+        ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
+        "\"${{id}};{input};$(stat -c %y {input[0]});NA;MeBaPiNa;Alignment: filtering and taxonomic classification.\" "
+        ">> {output}"
+
 ## K-MER MAPPING ##
 ###################
+
+rule report_kmermap_filtered:
+    input:
+        report="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kreport2",
+        output="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kraken2"
+    output:
+        temp("{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_filtered.report")
+    params:
+        "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
+        "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
+    shell:
+        "{params}"
+        "id=${{all_IDs[$(for i in \"${{!all_barcs[@]}}\"; do "
+        "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; "
+        "done)]}}; echo "
+        ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
+        "\"${{id}};{input};$(stat -c %y {input[0]});NA;MeBaPiNa;K-mer: taxonomic classification.\" "
+        ">> {output}"
+
+rule report_retax_kmermap:
+    input:
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/{reftype}.bracken",
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/{reftype}.kreport2",
+    output:
+        temp("{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_retax_kmermap.report")
+    params:
+        "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
+        "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
+    shell:
+        "{params}"
+        "id=${{all_IDs[$(for i in \"${{!all_barcs[@]}}\"; do "
+        "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; "
+        "done)]}}; echo "
+        ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
+        "\"${{id}};{input};$(stat -c %y {input[0]});NA;MeBaPiNa;K-mer: abundance reestimation.\" "
+        ">> {output}"
+
+rule report_counttax_kmermap:
+    input:
+        counttaxlist="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"
+    output:
+        temp("{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_kmermap.report")
+    params:
+        "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
+        "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
+    shell:
+        "{params}"
+        "id=${{all_IDs[$(for i in \"${{!all_barcs[@]}}\"; do "
+        "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; "
+        "done)]}}; echo "
+        ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
+        "\"${{id}};{input};$(stat -c %y {input[0]});NA;MeBaPiNa;K-mer: fle conversion.\" "
+        ">> {output}"
 
 ## CALIBRATION STRAIN ##
 ########################

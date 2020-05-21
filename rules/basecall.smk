@@ -35,13 +35,13 @@ checkpoint basecalling_raw:
         "--kit " + SEQ_KIT,
         "--barcode_kits " + BAC_KIT, ## always includes demultiplexing (all reads marked as unclassified if no barcodes were used)
         ("--calib_detect" if LAM_DCS else ""), ## includes detection of lambda clibration strands
-        # "--min_score 75", ## minimum score for barcode match (default 60)
-        # # "--require_barcodes_both_ends", ## very stringent
-        # # "--detect_mid_strand_barcodes", ## very slow
-        # # "--min_score_mid_barcodes 70"
-        # # "--min_score_rear_override 70"
-        # # "--trim_barcodes",
-        # # " --num_extra_bases_trim 10",
+        "--min_score 70", ## minimum score for barcode match (default 60)
+        # "--require_barcodes_both_ends", ## very stringent
+        # "--min_score_rear_override 70"
+        # "--detect_mid_strand_barcodes", ## very slow
+        # "--min_score_mid_barcodes 70"
+        # "--trim_barcodes",
+        # "--num_extra_bases_trim 10",
         "--qscore_filtering",
         ("--min_qscore " + config["filtering"]["q_min"]),
         ("--device cuda:all:100% "
@@ -78,10 +78,10 @@ rule trimming_basecalled:
         1
     params:
         "--min-score 70", ## Minimum barcode score. Barcode calls with a lower score will be discarded. Must be between 0 and 100. (default: 60)
-        "--detect-middle", #!# Search for adapters in the whole read
-        # "--min-read-length " + config["filtering"]["len_min"], ## Reads short than <min-read-length> after trimming will be discarded.
+        "--detect-middle", ## Search for adapters in the whole read #!# slower
+        # "--min-read-length " + config["filtering"]["len_min"], ## Reads short than <min-read-length> after trimming will be discarded. #!# Should be done in next step
         "--trim", ## Remove adapter and barcode sequences from reads.
-        ("--kit RAB204" if BAC_KIT == "SQK-RAB204" else "--kit Auto") #!#
+        ("--kit RAB204" if BAC_KIT == "SQK-RAB204" else "--kit Auto") #!# otherwise there are no barcoding folders
     shell:
         "input_folder={wildcards.tmp}01_processed_data/01_basecalling/{wildcards.run}/pass; " ## input dependency is handled by the all rule
         "output_folder={wildcards.tmp}01_processed_data/02_trimming_filtering/{wildcards.run}/{wildcards.barc}; " ## directory name of barcode

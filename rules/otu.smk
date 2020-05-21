@@ -166,29 +166,29 @@ rule q2filter_uchime:
 ## TAXONOMIC ASSIGNMENT ##
 ##########################
 
-rule q2filter_classify:
-    input:
-        nochimseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq.qza",
-        classifier="{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/classifyer.qza" ## not available
-    output:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/counttax.qza"
-    log:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_q2filter_classify.log"
-    benchmark:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_q2filter_classify.benchmark.tsv"
-    conda:
-        "../envs/qiime2.yml"
-    params:
-        "--p-confidence " + config["filtering"]["min_confidence"] ## Confidence threshold for limiting taxonomic depth. Set to "disable" to disable confidence calculation, or 0 to calculate confidence but not apply it to limit the taxonomic depth of the assignments. [default: 0.7]
-    threads:
-        8
-    shell:
-        "qiime feature-classifier classify-sklearn "
-        "--i-reads {input.nochimseq} "
-        "--i-classifier {input.classifier} "
-        "--o-classification {output} "
-        "--p-n-jobs {threads} "
-        "--verbose {params} >> {log} 2>&1"
+# rule q2filter_classify:
+#     input:
+#         nochimseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq.qza",
+#         classifier="{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/classifyer.qza" ## not available
+#     output:
+#         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/counttax.qza"
+#     log:
+#         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_q2filter_classify.log"
+#     benchmark:
+#         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_q2filter_classify.benchmark.tsv"
+#     conda:
+#         "../envs/qiime2.yml"
+#     params:
+#         "--p-confidence " + config["filtering"]["min_confidence"] ## Confidence threshold for limiting taxonomic depth. Set to "disable" to disable confidence calculation, or 0 to calculate confidence but not apply it to limit the taxonomic depth of the assignments. [default: 0.7]
+#     threads:
+#         8
+#     shell:
+#         "qiime feature-classifier classify-sklearn "
+#         "--i-reads {input.nochimseq} "
+#         "--i-classifier {input.classifier} "
+#         "--o-classification {output} "
+#         "--p-n-jobs {threads} "
+#         "--verbose {params} >> {log} 2>&1"
 
 rule convert_q2filter:
     input:

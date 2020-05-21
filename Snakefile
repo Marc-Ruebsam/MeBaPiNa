@@ -95,12 +95,25 @@ def input_barc(wildcards):
 
         ([""] if not "otu" in config["methodologie"] else ## "" if "otu" is not selected
         ["{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2filter_uchime.report",
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_q2rereplicate.report"])
+        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_q2kmermap.report"])
+
+        ## ALIGN ##
+
+        ([""] if not "align" in config["methodologie"] else ## "" if "align" is not selected
+        ["{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_filter_aligned.report",
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_aligned.report"])
+
+        ## K-MER ##
+
+        ([""] if not "kmer" in config["methodologie"] else ## "" if "kmer" is not selected
+        ["{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_filtered.report",
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_retax_kmermap.report",
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_kmermap.report"])
 
     )),
     tmp = config["experiments"]["tmp"],
     run = RUNS,
-    barc = all_barcs, 
+    barc = all_barcs,
     reference = config['reference']['source'],
     reftype = config['reference']['rank'] )
     ## return

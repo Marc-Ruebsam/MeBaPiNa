@@ -2,7 +2,7 @@
 
 rule kmermap_filtered:
     input:
-        fastq="{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq", 
+        fastq="{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq",
         krakdb="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database.kraken"
     output:
         report="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kreport2",
@@ -31,12 +31,12 @@ rule retax_kmermap:
         output="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kraken2",
         krakdb="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database.kraken"
     output:
-        rankS="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/Species.bracken",
-        tableS="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/Species.kreport2",
+        # rankF="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/Family.bracken",
+        # tableF="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/Family.kreport2",
         rankG="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/Genus.bracken",
         tableG="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/Genus.kreport2",
-        rankF="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/Family.bracken",
-        tableF="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/Family.kreport2"
+        rankS="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/Species.bracken",
+        tableS="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/Species.kreport2"
     log:
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_retax_kmermap.log"
     benchmark:
@@ -49,12 +49,12 @@ rule retax_kmermap:
     shell:
         "target={input.krakdb}; target=\"${{target/database.kraken/}}\" > {log} 2>&1; "
         "in_dir={input.report}; in_dir=\"${{in_dir/filtered.kreport2/}}\" > {log} 2>&1; "
-        "bracken {params} "
-        "-l S " ## [Default = 'S', Options = 'D','P','C','O','F','G','S']:: specifies the taxonomic rank to analyze. Each classification at this specified rank will receive an estimated number of reads belonging to that rank after abundance estimation.
-        "-d ${{target}} "
-        "-i {input.report} "
-        "-o {output.rankS} >> {log} 2>&1; "
-        "mv ${{in_dir}}filtered_bracken.kreport2 {output.tableS} >> {log} 2>&1; "
+        # "bracken {params} "
+        # "-l F " ## [Default = 'S', Options = 'D','P','C','O','F','G','S']:: specifies the taxonomic rank to analyze. Each classification at this specified rank will receive an estimated number of reads belonging to that rank after abundance estimation.
+        # "-d ${{target}} "
+        # "-i {input.report} "
+        # "-o {output.rankF} >> {log} 2>&1; "
+        # "mv ${{in_dir}}filtered_bracken.kreport2 {output.tableF} >> {log} 2>&1; "
         "bracken {params} "
         "-l G "
         "-d ${{target}} "
@@ -62,16 +62,16 @@ rule retax_kmermap:
         "-o {output.rankG} >> {log} 2>&1; "
         "mv ${{in_dir}}filtered_bracken.kreport2 {output.tableG} >> {log} 2>&1; "
         "bracken {params} "
-        "-l F "
+        "-l S "
         "-d ${{target}} "
         "-i {input.report} "
-        "-o {output.rankF} >> {log} 2>&1; "
-        "mv ${{in_dir}}/filtered_bracken.kreport2 {output.tableF} >> {log} 2>&1"
+        "-o {output.rankS} >> {log} 2>&1; "
+        "mv ${{in_dir}}/filtered_bracken.kreport2 {output.tableS} >> {log} 2>&1"
 
 rule counttax_kmermap:
     input:
         # kreport="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kreport2", ## kraken2
-        kreport="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/Species.kreport2", ## bracken
+        kreport="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/{reftype}.kreport2", ## bracken
         kronataxlist="{tmp}METADATA/Reference_Sequences/{reference}/krona/{reftype}/taxlist.txt"
     output:
         counttaxlist="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"
