@@ -83,13 +83,13 @@ def input_barc(wildcards):
 
         ## BASECALL ##
 
-        ["{tmp}00_raw_data/{run}/MeBaPiNa_moving_raw.report",
-        "{tmp}00_raw_data/{run}/MeBaPiNa_basecalling_raw.report"] +
+        ["{tmp}00_raw_data/{run}/MeBaPiNa_move_raw.report",
+        "{tmp}00_raw_data/{run}/MeBaPiNa_basecall_raw.report"] +
 
         ## TRIM AND FILTER ##
 
-        ["{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming_basecalled.report",
-        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering_trimmed.report"] +
+        ["{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trim_basecalled.report",
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filter_trimmed.report"] +
 
         ## OTU ##
 
