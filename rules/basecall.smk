@@ -5,7 +5,7 @@
 ## BASECALL DEMULTIPLEX ##
 ##########################
 
-rule moving_raw:
+rule move_raw:
     output:
         directory("{tmp}00_raw_data/{run}/fast5")
     shell:
@@ -13,7 +13,7 @@ rule moving_raw:
         "mv ${{long_path}} \"{wildcards.tmp}00_raw_data/{wildcards.run}\"; "
         "find {wildcards.tmp}00_raw_data/ -depth -type d -empty -delete" #!# delete empty directories
 
-checkpoint basecalling_raw:
+checkpoint basecall_raw:
     input:
         "{tmp}00_raw_data/{run}/fast5"
     output:
@@ -23,9 +23,9 @@ checkpoint basecalling_raw:
         (directory("{tmp}01_processed_data/01_basecalling/{run}/calibration_strands") if LAM_DCS else "") ## evaluation of Lambda calibration strands only when specified
         ]))
     log:
-        "{tmp}01_processed_data/01_basecalling/{run}/MeBaPiNa_basecalling_raw.log"
+        "{tmp}01_processed_data/01_basecalling/{run}/MeBaPiNa_basecall_raw.log"
     benchmark:
-        "{tmp}01_processed_data/01_basecalling/{run}/MeBaPiNa_basecalling_raw.benchmark.tsv"
+        "{tmp}01_processed_data/01_basecalling/{run}/MeBaPiNa_basecall_raw.benchmark.tsv"
     version:
         subprocess.check_output("guppy_basecaller --version | awk '{print $NF}'", shell=True)
     threads:
@@ -64,14 +64,14 @@ checkpoint basecalling_raw:
 ## TRIMM DEMULTIPLEX ##
 #######################
 
-rule trimming_basecalled:
+rule trim_basecalled:
     ## input dependency is handled by the all rule
     output:
         "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/trimmed.fastq"
     log:
-        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming_basecalled.log"
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trim_basecalled.log"
     benchmark:
-        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trimming_basecalled.benchmark.tsv"
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trim_basecalled.benchmark.tsv"
     conda:
         "../envs/qcat.yml"
     threads:
@@ -97,16 +97,16 @@ rule trimming_basecalled:
 ## FILTER ##
 ############
 
-rule filtering_trimmed:
+rule filter_trimmed:
     input:
         fastq="{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/trimmed.fastq",
         seqsum="{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary.txt"
     output:
         "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq"
     log:
-        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering_trimmed.log"
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filter_trimmed.log"
     benchmark:
-        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filtering_trimmed.benchmark.tsv"
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filter_trimmed.benchmark.tsv"
     conda:
         "../envs/nanopack.yml"
     params:
