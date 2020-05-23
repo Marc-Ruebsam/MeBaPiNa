@@ -1,5 +1,5 @@
 ## load library
-library(ggplot2)
+suppressPackageStartupMessages(library(ggplot2))
 
 ## load list opf read lengths from fasta index
 lenlist <- read.table( snakemake@input[[1]], header = FALSE, sep = "\t",
