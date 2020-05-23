@@ -42,7 +42,7 @@ rule stat_general_rawreadcount:
         raw="{tmp}00_raw_data/{run}/report.md",
         basecall="{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary.txt",
         trim="{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/trimmed.fastq.fai",
-        filter="{tmp}/02_analysis_results/02_trimming_filtering/{run}/nanocomp/NanoStats.txt"
+        filter="{tmp}02_analysis_results/02_trimming_filtering/{run}/nanocomp/NanoStats.txt"
     output:
         "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/read_base_counts.tsv"
     shell:
