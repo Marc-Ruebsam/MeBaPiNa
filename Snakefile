@@ -77,7 +77,7 @@ include: "rules/report.smk"
 ## collection of all statistics (and few plots)
 def input_stat(wildcards):
     ## report directories per PROMISE timepoint and sample as specified in the METADATA
-    promise_dirs = [config["experiments"]["tmp"] + TPs + "/" + IDs + "/" + RUNs + "/"
+    promise_dirs = [config["experiments"]["tmp"] + "03_report/" + TPs + "/" + IDs + "/" + RUNs + "/"
     for TPs,IDs,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), METADATA['Run ID']) if "PROM" in IDs]
 
     ## create file names with report dirs
