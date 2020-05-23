@@ -1,6 +1,6 @@
-#####################################################
-## MeBaPiNa - Meta Barcoding Pipeline for Nanopore ##
-#####################################################
+#######################################################################
+## MeBaPiNa - Meta Barcoding Analysis Pipeline for Nanopore Datasets ##
+#######################################################################
 
 ## author:      Marc Ruebsam (marc-ruebsam@hotmail.de)
 ## description: Pipeline for automated analysis of 16S metabarcoding samples.
@@ -18,7 +18,7 @@ min_version("5.4")
 
 ## location of configuration and report specifications
 configfile: "config.yaml"
-report: "report/workflow.rst"
+report: "report/workflow.rst" #!# not yet implemented
 
 ## set working directory to specified data location
 workdir: config["experiments"]["project"]
@@ -39,10 +39,11 @@ METADATA = pd.read_excel( config["experiments"]["meta"], header = 1 )
 ## find meta data for required samples
 METADATA = METADATA.loc[ METADATA['Sample name'].isin(config["experiments"]["samples"]), : ]
 #!# currently only one single run analysis is supported. Use run with most sample overlaps
-RUNS = METADATA['Run ID'].value_counts().sort_values(ascending=False).keys()[0]
-METADATA = METADATA.loc[ METADATA['Run ID'].isin([RUNS]), : ]
+RUNS = [METADATA['Run ID'].value_counts().sort_values(ascending=False).keys()[0]]
+METADATA = METADATA.loc[ METADATA['Run ID'].isin(RUNS), : ]
 ## sample barcode information
 SAMPLES = pd.Series(METADATA['Sample name'].values,index=METADATA['Barcode']).to_dict()
+TIMEPOINTS = pd.Series(METADATA['Zeitpunkt'].values,index=METADATA['Barcode']).to_dict()
 
 ## get run information
 FLOWCELL = METADATA['Flow cell product'].unique()[0]
@@ -56,8 +57,8 @@ PLOT_SMPL = "100000"
 PLOT_MAXLEN = config["filtering"]["len_max"]
 
 
-## PIELINE RULES AND END POINTS ##
-##################################
+## PIELINE RULES ##
+###################
 
 ## load rule set
 include: "rules/basecall.smk"
@@ -69,8 +70,37 @@ include: "rules/plot.smk"
 include: "rules/misc.smk"
 include: "rules/report.smk"
 
-## target output rule (the default end/output of the pipeline)
-def input_barc(wildcards):
+
+## END POINTS ##
+################
+
+## collection of all statistics (and few plots)
+def input_stat(wildcards):
+    ## report directories per timepoint and sample as specified in the METADATA
+    report_dirs = [config["experiments"]["tmp"] + TPs + "/" + IDs + "/" + RUNs + "/" for TPs,IDs,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), METADATA['Run ID'])]
+
+    ## create file names with report dirs
+    input_list = expand(list(filter(None,
+
+        ## RAW READS ##
+        [r_dir + "raw_read_count.tsv" for r_dir in report_dirs]
+
+        ## report files for reference data
+        ["{tmp}03_report/Reference_Sequences/{reference}/reference_lengthdist.tsv",
+        "{tmp}03_report/Reference_Sequences/{reference}/reference_lengthdist.pdf",
+        "{tmp}03_report/Reference_Sequences/{reference}/reference_taxaranks.tsv"]
+
+    )),
+    tmp = config["experiments"]["tmp"],
+    run = RUNS,
+    barc = all_barcs,
+    reference = config['reference']['source'],
+    reftype = config['reference']['rank'] )
+    ## return
+    return input_list
+
+## collection of all reports
+def input_report(wildcards):
     from os import listdir
     ## get "pass" directory
     basecall_dir = checkpoints.basecall_raw.get(tmp=config["experiments"]["tmp"],run=RUNS).output[1]
@@ -119,9 +149,15 @@ def input_barc(wildcards):
     ## return
     return input_list
 
-rule all:
+## rule for stats
+rule all_stat:
     input:
-        input_barc
+        input_stat
+
+## rule for reports
+rule all_report: #!# cannot specify ANALYSIS_PROGRESS_MANAGEMENT.csv as output or it will be overwritten each time. snakemake cannot append.
+    input:
+        input_report
     params:
         config["experiments"]["tmp"] + "METADATA/ANALYSIS_PROGRESS_MANAGEMENT.csv"
     shell:

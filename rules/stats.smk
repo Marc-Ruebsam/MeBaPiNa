@@ -37,18 +37,18 @@ rule stat_refseq_taxaranks:
 ## RAW READS ##
 ###############
 
-# rule stat_raw_read_count:
-#     input:
-#         "{tmp}00_raw_data/{run}/report.md"
-#     output:
-#         "{tmp}.tmp/stats/{run}/raw_read_count.tsv"
-#     shell:
-#         "echo -e \"$(tail -n 4 {input} | head -n 1 | cut -d\",\" -f2)\\traw_read_count\" >> {output}"
-#
-# ###################
-# ## DEMULTIPLEXED ##
-# ###################
-#
+rule stat_general_rawreadcount:
+    input:
+        "{tmp}00_raw_data/{run}/report.md"
+    output:
+        "{tmp}03_report/{timepoint}/{sample}/{run}/raw_read_count.tsv"
+    shell:
+        "echo -e \"$(tail -n 4 {input} | head -n 1 | cut -d\",\" -f2)\\traw_read_count\" >> {output}"
+
+###################
+## DEMULTIPLEXED ##
+###################
+
 # rule stat_demux_assigned_counts:
 #     input:
 #         "{tmp}02_analysis_results/01_basecalling/{run}/nanocomp/NanoStats.txt"
