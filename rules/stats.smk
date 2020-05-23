@@ -46,7 +46,8 @@ rule stat_general_rawreadcount:
     params:
         "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
         "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); ",
-        "test=\"" + [barc for barc,ID in SAMPLES.items() if ID == "{wildcards.sample}"] + "\"; "
+        # "test=\"" + [barc for barc,ID in SAMPLES.items() if ID == "{wildcards.sample}"] + "\"; "
+        "test=\"" + "{wildcards.sample}" + "\"; "
     shell:
         ## import list of all sample IDs and barcodes
         "{params}"
