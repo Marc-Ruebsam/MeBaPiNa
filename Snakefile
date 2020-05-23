@@ -84,7 +84,7 @@ def input_stat(wildcards):
     input_list = expand(list(filter(None,
 
         ## RAW READS ##
-        [r_dir + "raw_read_count.tsv" for r_dir in report_dirs]
+        [stat_dir + "raw_read_count.tsv" for stat_dir in promise_dirs]
 
         ## report files for reference data
         ["{tmp}03_report/Reference_Sequences/{reference}/reference_lengthdist.tsv",
