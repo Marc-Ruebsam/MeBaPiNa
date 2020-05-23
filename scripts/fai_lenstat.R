@@ -12,7 +12,7 @@ write.table( lenfreq, file = snakemake@output[["length_stat"]],
     quote = FALSE, sep = "\t", row.names = FALSE, col.names = FALSE )
 
 ## calculate mean, sd, median and mode
-lenstats <- c(with( lenlist, c(mean(length), sd(length), median(length))), lenfreq[which.max(lenfreq$Freq),2] )
+lenstats <- c(with( lenlist, c(mean(length), sd(length), median(length))), lenfreq[which.max(lenfreq$Freq),1] )
 
 ## plot
 lengthplot <- ggplot() + theme_bw() +
