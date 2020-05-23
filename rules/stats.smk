@@ -43,8 +43,19 @@ rule stat_general_rawreadcount:
         basecall="{tmp}02_analysis_results/01_basecalling/{run}/nanocomp/NanoStats.txt"
     output:
         "{tmp}03_report/{timepoint}/{sample}/{run}/read_base_counts.tsv"
+    params:
+        "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
+        "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); ",
+        "test=\"" + [barc for barc,ID in SAMPLES.items() if ID == "{wildcards.sample}"][0] + "\"; "
     shell:
+        ## import list of all sample IDs and barcodes
+        "{params}"
+        ## extract barcode associated with current
+        "barc=${{all_barcs[$(for i in \"${{!all_IDs[@]}}\"; do " ## to get barc form all_barcs, loop over index of all sample IDs
+        "if [[ \"${{all_IDs[$i]}}\" = \"{wildcards.sample}\" ]]; then echo $i; fi; done)]}}; " ## if current sample is wildcard sample, return index to all_barcs
+        ## get number of raw reads
         "echo -e \"$(tail -n 4 {input.raw} | head -n 1 | cut -d\",\" -f2)\\traw_read_count_all_samples\" > {output}; "
+        ## get number of basecalled reads and bases and mean length and quality
         "awk 'BEGIN{{rd_cnt=0;bp_cnt=0;rd_len=0;rd_qul=0}}; "
         "NR==1{{"
         "for(i=1; i<=NF; i++){{"
@@ -72,44 +83,6 @@ rule stat_general_rawreadcount:
         "rd_len\"\\tassigned_mean_length\\n\""
         "rd_qul\"\\tassigned_mean_quality\""
         "}}' {input.basecall} >> {output}"
-
-###################
-## DEMULTIPLEXED ##
-###################
-
-rule stat_demux_assigned_counts:
-    input:
-    output:
-        "{tmp}.tmp/stats/{run}/demux_assigned_counts.tsv"
-    shell:
-
-
-# filtered_reads <- c(
-#   44,
-#   30,
-#   673100,
-#   1487303,
-#   718362,
-#   857069,
-#   678881,
-#   530264,
-#   1341020,
-#   988081,
-#   724721,
-#   625320,
-#   66260,
-#   283913,
-#   723653,
-#   191520,
-#   192578,
-#   157178,
-#   138630,
-#   61976,
-#   78003,
-#   158098,
-#   230634,
-#   932741
-# )
 
 ###########
 ## K-MER ##
