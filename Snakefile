@@ -76,6 +76,9 @@ include: "rules/report.smk"
 
 ## collection of all statistics (and few plots)
 def input_stat(wildcards):
+
+    print( list(zip(TIMEPOINTS.values(), SAMPLES.values(), METADATA['Run ID'])) )
+
     ## report directories per timepoint and sample as specified in the METADATA
     report_dirs = [config["experiments"]["tmp"] + TPs + "/" + IDs + "/" + RUNs + "/" for TPs,IDs,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), METADATA['Run ID'])]
 
