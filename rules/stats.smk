@@ -40,14 +40,12 @@ rule stat_refseq_taxaranks:
 rule stat_general_rawreadcount:
     input:
         raw="{tmp}00_raw_data/{run}/report.md",
-        basecall="{tmp}02_analysis_results/01_basecalling/{run}/nanocomp/NanoStats.txt"
+        basecall="{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary.txt"
     output:
         "{tmp}03_report/{timepoint}/{sample}/{run}/read_base_counts.tsv"
     params:
         "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
-        "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); ",
-        # "test=\"" + [barc for barc,ID in SAMPLES.items() if ID == "{wildcards.sample}"] + "\"; "
-        "test=\"" + {wildcards.sample} + "\"; "
+        "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
         ## import list of all sample IDs and barcodes
         "{params}"
@@ -57,32 +55,16 @@ rule stat_general_rawreadcount:
         ## get number of raw reads
         "echo -e \"$(tail -n 4 {input.raw} | head -n 1 | cut -d\",\" -f2)\\traw_read_count_all_samples\" > {output}; "
         ## get number of basecalled reads and bases and mean length and quality
-        "awk 'BEGIN{{rd_cnt=0;bp_cnt=0;rd_len=0;rd_qul=0}}; "
-        "NR==1{{"
-        "for(i=1; i<=NF; i++){{"
-        "if($i == \"unclassified\"){{uncl_col=i}}"
-        "}}}}; "
-        "$1==\"Number\"{{"
-        "for(i=4; i<NF; i++){{"
-        "gsub(\",\",\"\",$i); rd_cnt = rd_cnt + $i"
-        "}}}}; "
-        "$1==\"Total\"{{"
-        "for(i=3; i<NF; i++){{"
-        "gsub(\",\",\"\",$i); bp_cnt = bp_cnt + $i"
-        "}}}}; "
-        "$1==\"Median\"&&$3==\"length:\"{{"
-        "for(i=4; i<NF; i++){{"
-        "gsub(\",\",\"\",$i); rd_len = rd_len + $i"
-        "}}; rd_len = rd_len / (NF-3)}}; "
-        "$1==\"Median\"&&$3==\"quality:\"{{"
-        "for(i=4; i<NF; i++){{"
-        "gsub(\",\",\"\",$i); rd_qul = rd_qul + $i"
-        "}}; rd_qul = rd_qul / (NF-3)}}; "
-        "END{{print "
-        "rd_cnt\"\\tassigned_read_count\\n\""
-        "bp_cnt\"\\tassigned_base_count\\n\""
-        "rd_len\"\\tassigned_mean_length\\n\""
-        "rd_qul\"\\tassigned_mean_quality\""
+        "awk 'BEGIN{{ all_base=0; all_qual=0 }}; "
+        "NR==1{{ for(i=1; i<=NF; i++){{ "
+        "if($i == \"sequence_length_template\"){{len_col=i}} "
+        "else if($i == \"mean_qscore_template\"){{qual_col=i}} }}; next }}; "
+        "{{ all_base = all_base + $len_col; all_qual = all_qual + $qual_col }}; "
+        "END{{ "
+        "print (NR-1)\"\\tbasecalled_read_count_all_samples\\n\""
+        "(all_base)\"\\tbasecalled_base_count_all_samples\\n\""
+        "(all_base/(NR-1))\"\\tbasecalled_mean_length_all_samples\\n\""
+        "all_qual/(NR-1)\"\\tbasecalled_mean_quality_all_samples\""
         "}}' {input.basecall} >> {output}"
 
 ###########
