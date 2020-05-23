@@ -4,9 +4,9 @@
 
 rule faidx:
     input:
-        "{fasta}.fasta"
+        "{fasta}"
     output:
-        "{fasta}.fasta.fai"
+        "{fasta}.fai"
     conda:
         "../envs/samtools.yml"
     shell:
