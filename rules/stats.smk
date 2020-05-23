@@ -41,13 +41,14 @@ rule stat_general_rawreadcount:
     input:
         raw="{tmp}00_raw_data/{run}/report.md",
         basecall="{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary.txt",
-        trim="{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/trimmed.fastq.fai"
+        trim="{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/trimmed.fastq.fai",
+        filter="{tmp}/02_analysis_results/02_trimming_filtering/{run}/nanocomp/NanoStats.txt"
     output:
         "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/read_base_counts.tsv"
     shell:
-        ## get number of raw reads
+        ## get number of raw: reads
         "echo -e \"$(tail -n 4 {input.raw} | head -n 1 | cut -d\",\" -f2)\\traw_read_count_all_samples\" > {output}; "
-        ## get number of basecalled reads and bases and mean length and quality
+        ## get number of basecalled: reads and bases and mean length and quality
         "awk 'BEGIN{{ all_base=0; all_qual=0 }}; "
         "NR==1{{ for(i=1; i<=NF; i++){{ " ## in first line
         "if($i == \"sequence_length_template\"){{len_col=i}} " ## get index of length column
@@ -59,14 +60,29 @@ rule stat_general_rawreadcount:
         "(all_base/(NR-1))\"\\tbasecalled_mean_length_all_samples\\n\"" ## mean bases per read
         "all_qual/(NR-1)\"\\tbasecalled_mean_quality_all_samples\"" ## mean quality
         "}}' {input.basecall} >> {output}; "
-        ## get number of demultiplexed and trimmed reads and mean read length for barcode
+        ## get number of demultiplexed and trimmed: reads and mean read length for barcode
         "awk 'BEGIN{{ all_base = 0 }}; "
         "{{ all_base = all_base + $2 }}; " ## cumulative sum of bases
         "END{{ "
         "print (NR-1)\"\\ttrim_read_count\\n\"" ## print number of reads - header
         "(all_base)\"\\ttrim_base_count\\n\"" ## number of all bases
         "(all_base/(NR-1))\"\\ttrim_mean_length\"" ## mean bases per read
-        "}}' {input.trim} >> {output}"
+        "}}' {input.trim} >> {output}; "
+        ## get number of filtered: reads and bases and mean length and quality for barcode
+        "awk -v barc=\"{wildcards.barc}\" 'BEGIN{{rd_cnt=0;bp_cnt=0;rd_len=0;rd_qul=0}}; "
+        "NR==1{{" ## in first row
+        "for(i=1; i<=NF; i++){{" ## in all columns
+        "if($i == barc){{barc_col=i}}" ## find barcode column and remember index
+        "}}}}; "
+        "$1==\"Number\"{{" ## in "Number of reads" row
+        "gsub(\",\",\"\",$barc_col); print $barc_col\"\\tfilter_read_count\"}}; " ## remove comma and print barcode value
+        "$1==\"Total\"{{" ## in "Total bases" row
+        "gsub(\",\",\"\",$barc_col); print $barc_col\"\\tfilter_base_count\"}}; "
+        "$1==\"Mean\"&&$3==\"length:\"{{"
+        "gsub(\",\",\"\",$barc_col); print $barc_col\"\\tfilter_mean_length\"}}; "
+        "$1==\"Mean\"&&$3==\"quality:\"{{"
+        "gsub(\",\",\"\",$barc_col); print $barc_col\"\\tfilter_mean_quality\"}}' "
+        " {input.filter} >> {output}"
 
 ###########
 ## K-MER ##
