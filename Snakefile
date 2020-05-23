@@ -92,8 +92,6 @@ def input_stat(wildcards):
 
     )),
     tmp = config["experiments"]["tmp"],
-    run = RUNS,
-    barc = all_barcs,
     reference = config['reference']['source'],
     reftype = config['reference']['rank'] )
     ## return
