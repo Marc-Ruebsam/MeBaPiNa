@@ -80,6 +80,10 @@ def input_stat(wildcards):
     promise_dirs = [config["experiments"]["tmp"] + "03_report/" + TPs + "/" + IDs + "/" + RUNs + "/"
     for TPs,IDs,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), METADATA['Run ID']) if "PROM" in IDs]
 
+    ## report directories for all other sample specified in the METADATA
+    promise_dirs = [config["experiments"]["tmp"] + "03_report/" + "non-PROMISE_samples" + "/" + IDs + "/" + RUNs + "/"
+    for TPs,IDs,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), METADATA['Run ID']) if not "PROM" in IDs]
+
     ## create file names with report dirs
     input_list = expand(list(filter(None,
 
