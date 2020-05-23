@@ -23,14 +23,20 @@ rule stat_refseq_lenstat:
     script:
         "../scripts/fai_lenstat.R"
 
-# ## taxonomic ranks and frequency
-# # cut -f 3 taxlist.txt | sort | uniq -c | sort -nr | egrep " root| domain| phylum| class| order| family| genus| species";
-# # cut -f 3 taxlist.txt | sort | uniq -c | sort -nr | egrep -v " root| domain| phylum| class| order| family| genus| species" | awk 'BEGIN{cnt=0};{cnt=cnt+$1};END{print cnt" other"}'
-#
-# ###############
-# ## RAW READS ##
-# ###############
-#
+rule stat_refseq_taxaranks:
+    input:
+        "{tmp}METADATA/Reference_Sequences/{reference}/krona/Species/taxlist.txt"
+    output:
+        "{tmp}METADATA/Reference_Sequences/{reference}/reference_taxaranks.tsv"
+    shell:
+        "awk -F \"\t\" '$3==\"root\"{{cnt[\"root\"]++;next}}; $3==\"domain\"{{cnt[\"domain\"]++;next}}; $3==\"phylum\"{{cnt[\"phylum\"]++;next}}; $3==\"class\"{{cnt[\"class\"]++;next}}; $3==\"order\"{{cnt[\"order\"]++;next}}; $3==\"family\"{{cnt[\"family\"]++;next}}; $3==\"genus\"{{cnt[\"genus\"]++;next}}; $3==\"species\"{{cnt[\"species\"]++;next}}; {{cnt[\"other\"]++}};"
+        "END{{ print \"root\t\"cnt[\"root\"]; print \"domain\t\"cnt[\"domain\"]; print \"phylum\t\"cnt[\"phylum\"]; print \"class\t\"cnt[\"class\"]; print \"order\t\"cnt[\"order\"]; print \"family\t\"cnt[\"family\"]; print \"genus\t\"cnt[\"genus\"]; print \"species\t\"cnt[\"species\"]; print \"other\t\"cnt[\"other\"] }}' "
+        "{input} > {output}"
+
+###############
+## RAW READS ##
+###############
+
 # rule stat_raw_read_count:
 #     input:
 #         "{tmp}00_raw_data/{run}/report.md"
