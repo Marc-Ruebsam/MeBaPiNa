@@ -16,7 +16,7 @@ rule report_move_raw:
         "all_IDs=( $(echo \"{params}\") ); "
         "for id in ${{all_IDs[@]}}; do echo "
         ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
-        "\"${{id}};{input};$(stat -c %y {input});NA;MeBaPiNa;Moved raw fast5 files to path ready for analysis.\" "
+        "\"${{id}};{input};$(stat -c %y {input});NA;MeBaPiNa;General: moved raw fast5 files to path ready for analysis.\" "
         ">> {output}; done"
 
 rule report_basecall_raw:
@@ -31,7 +31,7 @@ rule report_basecall_raw:
         "{params}"
         "for id in ${{all_IDs[@]}}; do echo "
         ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
-        "\"${{id}};{input};$(stat -c %y {input[0]});NA;MeBaPiNa;Basecalled and demultiplexed raw fast5 files into fastq.\" "
+        "\"${{id}};{input};$(stat -c %y {input[0]});NA;MeBaPiNa;General: basecalled and demultiplexed raw fast5 files into fastq.\" "
         ">> {output}; done"
 
 ## TRIM AND FILTER ##
@@ -51,7 +51,7 @@ rule report_trim_basecalled:
         "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; "
         "done)]}}; echo "
         ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
-        "\"${{id}};{input};$(stat -c %y {input});NA;MeBaPiNa;Trimmed adapters and barcodes from reads and demultiplexed a second time.\" "
+        "\"${{id}};{input};$(stat -c %y {input});NA;MeBaPiNa;General: trimmed adapters and barcodes from reads and demultiplexed a second time.\" "
         ">> {output}"
 
 rule report_filter_trimmed:
@@ -68,7 +68,7 @@ rule report_filter_trimmed:
         "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; "
         "done)]}}; echo "
         ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
-        "\"${{id}};{input};$(stat -c %y {input});NA;MeBaPiNa;Length and quality filtered reads.\" "
+        "\"${{id}};{input};$(stat -c %y {input});NA;MeBaPiNa;General: length and quality filtered reads.\" "
         ">> {output}"
 
 ## OTU ##
