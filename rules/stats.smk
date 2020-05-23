@@ -75,13 +75,13 @@ rule stat_general_rawreadcount:
         "if($i == barc){{barc_col=i}}" ## find barcode column and remember index
         "}}}}; "
         "$1==\"Number\"{{" ## in "Number of reads" row
-        "gsub(\",\",\"\",$barc_col); print $barc_col\"\\tfilter_read_count\"}}; " ## remove comma and print barcode value
+        "gsub(\",\",\"\",$(barc_col+1)); print $(barc_col+1)\"\\tfilter_read_count\"}}; " ## remove comma and print barcode value (Note that the row name can shift the barcode index)
         "$1==\"Total\"{{" ## in "Total bases" row
         "gsub(\",\",\"\",$barc_col); print $barc_col\"\\tfilter_base_count\"}}; "
         "$1==\"Mean\"&&$3==\"length:\"{{"
-        "gsub(\",\",\"\",$barc_col); print $barc_col\"\\tfilter_mean_length\"}}; "
+        "gsub(\",\",\"\",$(barc_col+1)); print $(barc_col+1)\"\\tfilter_mean_length\"}}; "
         "$1==\"Mean\"&&$3==\"quality:\"{{"
-        "gsub(\",\",\"\",$barc_col); print $barc_col\"\\tfilter_mean_quality\"}}' "
+        "gsub(\",\",\"\",$(barc_col+1)); print $(barc_col+1)\"\\tfilter_mean_quality\"}}' "
         " {input.filter} >> {output}"
 
 ###########
