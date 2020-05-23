@@ -25,7 +25,7 @@ workdir: config["experiments"]["project"]
 
 ## prevent unwanted extension of wildcards
 wildcard_constraints:
-    barc="[a-zA-Z0-9_-]+",
+    barc="[a-zA-Z0-9]+",
     run="\w+", ## is equalt to [a-zA-Z0-9_]+
     reftype="[a-zA-Z0-9]+",
     reference="[a-zA-Z0-9]+"
@@ -77,12 +77,12 @@ include: "rules/report.smk"
 ## collection of all statistics (and few plots)
 def input_stat(wildcards):
     ## report directories per PROMISE timepoint and sample as specified in the METADATA
-    promise_dirs = [config["experiments"]["tmp"] + "03_report/" + TPs + "/" + IDs + "/" + RUNs + "/"
-    for TPs,IDs,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), METADATA['Run ID']) if "PROM" in IDs]
+    promise_dirs = [config["experiments"]["tmp"] + "03_report/" + TPs + "/" + IDs + "/" + RUNs + "-" + barc + "/"
+    for TPs,IDs,barc,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), SAMPLES.keys(), METADATA['Run ID']) if "PROM" in IDs]
 
     ## report directories for all other sample specified in the METADATA
-    other_dirs = [config["experiments"]["tmp"] + "03_report/" + "non-PROMISE_samples" + "/" + IDs + "/" + RUNs + "/"
-    for TPs,IDs,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), METADATA['Run ID']) if not "PROM" in IDs]
+    other_dirs = [config["experiments"]["tmp"] + "03_report/" + "non-PROMISE_samples" + "/" + IDs + "/" + RUNs + "-" + barc + "/"
+    for TPs,IDs,barc,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), SAMPLES.keys(), METADATA['Run ID']) if not "PROM" in IDs]
 
     ## create file names with report dirs
     input_list = expand(list(filter(None,

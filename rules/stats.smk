@@ -40,32 +40,33 @@ rule stat_refseq_taxaranks:
 rule stat_general_rawreadcount:
     input:
         raw="{tmp}00_raw_data/{run}/report.md",
-        basecall="{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary.txt"
+        basecall="{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary.txt",
+        trim="{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/trimmed.fastq.fai"
     output:
-        "{tmp}03_report/{timepoint}/{sample}/{run}/read_base_counts.tsv"
-    params:
-        "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
-        "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
+        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/read_base_counts.tsv"
     shell:
-        ## import list of all sample IDs and barcodes
-        "{params}"
-        ## extract barcode associated with current
-        "barc=${{all_barcs[$(for i in \"${{!all_IDs[@]}}\"; do " ## to get barc form all_barcs, loop over index of all sample IDs
-        "if [[ \"${{all_IDs[$i]}}\" = \"{wildcards.sample}\" ]]; then echo $i; fi; done)]}}; " ## if current sample is wildcard sample, return index to all_barcs
         ## get number of raw reads
         "echo -e \"$(tail -n 4 {input.raw} | head -n 1 | cut -d\",\" -f2)\\traw_read_count_all_samples\" > {output}; "
         ## get number of basecalled reads and bases and mean length and quality
         "awk 'BEGIN{{ all_base=0; all_qual=0 }}; "
-        "NR==1{{ for(i=1; i<=NF; i++){{ "
-        "if($i == \"sequence_length_template\"){{len_col=i}} "
-        "else if($i == \"mean_qscore_template\"){{qual_col=i}} }}; next }}; "
-        "{{ all_base = all_base + $len_col; all_qual = all_qual + $qual_col }}; "
+        "NR==1{{ for(i=1; i<=NF; i++){{ " ## in first line
+        "if($i == \"sequence_length_template\"){{len_col=i}} " ## get index of length column
+        "else if($i == \"mean_qscore_template\"){{qual_col=i}} }}; next }}; " ## get index of quality column
+        "{{ all_base = all_base + $len_col; all_qual = all_qual + $qual_col }}; " ## cumulative sum of bases and qualities
         "END{{ "
-        "print (NR-1)\"\\tbasecalled_read_count_all_samples\\n\""
-        "(all_base)\"\\tbasecalled_base_count_all_samples\\n\""
-        "(all_base/(NR-1))\"\\tbasecalled_mean_length_all_samples\\n\""
-        "all_qual/(NR-1)\"\\tbasecalled_mean_quality_all_samples\""
-        "}}' {input.basecall} >> {output}"
+        "print (NR-1)\"\\tbasecalled_read_count_all_samples\\n\"" ## print number of reads - header
+        "(all_base)\"\\tbasecalled_base_count_all_samples\\n\"" ## number of all bases
+        "(all_base/(NR-1))\"\\tbasecalled_mean_length_all_samples\\n\"" ## mean bases per read
+        "all_qual/(NR-1)\"\\tbasecalled_mean_quality_all_samples\"" ## mean quality
+        "}}' {input.basecall} >> {output}; "
+        ## get number of demultiplexed and trimmed reads and mean read length for barcode
+        "awk 'BEGIN{{ all_base = 0 }}; "
+        "{{ all_base = all_base + $2 }}; " ## cumulative sum of bases
+        "END{{ "
+        "print (NR-1)\"\\ttrim_read_count\\n\"" ## print number of reads - header
+        "(all_base)\"\\ttrim_base_count\\n\"" ## number of all bases
+        "(all_base/(NR-1))\"\\ttrim_mean_length\"" ## mean bases per read
+        "}}' {input.trim} >> {output}"
 
 ###########
 ## K-MER ##
