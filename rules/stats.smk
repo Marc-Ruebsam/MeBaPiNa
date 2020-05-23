@@ -19,7 +19,7 @@ rule stat_refseq_lenstat:
         length_stat="{tmp}METADATA/Reference_Sequences/{reference}/reference_lengthdist.tsv",
         length_plot="{tmp}METADATA/Reference_Sequences/{reference}/reference_lengthdist.pdf"
     script:
-        "scripts/stats/fai_lenstat.R"
+        "scripts/fai_lenstat.R"
 
 # ## taxonomic ranks and frequency
 # # cut -f 3 taxlist.txt | sort | uniq -c | sort -nr | egrep " root| domain| phylum| class| order| family| genus| species";
