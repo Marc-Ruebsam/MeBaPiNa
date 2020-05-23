@@ -1,28 +1,26 @@
-# ###############
-# ## REFERENCE ##
-# ###############
-#
-# rule stat_refseq_lendist:
-#     input:
-#         "{tmp}METADATA/Reference_Sequences/{reference}/reference.fasta"
-#     output:
-#         "{tmp}.tmp/stats/{reference}/refseq_lendist.tsv"
-#     conda:
-#         "../envs/samtools.yml"
-#     shell:
-#         "samtools faidx {input}; "
-#         "cut -f 2 {input}.fai | sort -n | uniq -c | awk '{{print $1\"\t\"$2}}' > {output}"
-#
-# sort -nk2 reference.fasta.fai | awk 'BEGIN{c=0};
-#     {cnt_sort[c++]=$2};
-#     END{
-#         sm = 0;
-#         for(key in cnt_sort){ sm = sm + cnt_sort[key] };
-#         men = sm / c;
-#         if((c % 2) == 1){ medn = cnt_sort[ int(c/2) ];
-#         }else{ medn = ( cnt_sort[c/2] + cnt_sort[c/2-1] ) / 2 };
-#         print medn"\t"men }'
-#
+###############
+## REFERENCE ##
+###############
+
+rule faidx:
+    input:
+        "{fasta}.fasta"
+    output:
+        "{fasta}.fasta.fai"
+    conda:
+        "../envs/samtools.yml"
+    shell:
+        "samtools faidx {input}"
+
+rule stat_refseq_lenstat:
+    input:
+        "{tmp}METADATA/Reference_Sequences/{reference}/reference.fasta.fai"
+    output:
+        length_stat="{tmp}METADATA/Reference_Sequences/{reference}/reference_lengthdist.tsv",
+        length_plot="{tmp}METADATA/Reference_Sequences/{reference}/reference_lengthdist.pdf"
+    script:
+        "scripts/stats/fai_lenstat.R"
+
 # ## taxonomic ranks and frequency
 # # cut -f 3 taxlist.txt | sort | uniq -c | sort -nr | egrep " root| domain| phylum| class| order| family| genus| species";
 # # cut -f 3 taxlist.txt | sort | uniq -c | sort -nr | egrep -v " root| domain| phylum| class| order| family| genus| species" | awk 'BEGIN{cnt=0};{cnt=cnt+$1};END{print cnt" other"}'
