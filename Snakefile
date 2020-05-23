@@ -81,14 +81,14 @@ def input_stat(wildcards):
     for TPs,IDs,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), METADATA['Run ID']) if "PROM" in IDs]
 
     ## report directories for all other sample specified in the METADATA
-    promise_dirs = [config["experiments"]["tmp"] + "03_report/" + "non-PROMISE_samples" + "/" + IDs + "/" + RUNs + "/"
+    other_dirs = [config["experiments"]["tmp"] + "03_report/" + "non-PROMISE_samples" + "/" + IDs + "/" + RUNs + "/"
     for TPs,IDs,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), METADATA['Run ID']) if not "PROM" in IDs]
 
     ## create file names with report dirs
     input_list = expand(list(filter(None,
 
         ## RAW READS ##
-        [stat_dir + "read_base_counts.tsv" for stat_dir in promise_dirs] +
+        [stat_dir + "read_base_counts.tsv" for stat_dir in promise_dirs + other_dirs] +
 
         ## report files for reference data
         ["{tmp}03_report/Reference_Sequences/{reference}/reference_lengthdist.tsv",
