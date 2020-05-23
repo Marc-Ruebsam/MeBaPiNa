@@ -29,8 +29,8 @@ rule stat_refseq_taxaranks:
     output:
         "{tmp}METADATA/Reference_Sequences/{reference}/reference_taxaranks.tsv"
     shell:
-        "awk -F \"\t\" '$3==\"root\"{{cnt[\"root\"]++;next}}; $3==\"domain\"{{cnt[\"domain\"]++;next}}; $3==\"phylum\"{{cnt[\"phylum\"]++;next}}; $3==\"class\"{{cnt[\"class\"]++;next}}; $3==\"order\"{{cnt[\"order\"]++;next}}; $3==\"family\"{{cnt[\"family\"]++;next}}; $3==\"genus\"{{cnt[\"genus\"]++;next}}; $3==\"species\"{{cnt[\"species\"]++;next}}; {{cnt[\"other\"]++}};"
-        "END{{ print \"root\t\"cnt[\"root\"]; print \"domain\t\"cnt[\"domain\"]; print \"phylum\t\"cnt[\"phylum\"]; print \"class\t\"cnt[\"class\"]; print \"order\t\"cnt[\"order\"]; print \"family\t\"cnt[\"family\"]; print \"genus\t\"cnt[\"genus\"]; print \"species\t\"cnt[\"species\"]; print \"other\t\"cnt[\"other\"] }}' "
+        "awk -F \"\\t\" '$3==\"root\"{{cnt[\"root\"]++;next}}; $3==\"domain\"{{cnt[\"domain\"]++;next}}; $3==\"phylum\"{{cnt[\"phylum\"]++;next}}; $3==\"class\"{{cnt[\"class\"]++;next}}; $3==\"order\"{{cnt[\"order\"]++;next}}; $3==\"family\"{{cnt[\"family\"]++;next}}; $3==\"genus\"{{cnt[\"genus\"]++;next}}; $3==\"species\"{{cnt[\"species\"]++;next}}; {{cnt[\"other\"]++}};"
+        "END{{ print \"root\\t\"cnt[\"root\"]; print \"domain\\t\"cnt[\"domain\"]; print \"phylum\\t\"cnt[\"phylum\"]; print \"class\\t\"cnt[\"class\"]; print \"order\\t\"cnt[\"order\"]; print \"family\\t\"cnt[\"family\"]; print \"genus\\t\"cnt[\"genus\"]; print \"species\\t\"cnt[\"species\"]; print \"other\\t\"cnt[\"other\"] }}' "
         "{input} > {output}"
 
 ###############
