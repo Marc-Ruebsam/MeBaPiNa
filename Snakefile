@@ -79,6 +79,8 @@ def input_stat(wildcards):
     ## report directories per timepoint and sample as specified in the METADATA
     report_dirs = [config["experiments"]["tmp"] + TPs + "/" + IDs + "/" + RUNs + "/" for TPs,IDs,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), METADATA['Run ID'])]
 
+    print( report_dirs )
+
     ## create file names with report dirs
     input_list = expand(list(filter(None,
 
@@ -94,6 +96,9 @@ def input_stat(wildcards):
     tmp = config["experiments"]["tmp"],
     reference = config['reference']['source'],
     reftype = config['reference']['rank'] )
+
+    print( input_list )
+
     ## return
     return input_list
 
