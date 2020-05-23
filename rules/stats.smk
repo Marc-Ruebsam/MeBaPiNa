@@ -18,6 +18,8 @@ rule stat_refseq_lenstat:
     output:
         length_stat="{tmp}METADATA/Reference_Sequences/{reference}/reference_lengthdist.tsv",
         length_plot="{tmp}METADATA/Reference_Sequences/{reference}/reference_lengthdist.pdf"
+    conda:
+        "../envs/r-diversity.yml"
     script:
         "../scripts/fai_lenstat.R"
 
