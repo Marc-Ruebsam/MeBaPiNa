@@ -39,81 +39,82 @@ rule stat_refseq_taxaranks:
 
 rule stat_general_rawreadcount:
     input:
-        "{tmp}00_raw_data/{run}/report.md"
+        raw="{tmp}00_raw_data/{run}/report.md",
+        basecall="{tmp}02_analysis_results/01_basecalling/{run}/nanocomp/NanoStats.txt"
     output:
-        "{tmp}03_report/{timepoint}/{sample}/{run}/raw_read_count.tsv"
+        "{tmp}03_report/{timepoint}/{sample}/{run}/read_base_counts.tsv"
     shell:
-        "echo -e \"$(tail -n 4 {input} | head -n 1 | cut -d\",\" -f2)\\traw_read_count\" >> {output}"
+        "echo -e \"$(tail -n 4 {input.raw} | head -n 1 | cut -d\",\" -f2)\\traw_read_count_all_samples\" > {output}; "
+        "awk 'BEGIN{{rd_cnt=0;bp_cnt=0;rd_len=0;rd_qul=0}}; "
+        "NR==1{{"
+        "for(i=1; i<=NF; i++){{"
+        "if($i == \"unclassified\"){{uncl_col=i}}"
+        "}}}}; "
+        "$1==\"Number\"{{"
+        "for(i=4; i<NF; i++){{"
+        "gsub(\",\",\"\",$i); rd_cnt = rd_cnt + $i"
+        "}}}}; "
+        "$1==\"Total\"{{"
+        "for(i=3; i<NF; i++){{"
+        "gsub(\",\",\"\",$i); bp_cnt = bp_cnt + $i"
+        "}}}}; "
+        "$1==\"Median\"&&$3==\"length:\"{{"
+        "for(i=4; i<NF; i++){{"
+        "gsub(\",\",\"\",$i); rd_len = rd_len + $i"
+        "}}; rd_len = rd_len / (NF-3)}}; "
+        "$1==\"Median\"&&$3==\"quality:\"{{"
+        "for(i=4; i<NF; i++){{"
+        "gsub(\",\",\"\",$i); rd_qul = rd_qul + $i"
+        "}}; rd_qul = rd_qul / (NF-3)}}; "
+        "END{{print "
+        "rd_cnt\"\\tassigned_read_count\\n\""
+        "bp_cnt\"\\tassigned_base_count\\n\""
+        "rd_len\"\\tassigned_mean_length\\n\""
+        "rd_qul\"\\tassigned_mean_quality\""
+        "}}' {input.basecall} >> {output}"
 
 ###################
 ## DEMULTIPLEXED ##
 ###################
 
-# rule stat_demux_assigned_counts:
-#     input:
-#         "{tmp}02_analysis_results/01_basecalling/{run}/nanocomp/NanoStats.txt"
-#     output:
-#         "{tmp}.tmp/stats/{run}/demux_assigned_counts.tsv"
-#     shell:
-#         "awk 'BEGIN{{rd_cnt=0;bp_cnt=0;rd_len=0;rd_qul=0}}; "
-#         "NR==1{{"
-#         "for(i=1; i<=NF; i++){{"
-#         "if($i == \"unclassified\"){{uncl_col=i}}"
-#         "}}}}; "
-#         "$1==\"Number\"{{"
-#         "for(i=4; i<NF; i++){{"
-#         "gsub(\",\",\"\",$i); rd_cnt = rd_cnt + $i"
-#         "}}}}; "
-#         "$1==\"Total\"{{"
-#         "for(i=3; i<NF; i++){{"
-#         "gsub(\",\",\"\",$i); bp_cnt = bp_cnt + $i"
-#         "}}}}; "
-#         "$1==\"Median\"&&$3==\"length:\"{{"
-#         "for(i=4; i<NF; i++){{"
-#         "gsub(\",\",\"\",$i); rd_len = rd_len + $i"
-#         "}}; rd_len = rd_len / (NF-3)}}; "
-#         "$1==\"Median\"&&$3==\"quality:\"{{"
-#         "for(i=4; i<NF; i++){{"
-#         "gsub(\",\",\"\",$i); rd_qul = rd_qul + $i"
-#         "}}; rd_qul = rd_qul / (NF-3)}}; "
-#         "END{{print "
-#         "rd_cnt\"\\tassigned_read_count\\n\""
-#         "bp_cnt\"\\tassigned_base_count\\n\""
-#         "rd_len\"\\tassigned_mean_length\\n\""
-#         "rd_qul\"\\tassigned_mean_quality\""
-#         "}}' {input} >> {output}"
-#
-# # filtered_reads <- c(
-# #   44,
-# #   30,
-# #   673100,
-# #   1487303,
-# #   718362,
-# #   857069,
-# #   678881,
-# #   530264,
-# #   1341020,
-# #   988081,
-# #   724721,
-# #   625320,
-# #   66260,
-# #   283913,
-# #   723653,
-# #   191520,
-# #   192578,
-# #   157178,
-# #   138630,
-# #   61976,
-# #   78003,
-# #   158098,
-# #   230634,
-# #   932741
-# # )
-#
-# ###########
-# ## K-MER ##
-# ###########
-#
+rule stat_demux_assigned_counts:
+    input:
+    output:
+        "{tmp}.tmp/stats/{run}/demux_assigned_counts.tsv"
+    shell:
+
+
+# filtered_reads <- c(
+#   44,
+#   30,
+#   673100,
+#   1487303,
+#   718362,
+#   857069,
+#   678881,
+#   530264,
+#   1341020,
+#   988081,
+#   724721,
+#   625320,
+#   66260,
+#   283913,
+#   723653,
+#   191520,
+#   192578,
+#   157178,
+#   138630,
+#   61976,
+#   78003,
+#   158098,
+#   230634,
+#   932741
+# )
+
+###########
+## K-MER ##
+###########
+
 # ## run time
 # # find -name "MeBaPiNa_kmermap_filtered.benchmark.tsv" -exec tail -n 1 {} \; | sort -nr | head -n 1
 # ## number of total and species taxa, total ans species reads and median reads per Species
