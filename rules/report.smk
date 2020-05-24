@@ -6,7 +6,9 @@
 def input_report(wildcards):
     from os import listdir
     print(wildcards)
-    print("\n")
+    print("I was here")
+    print(checkpoints.basecall_raw.get(tmp=config["experiments"]["tmp"],run=RUNS).output[1])
+    print("But not here")
     ## get "pass" directory
     basecall_dir = checkpoints.basecall_raw.get(tmp=config["experiments"]["tmp"],run=RUNS).output[1]
     ## get barcode directory names within "pass" directory
