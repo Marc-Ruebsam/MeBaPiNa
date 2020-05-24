@@ -5,12 +5,8 @@
 ## collection of all reports
 def input_report(wildcards):
     from os import listdir
-    print(wildcards)
-    print("I was here")
-    print(checkpoints.basecall_raw.get(tmp=wildcards.tmp,run=wildcards.run).output[0])
-    print("But not here")
     ## get "pass" directory
-    basecall_dir = checkpoints.basecall_raw.get(tmp=config["experiments"]["tmp"],run=RUNS).output[0]
+    basecall_dir = checkpoints.basecall_raw.get(tmp=wildcards.tmp,run=wildcards.run).output[0]
     ## get barcode directory names within "pass" directory
     all_barcs = listdir(basecall_dir)
     ## retain only folders containing one of the selected barcodes
