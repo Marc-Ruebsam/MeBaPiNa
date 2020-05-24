@@ -51,7 +51,7 @@ rule all_report:
     output:
         temp("{tmp}METADATA/{run}-{reference}-{reftype}-reports.csv")
     shell:
-        "report_file=$(echo \"{output}\" | sed 's#{wildcards.run}-{wildcards.reference}-{wildcards.reftype}#ANALYSIS_PROGRESS_MANAGEMENT#'); "
+        "report_file=$(echo \"{output}\" | sed 's#{wildcards.run}-{wildcards.reference}-{wildcards.reftype}-reports#ANALYSIS_PROGRESS_MANAGEMENT#'); "
         "if [[ ! -f ${{report_file}} ]]; then "
         "echo \"Sample name;File/directory;Completion date;Checksum;Performed by;Description\" > ${{report_file}}; fi; "
         "indiv_reports=( $(echo \"{input}\") ); "

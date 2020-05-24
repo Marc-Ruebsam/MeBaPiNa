@@ -71,18 +71,26 @@ include: "rules/misc.smk"
 include: "rules/report.smk"
 
 
-## END POINTS ##
-################
+## TARGET RULE ##
+#################
 
 ## collection of all statistics (and few plots)
 def input_stat(wildcards):
+    from os import listdir
+    ## get "pass" directory
+    basecall_dir = checkpoints.basecall_raw.get(tmp=config["experiments"]["tmp"],run=RUNS).output[0]
+    ## get barcode directory names within "pass" directory
+    all_barcs = listdir(basecall_dir)
+    ## retain only folders containing one of the selected barcodes (not unassigned)
+    all_barcs = [barc for barc in all_barcs if barc in SAMPLES.keys()]
+
     ## report directories per PROMISE timepoint and sample as specified in the METADATA
     promise_dirs = [config["experiments"]["tmp"] + "03_report/" + TPs + "/" + IDs + "/" + RUNs + "-" + barc + "/"
-    for TPs,IDs,barc,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), SAMPLES.keys(), METADATA['Run ID']) if "PROM" in IDs]
+    for TPs,IDs,barc,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), SAMPLES.keys(), METADATA['Run ID']) if ("PROM" in IDs) & (barc in all_barcs)]
 
     ## report directories for all other sample specified in the METADATA
     other_dirs = [config["experiments"]["tmp"] + "03_report/" + "non-PROMISE_samples" + "/" + IDs + "/" + RUNs + "-" + barc + "/"
-    for TPs,IDs,barc,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), SAMPLES.keys(), METADATA['Run ID']) if not "PROM" in IDs]
+    for TPs,IDs,barc,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), SAMPLES.keys(), METADATA['Run ID']) if (not "PROM" in IDs) & (barc in all_barcs)]
 
     ## create file names with report dirs
     input_list = (
@@ -93,7 +101,9 @@ def input_stat(wildcards):
         "{tmp}03_report/Reference_Sequences/{reference}/reference_lengthdist.pdf",
         "{tmp}03_report/Reference_Sequences/{reference}/reference_taxaranks.tsv"] +
         ## REPORTS ##
-        ["{tmp}METADATA/{run}-{reference}-{reftype}.csv"]) ## from all_report rule
+        ["{tmp}METADATA/{run}-{reference}-{reftype}-reports.csv"] + ## from all_report rule
+        ## PLOTS ##
+        ["{tmp}METADATA/{run}-{reference}-{reftype}-plots.csv"]) ## from all_plot rule
     input_list = expand(input_list,
     tmp = config["experiments"]["tmp"],
     run = RUNS,
@@ -106,111 +116,3 @@ def input_stat(wildcards):
 rule all:
     input:
         input_stat
-
-
-
-
-
-# def basecalls_per_barcode(wildcards):
-#     ## get "pass" directory and trigger checkpoint (this way we can specify output inside the checkpoints output directory "pass" without direct rule association)
-#     pass_dir = checkpoints.basecalling_raw.get(run=wildcards.run,tmp=wildcards.tmp).output[0]
-#     ## get barcode for sample
-#     sample_barcode = wildcards.barc
-#     ## create file name for barcode
-#     barc_input = pass_dir + "/" + sample_barcode
-#     return barc_input
-#
-# rule all:
-#     input:
-#         expand(list(filter(None,[
-#
-#         ## BASECALL ##
-#
-#         ## general QC: all reads, including calibtation strads, intentional downsampling
-#         "{tmp}02_analysis_results/01_basecalling/{run}/nanoplot/NanoStats.txt",
-#         ## general QC: all reads, forced downsampling
-#         "{tmp}02_analysis_results/01_basecalling/{run}/pycoqc/pycoQC_report.json",
-#         ## per base QC: all reads, forced downsampling
-#         "{tmp}02_analysis_results/01_basecalling/{run}/nanoqc/nanoQC.html",
-#         ## read QC: all passed reads
-#         "{tmp}02_analysis_results/01_basecalling/{run}/fastqc/stdin_fastqc.html",
-#
-#         ## barcode QC: per barcode
-#         ("" if not BAC_KIT else ## "" if bac_kit is ""
-#         "{tmp}02_analysis_results/01_basecalling/{run}/nanocomp/NanoStats.txt"),
-#
-#         ## TRIM AND FILTER ##
-#
-#         ## general QC: trimed and filtered barcoded reads, intentional downsampling
-#         "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoplot/NanoStats.txt",
-#         ## per base QC: trimed and filtered barcoded reads, forced downsampling
-#         "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoqc/nanoQC.html",
-#         ## read QC: trimed and filtered barcoded reads
-#         "{tmp}02_analysis_results/02_trimming_filtering/{run}/fastqc/stdin_fastqc.html",
-#
-#         ## barcode QC: trimed and filtered barcoded reads
-#         ("" if not BAC_KIT else ## "" if bac_kit is ""
-#         "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanocomp/NanoStats.txt"),
-#
-#         ## ALIGNMENT ##
-#
-#         ## general QC: per barcode, intentional downsampling
-#         ("" if not "align" in config["methodologie"] else ## "" if "align" is not selected
-#         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc.html"),
-#         ## taxonomic composition
-#         ("" if not "align" in config["methodologie"] else ## "" if "align" is not selected
-#         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/aligned.counttaxlist"),
-#         ("" if not "align" in config["methodologie"] else ## "" if "align" is not selected
-#         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/krona.html"),
-#
-#         # K-MER MAPPING ##
-#
-#         ## taxonomic composition
-#         ("" if not "kmer" in config["methodologie"] else ## "" if "kmer" is not selected
-#         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"),
-#         ("" if not "kmer" in config["methodologie"] else ## "" if "kmer" is not selected
-#         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona.html"),
-#         ("" if not "kmer" in config["methodologie"] else ## "" if "kmer" is not selected
-#         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona_bracken.html"),
-#
-#         ## OTU ##
-#
-#         ## clustered reads
-#         ("" if not "otu" in config["methodologie"] else ## "" if "otu" is not selected
-#         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2otupick/index.html"),
-#         ## filtered reads
-#         ("" if not "otu" in config["methodologie"] else ## "" if "otu" is not selected
-#         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2filter/index.html"),
-#         ## classified taxa
-#         ("" if not "otu" in config["methodologie"] else ## "" if "otu" is not selected
-#         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"),
-#         ("" if not "otu" in config["methodologie"] else ## "" if "otu" is not selected
-#         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/krona.html"),
-#
-#         ## CALIBRATION STRAIN ##
-#
-#         ## calibration QC: only calinration strands
-#         ("" if not LAM_DCS else ## "" if lam_DCS is False
-#         "{tmp}02_analysis_results/01_basecalling/{run}_calibration_strands/nanoplot/NanoStats.txt"),
-#
-#         ## calibration QC: only calinration strands
-#         ("" if not LAM_DCS else ## "" if lam_DCS is False
-#         "{tmp}02_analysis_results/03_alignment/{run}_calibration_strands/lambda_nanoplot/NanoStats.txt"),
-#         ("" if not LAM_DCS else ## "" if lam_DCS is False
-#         "{tmp}02_analysis_results/03_alignment/{run}_calibration_strands/lambda_pycoqc/pycoQC_report.json"),
-#
-#         ## REPORT ##
-#         "{tmp}00_raw_data/{run}_ANALYSIS_PROGRESS_MANAGEMENT.csv"
-#
-#         ])), tmp = config["experiments"]["tmp"], run = RUNS, barc = SAMPLES.keys(), reference = config['reference']['source'], reftype = config['reference']['rank'])
-#
-# ## REPORT ##
-# ############
-#
-# rule report:
-#     input:
-#         "{tmp}00_raw_data/{run}/MeBaPiNa_moving_raw.report"
-#     output:
-#         temp("{tmp}00_raw_data/{run}_ANALYSIS_PROGRESS_MANAGEMENT.csv")
-#     shell:
-#         "{output}"

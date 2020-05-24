@@ -2,6 +2,101 @@
 ## PLOTTING ##
 ##############
 
+## TARGET RULE ##
+#################
+
+## collection of all plots
+def input_plot(wildcards):
+    from os import listdir
+    ## get "pass" directory
+    basecall_dir = checkpoints.basecall_raw.get(tmp=wildcards.tmp,run=wildcards.run).output[0]
+    ## get barcode directory names within "pass" directory
+    all_barcs = listdir(basecall_dir)
+    ## retain only folders containing one of the selected barcodes (not unassigned)
+    all_barcs = [barc for barc in all_barcs if barc in SAMPLES.keys()]
+
+    ## report directories per PROMISE timepoint and sample as specified in the METADATA
+    promise_dirs = [config["experiments"]["tmp"] + "03_report/" + TPs + "/" + IDs + "/" + RUNs + "-" + barc + "/"
+    for TPs,IDs,barc,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), SAMPLES.keys(), METADATA['Run ID']) if ("PROM" in IDs) & (barc in all_barcs)]
+
+    ## report directories for all other sample specified in the METADATA
+    other_dirs = [config["experiments"]["tmp"] + "03_report/" + "non-PROMISE_samples" + "/" + IDs + "/" + RUNs + "-" + barc + "/"
+    for TPs,IDs,barc,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), SAMPLES.keys(), METADATA['Run ID']) if (not "PROM" in IDs) & (barc in all_barcs)]
+
+    ## create file names with barcodes
+    input_list = [stat_dir + config["reference"]["source"] + "-" + config["reference"]["rank"] + "-reports.csv" for stat_dir in promise_dirs + other_dirs]
+
+    ## return
+    return input_list
+
+## rule for reports
+rule all_plot:
+    input:
+        input_report
+    output:
+        temp("{tmp}METADATA/{run}-{reference}-{reftype}-plots.csv")
+    shell:
+        "report_file=$(echo \"{output}\" | sed 's#{wildcards.run}-{wildcards.reference}-{wildcards.reftype}-plots#ANALYSIS_PROGRESS_MANAGEMENT#'); "
+        "if [[ ! -f ${{report_file}} ]]; then "
+        "echo \"Sample name;File/directory;Completion date;Checksum;Performed by;Description\" > ${{report_file}}; fi; "
+        "indiv_reports=( $(echo \"{input}\") ); "
+        "for rprt in ${{indiv_reports[@]}}; do cat ${{rprt}} >> ${{report_file}}; done; "
+        "awk 'NR == 1; NR > 1 {{print $0 | \"sort -n | uniq\"}}' ${{report_file}} > {output}" ## store unique lines in temporary output
+
+rule all_plot_barc:
+    input:
+        ## BASECALL ##
+        ["{tmp}02_analysis_results/01_basecalling/{run}/nanoplot/NanoStats.txt", ## general QC: all reads, including calibtation strads, intentional downsampling
+        "{tmp}02_analysis_results/01_basecalling/{run}/pycoqc/pycoQC_report.json", ## general QC: all reads, forced downsampling
+        "{tmp}02_analysis_results/01_basecalling/{run}/nanoqc/nanoQC.html", ## per base QC: all reads, forced downsampling
+        "{tmp}02_analysis_results/01_basecalling/{run}/fastqc/stdin_fastqc.html"] + ## read QC: all passed reads
+        [x for x in
+        ["{tmp}02_analysis_results/01_basecalling/{run}/nanocomp/NanoStats.txt"] ## barcode QC: per barcode
+        if BAC_KIT] + ## if BAC_KIT is not ""
+        ## TRIM AND FILTER ##
+        ["{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoplot/NanoStats.txt", ## general QC: trimed and filtered barcoded reads, intentional downsampling
+        "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoqc/nanoQC.html", ## per base QC: trimed and filtered barcoded reads, forced downsampling
+        "{tmp}02_analysis_results/02_trimming_filtering/{run}/fastqc/stdin_fastqc.html"] + ## read QC: trimed and filtered barcoded reads
+        [x for x in
+        ["{tmp}02_analysis_results/02_trimming_filtering/{run}/nanocomp/NanoStats.txt"] ## barcode QC: trimed and filtered barcoded reads
+        if BAC_KIT] + ## if BAC_KIT is not ""
+        ## OTU ##
+        [x for x in
+        ["{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2otupick/index.html", ## clustered reads
+        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2filter/index.html", ## filtered reads
+        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/krona.html", ## classified taxa
+        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"] ## taxonomic classifications
+        if "otu" in config["methodologie"]] + ## if "otu" is selected
+        ## ALIGNMENT ##
+        [x for x in
+        ["{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc.html", ## general QC: per barcode, intentional downsampling
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/krona.html", ## taxonomic composition
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/aligned.counttaxlist"] ## taxonomic classification
+        if "align" in config["methodologie"]] + ## if "align" is selected
+        ## K-MER MAPPING ##
+        [x for x in
+        ["{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona.html", ## taxonomic composition
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona_bracken.html", ## taxonomic composition after reestimation
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"] ## taxonomic classification
+        if "kmer" in config["methodologie"]] ## if "kmer" is selected
+    output:
+        temp("{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/{reference}-{reftype}-reports.csv")
+    shell:
+        "indiv_files=( $(echo \"{input}\") ); " ## convert input list to array
+        "for fl in ${{indiv_files[@]}}; do " ## loop over files
+        "cp \"${{fl}}\" " ## copy file to ...
+        "$( echo \"${{fl}}\" | sed 's#/#\\t#g' | " ## ...make file path tab separated
+        "awk 'BEGIN{{ run_col=0;barc_col=0;prnt=\"\" }}; " ## set variables
+        "{{ for(i=1;i<=NF;i++){{ if($i==\"{wildcards.run}\"){{run_col = i}}; " ## loop over path chunks to search for run id...
+        "if($i==\"{wildcards.barc}\"){{barc_col = i}} }} }}; " ## ...and barcode id and save their index
+        "{{ if(barc_col!=0){{ for(i=(barc_col+1);i<=NF;i++){{prnt=prnt\"-\"$i}} }}; " ## if there is no barcode id, combine some columns...
+        "if(barc_col==0){{ for(i=(run_col+1);i<=NF;i++){{prnt=prnt\"-\"$i}} }}; " ## ...if there is one, combine other columns
+        "print \"{wildcards.tmp}03_report/{wildcards.timepoint}/{wildcards.sample}/{wildcards.run}-{wildcards.barc}/\"$(run_col-1)prnt; " ## generate new path
+        "run_col=0;barc_col=0;prnt=\"\" }}' ); done; " ## reset variables and report new file path to copy command
+        ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
+        "echo {wildcards.barc};NA;$(date +\"%Y-%m-%d %T\");NA;MeBaPiNa;Plots: plots copied to report directory.\" "
+        ">> {output}"
+
 ## BASECALLING ##
 #################
 
