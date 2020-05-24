@@ -138,7 +138,7 @@ def input_stat(wildcards):
     for TPs,IDs,barc,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), SAMPLES.keys(), METADATA['Run ID']) if not "PROM" in IDs]
 
     ## create file names with report dirs
-    input_list =
+    input_list = [] +
         ## RAW READS ##
         [stat_dir + "read_base_counts.tsv" for stat_dir in promise_dirs + other_dirs] +
         ## REFERENCE DATA ##
