@@ -81,6 +81,8 @@ rule trim_basecalled:
         "--detect-middle", ## Search for adapters in the whole read #!# slower
         # "--min-read-length " + config["filtering"]["len_min"], ## Reads short than <min-read-length> after trimming will be discarded. #!# Should be done in next step
         "--trim", ## Remove adapter and barcode sequences from reads.
+        "--epi2me", ## Use EPI2ME's demultiplexing algorithm (default: true)
+        # "--guppy", ## Use Guppy's demultiplexing algorithm (default: false) #!# Multi threading only works with in guppy mode
         ("--kit RAB204" if BAC_KIT == "SQK-RAB204" else "--kit Auto") #!# otherwise there are no barcoding folders
     shell:
         "input_folder={wildcards.tmp}01_processed_data/01_basecalling/{wildcards.run}/pass/{barc}; " ## input dependency is handled by the all rule
