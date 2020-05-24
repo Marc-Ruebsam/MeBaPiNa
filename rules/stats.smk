@@ -92,7 +92,7 @@ rule stat_otu:
     input:
         otutable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_ftable.qza" ## also dummy for MeBaPiNa_q2otupick.log
     output:
-        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/otu_cluster_counts.tsv"
+        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/otu_cluster_counts_{reference}.tsv"
     conda:
         "../envs/qiime2.yml"
     shell:

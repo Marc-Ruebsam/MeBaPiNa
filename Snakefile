@@ -97,7 +97,7 @@ def input_stat(wildcards):
         ## READS AND BASE COUNTS ##
         [stat_dir + "read_base_counts.tsv" for stat_dir in promise_dirs + other_dirs] +
         ## OTU ##
-        [stat_dir + "otu_cluster_counts.tsv" for stat_dir in promise_dirs + other_dirs] +
+        [stat_dir + "otu_cluster_counts_{reference}.tsv" for stat_dir in promise_dirs + other_dirs] +
         ## REFERENCE DATA ##
         ["{tmp}03_report/Reference_Sequences/{reference}/reference_lengthdist.tsv",
         "{tmp}03_report/Reference_Sequences/{reference}/reference_lengthdist.pdf",
