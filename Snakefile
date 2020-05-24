@@ -97,11 +97,11 @@ def input_stat(wildcards):
     print(input_list)
     input_list = expand(input_list,
     tmp = config["experiments"]["tmp"],
+    run = RUNS,
     reference = config['reference']['source'],
     reftype = config['reference']['rank'] )
     ## return
     return input_list
-
 
 ## rule for stats
 rule all_stat:
