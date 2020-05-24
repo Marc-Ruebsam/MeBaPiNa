@@ -100,8 +100,8 @@ rule stat_otu:
         "sleep 1; " ## make sure the log file was created
         "if [[ ! -f \"${{otu_dir}}cluster_ftable/feature-table.biom\" ]]; then "
         "qiime tools export --input-path \"${{otu_dir}}cluster_ftable.qza\" --output-path \"${{otu_dir}}cluster_ftable\"; fi; "
-        "awk '$2==\"observations:\"{{print $3\"\\ttotal_cluster_count\"}}; "
-        "$2==\"count:\"{{print $3\"\\ttotal_read_count\"}}' "
+        "awk '$2==\"observations:\"{{gsub(\",\",\"\",$3); print $3\"\\ttotal_cluster_count\"}}; "
+        "$2==\"count:\"{{gsub(\",\",\"\",$3); print $3\"\\ttotal_read_count\"}}' "
         "<(biom summarize-table -i \"${{otu_dir}}cluster_ftable/feature-table.biom\") > {output.report}; "
         "awk '$1==\"Clusters:\"{{print $2\"\\tdenovo_cluster_count\"}}' \"${{otu_dir}}MeBaPiNa_q2otupick.log\" >> {output.report}"
 
