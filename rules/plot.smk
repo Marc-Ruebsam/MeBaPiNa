@@ -80,7 +80,7 @@ rule all_plot_barc:
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"] ## taxonomic classification
         if "kmer" in config["methodologie"]] ## if "kmer" is selected
     output:
-        temp("{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/{reference}-{reftype}-reports.csv")
+        temp("{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/{reference}-{reftype}-reports.report")
     shell:
         "indiv_files=( $(echo \"{input}\") ); " ## convert input list to array
         "for fl in ${{indiv_files[@]}}; do " ## loop over files
