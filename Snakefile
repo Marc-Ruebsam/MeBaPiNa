@@ -99,8 +99,7 @@ def input_stat(wildcards):
     run = RUNS,
     reference = config['reference']['source'],
     reftype = config['reference']['rank'] )
-    print(input_list)
-    print("\n")    ## return
+    ## return
     return input_list
 
 ## rule for stats
