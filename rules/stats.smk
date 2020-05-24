@@ -108,7 +108,7 @@ rule stat_otu:
         "<(biom summarize-table -i \"${{otu_dir}}cluster_ftable/feature-table.biom\") > {output.report}; "
         ## get number of de-novo: clusters and reads and mean reads per cluster (abundance)
         "awk 'BEGIN{{prnt_once=0}}"
-        "$1==\"Clusters:\"{{clst_cnt=$2}};
+        "$1==\"Clusters:\"{{clst_cnt=$2}}; "
         "$2==\"nt\"&&$3==\"in\"&&prnt_once==0{{read_cnt=$4;prnt_once++}}; "
         "END{{print clst_cnt\"\\tdenovo_cluster_count\\n\"read_cnt\"\\tdenovo_read_count\\n\"(read_cnt/clst_cnt)\"\\tdenovo_mean_abund\"}}' "
         "\"${{otu_dir}}MeBaPiNa_q2otupick.log\" >> {output.report}; "
