@@ -78,7 +78,7 @@ include: "rules/report.smk"
 def input_stat(wildcards):
     from os import listdir
     ## get "pass" directory
-    basecall_dir = checkpoints.basecall_raw.get(tmp=config["experiments"]["tmp"],run=RUNS).output[0]
+    basecall_dir = checkpoints.basecall_raw.get(tmp=config["experiments"]["tmp"],run=RUNS[0]).output[0]
     ## get barcode directory names within "pass" directory
     all_barcs = listdir(basecall_dir)
     ## retain only folders containing one of the selected barcodes (not unassigned)
