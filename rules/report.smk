@@ -15,12 +15,12 @@ def input_report(wildcards):
     ## retain only folders containing one of the selected barcodes (not unassigned)
     all_barcs = [barc for barc in all_barcs if barc in SAMPLES.keys()]
     ## create file names with barcodes
-    input_list = ([
+    input_list = (
         ## BASECALL ##
-        ["{tmp}00_raw_data/{run}/MeBaPiNa_move_raw.report",
-        "{tmp}00_raw_data/{run}/MeBaPiNa_basecall_raw.report"] +
+        [["{tmp}00_raw_data/{run}/MeBaPiNa_move_raw.report",
+        "{tmp}00_raw_data/{run}/MeBaPiNa_basecall_raw.report"]] +
         ## TRIM AND FILTER ##
-        ["{tmp}01_processed_data/02_trimming_filtering/{run}/" + barc + "/MeBaPiNa_trim_basecalled.report",
+        [["{tmp}01_processed_data/02_trimming_filtering/{run}/" + barc + "/MeBaPiNa_trim_basecalled.report",
         "{tmp}01_processed_data/02_trimming_filtering/{run}/" + barc + "/MeBaPiNa_filter_trimmed.report"] +
         ## OTU ##
         [x for x in
