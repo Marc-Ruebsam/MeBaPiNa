@@ -98,7 +98,8 @@ rule stat_otu:
     shell:
         "otu_dir={input.otutable}; otu_dir=\"${{otu_dir/cluster_ftable.qza/}}\"; "
         "sleep 1; " ## make sure the log file was created
-        "qiime tools export -i \"${{otu_dir}}cluster_ftable.qza\" -o \"${{otu_dir}}cluster_ftable\"; "
+        "if [[ ! -f \"${{otu_dir}}cluster_ftable/feature-table.biom\" ]]; then "
+        "qiime tools export --input-path \"${{otu_dir}}cluster_ftable.qza\" --output-path \"${{otu_dir}}cluster_ftable\"; fi; "
         "awk '$2==\"observations:\"{{print $3\"\\ttotal_cluster_count\"}}; "
         "$2==\"count:\"{{print $3\"\\ttotal_read_count\"}}' "
         "<(biom summarize-table -i \"${{otu_dir}}cluster_ftable/feature-table.biom\") > {output.report}; "
