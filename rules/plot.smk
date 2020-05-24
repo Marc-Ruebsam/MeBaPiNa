@@ -37,8 +37,7 @@ rule all_plot:
         temp("{tmp}METADATA/{run}-{reference}-{reftype}-plots.report")
     shell:
         "indiv_reports=( $(echo \"{input}\") ); "
-        "for rprt in ${{indiv_reports[@]}}; do cat ${{rprt}} >> ${{report_file}}; done; "
-        "awk 'NR == 1; NR > 1 {{print $0 | \"sort -n | uniq\"}}' ${{report_file}} > {output}" ## store unique lines in temporary output
+        "for rprt in ${{indiv_reports[@]}}; do cat ${{rprt}} >> {output}; done"
 
 rule all_plot_barc:
     input:
