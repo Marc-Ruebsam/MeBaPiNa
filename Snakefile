@@ -74,34 +74,6 @@ include: "rules/report.smk"
 ## END POINTS ##
 ################
 
-## collection of all statistics (and few plots)
-def input_stat(wildcards):
-    ## report directories per PROMISE timepoint and sample as specified in the METADATA
-    promise_dirs = [config["experiments"]["tmp"] + "03_report/" + TPs + "/" + IDs + "/" + RUNs + "-" + barc + "/"
-    for TPs,IDs,barc,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), SAMPLES.keys(), METADATA['Run ID']) if "PROM" in IDs]
-
-    ## report directories for all other sample specified in the METADATA
-    other_dirs = [config["experiments"]["tmp"] + "03_report/" + "non-PROMISE_samples" + "/" + IDs + "/" + RUNs + "-" + barc + "/"
-    for TPs,IDs,barc,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), SAMPLES.keys(), METADATA['Run ID']) if not "PROM" in IDs]
-
-    ## create file names with report dirs
-    input_list = expand(list(filter(None,
-
-        ## RAW READS ##
-        [stat_dir + "read_base_counts.tsv" for stat_dir in promise_dirs + other_dirs] +
-
-        ## report files for reference data
-        ["{tmp}03_report/Reference_Sequences/{reference}/reference_lengthdist.tsv",
-        "{tmp}03_report/Reference_Sequences/{reference}/reference_lengthdist.pdf",
-        "{tmp}03_report/Reference_Sequences/{reference}/reference_taxaranks.tsv"]
-
-    )),
-    tmp = config["experiments"]["tmp"],
-    reference = config['reference']['source'],
-    reftype = config['reference']['rank'] )
-    ## return
-    return input_list
-
 ## collection of all reports
 def input_report(wildcards):
     from os import listdir
@@ -152,23 +124,58 @@ def input_report(wildcards):
     ## return
     return input_list
 
+## rule for reports
+rule all_report:
+    input:
+        input_report
+    output:
+        temp("{tmp}METADATA/{run}.csv")
+    shell:
+        "report_file=$(echo \"{output}\" | sed 's#{wildcards.run}#ANALYSIS_PROGRESS_MANAGEMENT#'); "
+        "if [[ ! -f ${{report_file}} ]]; then "
+        "echo \"Sample name;File/directory;Completion date;Checksum;Performed by;Description\" > ${{report_file}}; fi; "
+        "indiv_reports=( $(echo \"{input}\") ); "
+        "for rprt in ${{indiv_reports[@]}}; do cat ${{rprt}} >> ${{report_file}}; done; "
+        "awk 'NR == 1; NR > 1 {{print $0 | \"sort -n | uniq\"}}' ${{report_file}} > {output}; " ## store unique lines in temporary output
+        "cp {output} > ${{report_file}}" ## cp unique lines into output
+
+## collection of all statistics (and few plots)
+def input_stat(wildcards):
+    ## report directories per PROMISE timepoint and sample as specified in the METADATA
+    promise_dirs = [config["experiments"]["tmp"] + "03_report/" + TPs + "/" + IDs + "/" + RUNs + "-" + barc + "/"
+    for TPs,IDs,barc,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), SAMPLES.keys(), METADATA['Run ID']) if "PROM" in IDs]
+
+    ## report directories for all other sample specified in the METADATA
+    other_dirs = [config["experiments"]["tmp"] + "03_report/" + "non-PROMISE_samples" + "/" + IDs + "/" + RUNs + "-" + barc + "/"
+    for TPs,IDs,barc,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), SAMPLES.keys(), METADATA['Run ID']) if not "PROM" in IDs]
+
+    ## create file names with report dirs
+    input_list = expand(list(filter(None,
+
+        ## RAW READS ##
+        [stat_dir + "read_base_counts.tsv" for stat_dir in promise_dirs + other_dirs] +
+
+        ## report files for reference data
+        ["{tmp}03_report/Reference_Sequences/{reference}/reference_lengthdist.tsv",
+        "{tmp}03_report/Reference_Sequences/{reference}/reference_lengthdist.pdf",
+        "{tmp}03_report/Reference_Sequences/{reference}/reference_taxaranks.tsv"] +
+
+        ## run report file from all_report rule
+        ["{tmp}METADATA/{run}.csv"]
+
+    )),
+    tmp = config["experiments"]["tmp"],
+    reference = config['reference']['source'],
+    reftype = config['reference']['rank'] )
+    ## return
+    return input_list
+
+
 ## rule for stats
 rule all_stat:
     input:
         input_stat
 
-## rule for reports
-rule all_report: #!# cannot specify ANALYSIS_PROGRESS_MANAGEMENT.csv as output or it will be overwritten each time. snakemake cannot append.
-    input:
-        input_report
-    params:
-        config["experiments"]["tmp"] + "METADATA/ANALYSIS_PROGRESS_MANAGEMENT.csv"
-    shell:
-        "report_file={params}; "
-        "if [[ ! -f ${{report_file}} ]]; then "
-        "echo \"Sample name;File/directory;Completion date;Checksum;Performed by;Description\" > ${{report_file}}; fi; "
-        "indiv_reports=( $(echo \"{input}\") ); "
-        "for rprt in ${{indiv_reports[@]}}; do cat ${{rprt}} >> ${{report_file}}; done"
 
 
 
