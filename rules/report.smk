@@ -2,6 +2,59 @@
 ## REPORTS ##
 #############
 
+## collection of all reports
+def input_report(wildcards):
+    from os import listdir
+    ## get "pass" directory
+    basecall_dir = checkpoints.basecall_raw.get(tmp=config["experiments"]["tmp"],run=RUNS).output[1]
+    ## get barcode directory names within "pass" directory
+    all_barcs = listdir(basecall_dir)
+    ## retain only folders containing one of the selected barcodes
+    all_barcs = [barc for barc in all_barcs if barc in SAMPLES.keys()]
+    ## create file names with barcodes
+    input_list = [
+        ## BASECALL ##
+        ["{tmp}00_raw_data/{run}/MeBaPiNa_move_raw.report",
+        "{tmp}00_raw_data/{run}/MeBaPiNa_basecall_raw.report"] +
+        ## TRIM AND FILTER ##
+        ["{tmp}01_processed_data/02_trimming_filtering/{run}/" + barc + "/MeBaPiNa_trim_basecalled.report",
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/" + barc + "/MeBaPiNa_filter_trimmed.report"] +
+        ## OTU ##
+        [x for x in
+        ["{tmp}01_processed_data/03_otu_picking/{run}/" + barc + "/{reference}/MeBaPiNa_q2filter_uchime.report",
+        "{tmp}02_analysis_results/03_otu_picking/{run}/" + barc + "/{reference}_{reftype}/MeBaPiNa_counttax_q2kmermap.report"]
+        if "otu" in config["methodologie"]] +
+        ## ALIGN ##
+        [x for x in
+        ["{tmp}01_processed_data/03_alignment/{run}/" + barc + "/{reference}/MeBaPiNa_filter_aligned.report",
+        "{tmp}02_analysis_results/03_alignment/{run}/" + barc + "/{reference}_{reftype}/MeBaPiNa_counttax_aligned.report"]
+        if "align" in config["methodologie"]] +
+        ## K-MER ##
+        [x for x in
+        ["{tmp}01_processed_data/03_kmer_mapping/{run}/" + barc + "/{reference}_{reftype}/MeBaPiNa_kmermap_filtered.report",
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/" + barc + "/{reference}_{reftype}/MeBaPiNa_retax_kmermap.report",
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/" + barc + "/{reference}_{reftype}/MeBaPiNa_counttax_kmermap.report"]
+        if "kmer" in config["methodologie"]]
+        for barc in all_barcs]
+    print(input_list)
+    ## return
+    return input_list
+
+## rule for reports
+rule all_report:
+    input:
+        input_report
+    output:
+        temp("{tmp}METADATA/{run}-{reference}-{reftype}.csv")
+    shell:
+        "report_file=$(echo \"{output}\" | sed 's#{wildcards.run}-{wildcards.reference}-{wildcards.reftype}#ANALYSIS_PROGRESS_MANAGEMENT#'); "
+        "if [[ ! -f ${{report_file}} ]]; then "
+        "echo \"Sample name;File/directory;Completion date;Checksum;Performed by;Description\" > ${{report_file}}; fi; "
+        "indiv_reports=( $(echo \"{input}\") ); "
+        "for rprt in ${{indiv_reports[@]}}; do cat ${{rprt}} >> ${{report_file}}; done; "
+        "awk 'NR == 1; NR > 1 {{print $0 | \"sort -n | uniq\"}}' ${{report_file}} > {output}; " ## store unique lines in temporary output
+        "cp {output} > ${{report_file}}" ## cp unique lines into output
+
 ## BASECALLING ##
 #################
 
