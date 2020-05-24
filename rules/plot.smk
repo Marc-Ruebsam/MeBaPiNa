@@ -94,7 +94,7 @@ rule all_plot_barc:
         "print \"{wildcards.tmp}03_report/{wildcards.timepoint}/{wildcards.sample}/{wildcards.run}-{wildcards.barc}/\"$(run_col-1)prnt; " ## generate new path
         "run_col=0;barc_col=0;prnt=\"\" }}' ); done; " ## reset variables and report new file path to copy command
         ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
-        "echo {wildcards.barc};NA;$(date +\"%Y-%m-%d %T\");NA;MeBaPiNa;Plots: plots copied to report directory.\" "
+        "echo \"{wildcards.barc};NA;\"$(date \"+%Y-%m-%d %T\")\";NA;MeBaPiNa;Plots: plots copied to report directory.\" "
         ">> {output}"
 
 ## BASECALLING ##
