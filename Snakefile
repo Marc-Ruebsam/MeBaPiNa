@@ -95,7 +95,7 @@ def input_stat(wildcards):
         ## REPORTS ##
         ["{tmp}METADATA/{run}.csv"]) ## from all_report rule
     print(input_list)
-    input_list = expand(list(filter(None,input_list)),
+    input_list = expand(input_list,
     tmp = config["experiments"]["tmp"],
     reference = config['reference']['source'],
     reftype = config['reference']['rank'] )
