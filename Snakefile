@@ -98,7 +98,8 @@ def input_stat(wildcards):
         [stat_dir + "read_base_counts.tsv" for stat_dir in promise_dirs + other_dirs] +
         ## OTU ##
         [x for x in
-        [stat_dir + "otu_feature_counts_{reference}.tsv" for stat_dir in promise_dirs + other_dirs]
+        [stat_dir + "otu_feature_counts-{reference}.tsv" for stat_dir in promise_dirs + other_dirs] +
+        [stat_dir + "otu_taxa_counts-{reference}_{reftype}.tsv" for stat_dir in promise_dirs + other_dirs]
         if "otu" in config["methodologie"]] + ## if "otu" is selected
         ## REFERENCE DATA ##
         ["{tmp}03_report/Reference_Sequences/{reference}/reference_lengthdist.tsv",

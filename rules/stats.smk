@@ -88,11 +88,11 @@ rule stat_general_readbasecount:
 ## OTU ##
 #########
 
-rule stat_otu_featureextraction:
+rule stat_otu_feature:
     input:
         otutable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_ftable.qza" ## also dummy for MeBaPiNa_q2otupick.log
     output:
-        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/otu_feature_counts_{reference}.tsv"
+        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/otu_feature_counts-{reference}.tsv"
     conda:
         "../envs/qiime2.yml"
     shell:
@@ -100,8 +100,8 @@ rule stat_otu_featureextraction:
         "otu_dir={input.otutable}; otu_dir=\"${{otu_dir/cluster_ftable.qza/}}\"; "
         "sleep 1; " ## make sure the log file was created
         ## get number of total: clusters and reads and mean reads per cluster (abundance)
-        "if [[ ! -f \"${{otu_dir}}cluster_ftable/feature-table.biom\" ]]; then "
-        "qiime tools export --input-path \"${{otu_dir}}cluster_ftable.qza\" --output-path \"${{otu_dir}}cluster_ftable\"; fi; "
+        "if [[ ! -f \"${{otu_dir}}cluster_ftable/feature-table.biom\" ]]; then " ## if file doesnt exsist...
+        "qiime tools export --input-path \"${{otu_dir}}cluster_ftable.qza\" --output-path \"${{otu_dir}}cluster_ftable\"; fi; " ## ...create it
         "awk '$2==\"observations:\"{{gsub(\",\",\"\",$3); clst_cnt=$3}}; "
         "$2==\"count:\"{{gsub(\",\",\"\",$3); read_cnt=$3}}; "
         "END{{print clst_cnt\"\\ttotal_cluster_count\\n\"read_cnt\"\\ttotal_read_count\\n\"(read_cnt/clst_cnt)\"\\ttotal_mean_abund\"}}' "
@@ -120,51 +120,22 @@ rule stat_otu_featureextraction:
         "END{{print clst_cnt\"\\tfilter_cluster_count\\n\"read_cnt\"\\tfilter_read_count\\n\"(read_cnt/clst_cnt)\"\\tfilter_mean_abund\"}}' "
         "<(biom summarize-table -i \"${{otu_dir}}filt_ftable/feature-table.biom\") >> {output.report}"
 
-# ## time kmer
-# # find -name "MeBaPiNa_kmermap_q2rereplicate.benchmark.tsv" -exec tail -n 1 {} \; | sort -nr | head -n 1
-# for fl in $(find 16S_Metabarcoding/01_processed_data/03_otu_picking/ -name "filtered.kreport2" | sort)
-#     do
-#     awk '
-#     BEGIN{
-#         c=0;
-#         cnt_stax=0;
-#         cnt_htax=0 };
-#     $6=="root"{ cnt_hfeat=$2 };
-#     $3!=0{ cnt_htax++ };
-#     $3!=0&&$4=="S"{
-#         cnt_stax++;
-#         cnt_sfeat[c++]=$3 };
-#     END{
-#         sm = 0;
-#         for(key in cnt_sfeat){ sm = sm + cnt_sfeat[key] };
-#         if((c % 2) == 1){ medn = cnt_sfeat[ int(c/2) ];
-#         }else{ medn = ( cnt_sfeat[c/2] + cnt_sfeat[c/2-1] ) / 2 };
-#         print cnt_htax"\t"cnt_stax"\t"cnt_hfeat"\t"sm"\t"medn"\t" }
-#     ' <(sort -nk3 $fl)
-# done
-#
-#
-#
-# for fl in $(find -name "*.qza")
-#   do
-#   echo ${fl}
-#   qiime tools export --input-path ${fl} --output-path "${fl/.qza/}"
-# done
-# for fl in $(find -name "*.biom")
-#   do
-#   echo ${fl}
-#   biom summarize-table -i ${fl}
-#   biom convert -i ${fl} -o ${fl/.biom/.tsv} --to-tsv
-# done
+rule stat_otu_taxa:
+    input:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/filtered.kreport2"
+    output:
+        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/otu_taxa_counts-{reference}_{reftype}.tsv"
+    shell:
+        ## get initial char of reftype
+        "awk 'BEGIN{{c=0;cnt_stax=0;cnt_tax=0;cnt_sfeat=0;"
+        "lw_rnk=substr(\"{wildcards.reftype}\",1,1)}}}}; "
+        "$6==\"root\"{{ cnt_feat=$2 }}; "
+        "$3!=0{{ cnt_tax++ }}; "
+        "$3!=0&&$4==lw_rnk{{cnt_stax++;cnt_sfeat=cnt_sfeat+$3}}; "
+        "END{{printf \"%d\\ttotal_taxa_count\\n%d\\ttotal_read_count\\n%.2f\\ttotal_mean_abund\\n"
+        "%d\\t{wildcards.reftype}_taxa_count\\n%d\\t{wildcards.reftype}_read_count\\n%.2f\\t{wildcards.reftype}_mean_abund\","
+        "cnt_tax,cnt_feat,(cnt_feat/cnt_tax),cnt_stax,cnt_sfeat,(cnt_sfeat/cnt_stax)}}' {input}"
 
-# for fl in $(find -name "*.biom")
-#   do
-#   echo ${fl}
-#   biom summarize-table -i ${fl}
-#   biom convert -i ${fl} -o ${fl/.biom/.tsv} --to-tsv
-# done
-#
-#
 # ###########
 # ## K-MER ##
 # ###########
