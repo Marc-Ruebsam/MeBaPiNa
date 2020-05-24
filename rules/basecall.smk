@@ -17,11 +17,10 @@ checkpoint basecall_raw:
     input:
         "{tmp}00_raw_data/{run}/fast5"
     output:
-        list(filter(None,[
-        directory("{tmp}01_processed_data/01_basecalling/{run}/pass"),
-        "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary.txt",
-        (directory("{tmp}01_processed_data/01_basecalling/{run}/calibration_strands") if LAM_DCS else "") ## evaluation of Lambda calibration strands only when specified
-        ]))
+        ([directory("{tmp}01_processed_data/01_basecalling/{run}/pass"),
+        "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary.txt" +
+        [x for x in [directory("{tmp}01_processed_data/01_basecalling/{run}/calibration_strands")] if LAM_DCS ]) ## evaluation of Lambda calibration strands only when specified
+
     log:
         "{tmp}01_processed_data/01_basecalling/{run}/MeBaPiNa_basecall_raw.log"
     benchmark:

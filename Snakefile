@@ -103,7 +103,7 @@ def input_stat(wildcards):
     return input_list
 
 ## rule for stats
-rule all_stat:
+rule all:
     input:
         input_stat
 
