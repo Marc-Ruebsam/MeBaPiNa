@@ -128,7 +128,7 @@ rule stat_otu_taxa:
     shell:
         ## get initial char of reftype
         "awk 'BEGIN{{c=0;cnt_stax=0;cnt_tax=0;cnt_sfeat=0;"
-        "lw_rnk=substr(\"{wildcards.reftype}\",1,1)}}}}; "
+        "lw_rnk=substr(\"{wildcards.reftype}\",1,1)}}; "
         "$6==\"root\"{{ cnt_feat=$2 }}; "
         "$3!=0{{ cnt_tax++ }}; "
         "$3!=0&&$4==lw_rnk{{cnt_stax++;cnt_sfeat=cnt_sfeat+$3}}; "
