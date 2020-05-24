@@ -54,7 +54,7 @@ rule all_report:
         "indiv_reports=( $(echo \"{input}\") ); "
         "for rprt in ${{indiv_reports[@]}}; do cat ${{rprt}} >> ${{report_file}}; done; "
         "awk 'NR == 1; NR > 1 {{print $0 | \"sort -n | uniq\"}}' ${{report_file}} > {output}; " ## store unique lines in temporary output
-        "cp {output} > ${{report_file}}" ## cp unique lines into output
+        "cp {output} ${{report_file}}" ## cp unique lines into output
 
 ## BASECALLING ##
 #################
