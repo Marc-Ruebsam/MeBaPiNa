@@ -40,7 +40,7 @@ def input_report(wildcards):
         if "kmer" in config["methodologie"]]
         for barc in all_barcs] +
         ## PLOTS ##
-        ["{tmp}METADATA/{run}-{reference}-{reftype}-plots.csv"]) ## from all_plot rule
+        [["{tmp}METADATA/{run}-{reference}-{reftype}-plots.csv"]]) ## from all_plot rule
     ## flatten list of lists
     input_list = [item for sublist in input_list for item in sublist]
     ## return
