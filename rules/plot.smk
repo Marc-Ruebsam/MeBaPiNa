@@ -24,7 +24,7 @@ def input_plot(wildcards):
     for TPs,IDs,barc,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), SAMPLES.keys(), METADATA['Run ID']) if (not "PROM" in IDs) & (barc in all_barcs)]
 
     ## create file names with barcodes
-    input_list = [stat_dir + config["reference"]["source"] + "-" + config["reference"]["rank"] + "-reports.csv" for stat_dir in promise_dirs + other_dirs]
+    input_list = [stat_dir + config["reference"]["source"] + "-" + config["reference"]["rank"] + "-reports.report" for stat_dir in promise_dirs + other_dirs]
 
     ## return
     return input_list
@@ -34,7 +34,7 @@ rule all_plot:
     input:
         input_plot
     output:
-        temp("{tmp}METADATA/{run}-{reference}-{reftype}-plots.csv")
+        temp("{tmp}METADATA/{run}-{reference}-{reftype}-plots.report")
     shell:
         "report_file=$(echo \"{output}\" | sed 's#{wildcards.run}-{wildcards.reference}-{wildcards.reftype}-plots#ANALYSIS_PROGRESS_MANAGEMENT#'); "
         "if [[ ! -f ${{report_file}} ]]; then "
