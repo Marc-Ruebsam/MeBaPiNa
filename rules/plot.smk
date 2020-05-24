@@ -36,9 +36,6 @@ rule all_plot:
     output:
         temp("{tmp}METADATA/{run}-{reference}-{reftype}-plots.report")
     shell:
-        "report_file=$(echo \"{output}\" | sed 's#{wildcards.run}-{wildcards.reference}-{wildcards.reftype}-plots#ANALYSIS_PROGRESS_MANAGEMENT#'); "
-        "if [[ ! -f ${{report_file}} ]]; then "
-        "echo \"Sample name;File/directory;Completion date;Checksum;Performed by;Description\" > ${{report_file}}; fi; "
         "indiv_reports=( $(echo \"{input}\") ); "
         "for rprt in ${{indiv_reports[@]}}; do cat ${{rprt}} >> ${{report_file}}; done; "
         "awk 'NR == 1; NR > 1 {{print $0 | \"sort -n | uniq\"}}' ${{report_file}} > {output}" ## store unique lines in temporary output
