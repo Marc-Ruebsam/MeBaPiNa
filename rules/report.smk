@@ -15,7 +15,7 @@ def input_report(wildcards):
     ## retain only folders containing one of the selected barcodes (not unassigned)
     all_barcs = [barc for barc in all_barcs if barc in SAMPLES.keys()]
     ## create file names with barcodes
-    input_list = [
+    input_list = ([
         ## BASECALL ##
         ["{tmp}00_raw_data/{run}/MeBaPiNa_move_raw.report",
         "{tmp}00_raw_data/{run}/MeBaPiNa_basecall_raw.report"] +
@@ -40,7 +40,7 @@ def input_report(wildcards):
         if "kmer" in config["methodologie"]]
         for barc in all_barcs] +
         ## PLOTS ##
-        ["{tmp}METADATA/{run}-{reference}-{reftype}-plots.csv"] ## from all_plot rule
+        ["{tmp}METADATA/{run}-{reference}-{reftype}-plots.csv"]) ## from all_plot rule
     ## flatten list of lists
     input_list = [item for sublist in input_list for item in sublist]
     ## return
