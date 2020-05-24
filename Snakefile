@@ -84,43 +84,31 @@ def input_report(wildcards):
     ## retain only folders containing one of the selected barcodes
     all_barcs = [barc for barc in all_barcs if barc in SAMPLES.keys()]
     ## create file names with barcodes
-    input_list = expand(list(filter(None,
-
+    input_list = [
         ## BASECALL ##
-
         ["{tmp}00_raw_data/{run}/MeBaPiNa_move_raw.report",
         "{tmp}00_raw_data/{run}/MeBaPiNa_basecall_raw.report"] +
-
         ## TRIM AND FILTER ##
-
-        ["{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trim_basecalled.report",
-        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filter_trimmed.report"] +
-
+        ["{tmp}01_processed_data/02_trimming_filtering/{run}/" + barc + "/MeBaPiNa_trim_basecalled.report",
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/" + barc + "/MeBaPiNa_filter_trimmed.report"] +
         ## OTU ##
-
-        ([""] if not "otu" in config["methodologie"] else ## "" if "otu" is not selected
-        ["{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2filter_uchime.report",
-        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_q2kmermap.report"]) +
-
+        [x for x in
+        ["{tmp}01_processed_data/03_otu_picking/{run}/" + barc + "/{reference}/MeBaPiNa_q2filter_uchime.report",
+        "{tmp}02_analysis_results/03_otu_picking/{run}/" + barc + "/{reference}_{reftype}/MeBaPiNa_counttax_q2kmermap.report"]
+        if "otu" in config["methodologie"]] +
         ## ALIGN ##
-
-        ([""] if not "align" in config["methodologie"] else ## "" if "align" is not selected
-        ["{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_filter_aligned.report",
-        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_aligned.report"]) +
-
+        [x for x in
+        ["{tmp}01_processed_data/03_alignment/{run}/" + barc + "/{reference}/MeBaPiNa_filter_aligned.report",
+        "{tmp}02_analysis_results/03_alignment/{run}/" + barc + "/{reference}_{reftype}/MeBaPiNa_counttax_aligned.report"]
+        if "align" in config["methodologie"]] +
         ## K-MER ##
-
-        ([""] if not "kmer" in config["methodologie"] else ## "" if "kmer" is not selected
-        ["{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_filtered.report",
-        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_retax_kmermap.report",
-        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_kmermap.report"])
-
-    )),
-    tmp = config["experiments"]["tmp"],
-    run = RUNS,
-    barc = all_barcs,
-    reference = config['reference']['source'],
-    reftype = config['reference']['rank'] )
+        [x for x in
+        ["{tmp}01_processed_data/03_kmer_mapping/{run}/" + barc + "/{reference}_{reftype}/MeBaPiNa_kmermap_filtered.report",
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/" + barc + "/{reference}_{reftype}/MeBaPiNa_retax_kmermap.report",
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/" + barc + "/{reference}_{reftype}/MeBaPiNa_counttax_kmermap.report"]
+        if "kmer" in config["methodologie"]]
+        for barc in all_barcs]
+    print input_list
     ## return
     return input_list
 
@@ -129,9 +117,9 @@ rule all_report:
     input:
         input_report
     output:
-        temp("{tmp}METADATA/{run}.csv")
+        temp("{tmp}METADATA/{run}-{reference}-{reftype}.csv")
     shell:
-        "report_file=$(echo \"{output}\" | sed 's#{wildcards.run}#ANALYSIS_PROGRESS_MANAGEMENT#'); "
+        "report_file=$(echo \"{output}\" | sed 's#{wildcards.run}-{wildcards.reference}-{wildcards.reftype}#ANALYSIS_PROGRESS_MANAGEMENT#'); "
         "if [[ ! -f ${{report_file}} ]]; then "
         "echo \"Sample name;File/directory;Completion date;Checksum;Performed by;Description\" > ${{report_file}}; fi; "
         "indiv_reports=( $(echo \"{input}\") ); "
@@ -150,20 +138,17 @@ def input_stat(wildcards):
     for TPs,IDs,barc,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), SAMPLES.keys(), METADATA['Run ID']) if not "PROM" in IDs]
 
     ## create file names with report dirs
-    input_list = expand(list(filter(None,
-
+    input_list =
         ## RAW READS ##
         [stat_dir + "read_base_counts.tsv" for stat_dir in promise_dirs + other_dirs] +
-
-        ## report files for reference data
+        ## REFERENCE DATA ##
         ["{tmp}03_report/Reference_Sequences/{reference}/reference_lengthdist.tsv",
         "{tmp}03_report/Reference_Sequences/{reference}/reference_lengthdist.pdf",
         "{tmp}03_report/Reference_Sequences/{reference}/reference_taxaranks.tsv"] +
+        ## REPORTS ##
+        ["{tmp}METADATA/{run}.csv"] ## from all_report rule
 
-        ## run report file from all_report rule
-        ["{tmp}METADATA/{run}.csv"]
-
-    )),
+    input_list = expand(list(filter(None,input_list)),
     tmp = config["experiments"]["tmp"],
     reference = config['reference']['source'],
     reftype = config['reference']['rank'] )
