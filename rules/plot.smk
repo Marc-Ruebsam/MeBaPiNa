@@ -435,55 +435,55 @@ rule plot_krona_kmermap_kraken:
 ## CALIBRATION STRAIN ##
 ########################
 
-rule plot_nanoplot_seqsum_calib:
-    input:
-        "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/split"
-    output:
-        "{tmp}02_analysis_results/01_basecalling/{run}_calibration_strands/nanoplot/NanoStats.txt"
-    log:
-        "{tmp}02_analysis_results/01_basecalling/{run}_calibration_strands/nanoplot/MeBaPiNa_nanoplot_seqsum_calib.log"
-    benchmark:
-        "{tmp}02_analysis_results/01_basecalling/{run}_calibration_strands/nanoplot/MeBaPiNa_nanoplot_seqsum_calib.benchmark.tsv"
-    conda:
-        "../envs/nanopack.yml"
-    threads:
-        2
-    params:
-        "--drop_outliers", ## other functions use "--maxlength 10000", to keep it consistent with other plots
-        "--plots kde hex dot",
-        "--format png",
-        "--colormap viridis",
-        "--color black", ## use NanoPlot --listcolors to get list of valid colors
-        "--downsample " + PLOT_SMPL, ## downlsampling
-        "--verbose" ## or nothing to log
-    shell:
-        "NanoPlot --threads {threads} {params} "
-        "--outdir {wildcards.tmp}02_analysis_results/01_basecalling/{wildcards.run}/nanoplot "
-        "--summary {input}/lambda.txt > {log} 2>&1"
-
-rule plot_pycoqc_bam_calib:
-    input:
-        seqsum="{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/split", ## only folder is specified as output in splitting rule
-        bam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/lambda/filteredsorted.bam"
-    output:
-        html="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc/calibration.html",
-        json="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc/calibration.json"
-    log:
-        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc/MeBaPiNa_pycoqc_bam_calib.log"
-    benchmark:
-        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc/MeBaPiNa_pycoqc_bam_calib.tsv"
-    conda:
-        "../envs/pycoqc.yml"
-    params:
-        ("--config {tmp}Pipeline/MeBaPiNa/scripts/pycoQC_config.json " if  ## use custom config (without coverage plot) for barcodes...
-        not config["reference"]["source"] == "zymobiomics" ## ...but not for the Zymo reference
-        and not "{wildcards.barc}" == "lambda" else ""), ## or calibration strains
-        "--min_pass_qual 0",
-        "--sample " + PLOT_SMPL, ## downsampling
-        "--verbose"
-    shell:
-        "pycoQC {params} "
-        "--summary_file {input.seqsum}/{wildcards.barc}.txt " ## only folder is specified as output in splitting rule
-        "--bam_file {input.bam} "
-        "--html_outfile {output.html} "
-        "--json_outfile {output.json} > {log} 2>&1"
+# rule plot_nanoplot_seqsum_calib:
+#     input:
+#         "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/split"
+#     output:
+#         "{tmp}02_analysis_results/01_basecalling/{run}_calibration_strands/nanoplot/NanoStats.txt"
+#     log:
+#         "{tmp}02_analysis_results/01_basecalling/{run}_calibration_strands/nanoplot/MeBaPiNa_nanoplot_seqsum_calib.log"
+#     benchmark:
+#         "{tmp}02_analysis_results/01_basecalling/{run}_calibration_strands/nanoplot/MeBaPiNa_nanoplot_seqsum_calib.benchmark.tsv"
+#     conda:
+#         "../envs/nanopack.yml"
+#     threads:
+#         2
+#     params:
+#         "--drop_outliers", ## other functions use "--maxlength 10000", to keep it consistent with other plots
+#         "--plots kde hex dot",
+#         "--format png",
+#         "--colormap viridis",
+#         "--color black", ## use NanoPlot --listcolors to get list of valid colors
+#         "--downsample " + PLOT_SMPL, ## downlsampling
+#         "--verbose" ## or nothing to log
+#     shell:
+#         "NanoPlot --threads {threads} {params} "
+#         "--outdir {wildcards.tmp}02_analysis_results/01_basecalling/{wildcards.run}/nanoplot "
+#         "--summary {input}/lambda.txt > {log} 2>&1"
+#
+# rule plot_pycoqc_bam_calib:
+#     input:
+#         seqsum="{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/split", ## only folder is specified as output in splitting rule
+#         bam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/lambda/filteredsorted.bam"
+#     output:
+#         html="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc/calibration.html",
+#         json="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc/calibration.json"
+#     log:
+#         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc/MeBaPiNa_pycoqc_bam_calib.log"
+#     benchmark:
+#         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc/MeBaPiNa_pycoqc_bam_calib.tsv"
+#     conda:
+#         "../envs/pycoqc.yml"
+#     params:
+#         ("--config {tmp}Pipeline/MeBaPiNa/scripts/pycoQC_config.json " if  ## use custom config (without coverage plot) for barcodes...
+#         not config["reference"]["source"] == "zymobiomics" ## ...but not for the Zymo reference
+#         and not "{wildcards.barc}" == "lambda" else ""), ## or calibration strains
+#         "--min_pass_qual 0",
+#         "--sample " + PLOT_SMPL, ## downsampling
+#         "--verbose"
+#     shell:
+#         "pycoQC {params} "
+#         "--summary_file {input.seqsum}/{wildcards.barc}.txt " ## only folder is specified as output in splitting rule
+#         "--bam_file {input.bam} "
+#         "--html_outfile {output.html} "
+#         "--json_outfile {output.json} > {log} 2>&1"
