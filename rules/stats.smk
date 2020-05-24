@@ -96,7 +96,7 @@ rule stat_otu:
     conda:
         "../envs/qiime2.yml"
     shell:
-        "otu­_dir={input.otutable}; otu_dir=\"${{otu_dir/cluster_ftable.qza/}}\"; "
+        "otu_dir={input.otutable}; otu_dir=\"${{otu_dir/cluster_ftable.qza/}}\"; "
         "sleep 1; " ## make sure the log file was created
         "qiime tools export -i \"${{otu_dir}}cluster_ftable.qza\" -o \"${{otu_dir}}cluster_ftable\"; "
         "awk '$2==\"observations:\"{{print $3\"\\ttotal_cluster_count\"}}; "
