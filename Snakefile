@@ -101,7 +101,7 @@ def input_stat(wildcards):
         "{tmp}03_report/Reference_Sequences/{reference}/reference_lengthdist.pdf",
         "{tmp}03_report/Reference_Sequences/{reference}/reference_taxaranks.tsv"] +
         ## REPORTS ##
-        ["{tmp}METADATA/{run}-{reference}-{reftype}-reports.csv"] ## from all_report rule
+        ["{tmp}METADATA/{run}-{reference}-{reftype}-reports.csv"]) ## from all_report rule
     input_list = expand(input_list,
     tmp = config["experiments"]["tmp"],
     run = RUNS,
