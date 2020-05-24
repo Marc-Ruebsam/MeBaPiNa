@@ -94,13 +94,13 @@ def input_stat(wildcards):
         "{tmp}03_report/Reference_Sequences/{reference}/reference_taxaranks.tsv"] +
         ## REPORTS ##
         ["{tmp}METADATA/{run}-{reference}-{reftype}.csv"]) ## from all_report rule
-    print(input_list)
     input_list = expand(input_list,
     tmp = config["experiments"]["tmp"],
     run = RUNS,
     reference = config['reference']['source'],
     reftype = config['reference']['rank'] )
-    ## return
+    print(input_list)
+    print("\n")    ## return
     return input_list
 
 ## rule for stats

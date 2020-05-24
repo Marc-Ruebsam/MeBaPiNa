@@ -12,6 +12,10 @@ def input_report(wildcards):
     ## retain only folders containing one of the selected barcodes
     all_barcs = [barc for barc in all_barcs if barc in SAMPLES.keys()]
     ## create file names with barcodes
+    print(basecall_dir)
+    print("\n")
+    print(all_barcs)
+    print("\n")
     input_list = [
         ## BASECALL ##
         ["{tmp}00_raw_data/{run}/MeBaPiNa_move_raw.report",
@@ -37,6 +41,7 @@ def input_report(wildcards):
         if "kmer" in config["methodologie"]]
         for barc in all_barcs]
     print(input_list)
+    print("\n")
     ## return
     return input_list
 
