@@ -9,7 +9,7 @@ def input_report(wildcards):
     basecall_dir = checkpoints.basecall_raw.get(tmp=wildcards.tmp,run=wildcards.run).output[0]
     ## get barcode directory names within "pass" directory
     all_barcs = listdir(basecall_dir)
-    ## retain only folders containing one of the selected barcodes
+    ## retain only folders containing one of the selected barcodes (not unassigned)
     all_barcs = [barc for barc in all_barcs if barc in SAMPLES.keys()]
     ## create file names with barcodes
     print(basecall_dir)
