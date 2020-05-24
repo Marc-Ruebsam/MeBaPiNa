@@ -37,7 +37,7 @@ rule stat_refseq_taxaranks:
 ## RAW READS ##
 ###############
 
-rule stat_general_rawreadcount:
+rule stat_general_readbasecount:
     input:
         raw="{tmp}00_raw_data/{run}/report.md",
         basecall="{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary.txt",
@@ -84,10 +84,119 @@ rule stat_general_rawreadcount:
         "gsub(\",\",\"\",$(barc_col+1)); print $(barc_col+1)\"\\tfilter_mean_quality\"}}' "
         " {input.filter} >> {output}"
 
-###########
-## K-MER ##
-###########
+#########
+## OTU ##
+#########
 
+rule stat_otu:
+    input:
+        otutable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_ftable.qza" ## also dummy for MeBaPiNa_q2otupick.log
+    output:
+        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/otu_cluster_counts.tsv",
+        dummy=temp(directory("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_ftable"))
+    conda:
+        "../envs/qiime2.yml"
+    shell:
+        "otu­_dir={input.otutable}; otu_dir=\"${{otu_dir/cluster_ftable.qza/}}\"; "
+        "sleep 1; " ## make sure the log file was created
+        "qiime tools export -i \"${{otu_dir}}cluster_ftable.qza\" -o \"${{otu_dir}}cluster_ftable\"; "
+        "awk '$2==\"observations:\"{{print $3\"\\ttotal_cluster_count\"}}; "
+        "$2==\"count:\"{{print $3\"\\ttotal_read_count\"}}' "
+        "<(biom summarize-table -i \"${{otu_dir}}cluster_ftable/feature-table.biom\") > {output.report}; "
+        "awk '$1==\"Clusters:\"{{print $2\"\\tdenovo_cluster_count\"}}' \"${{otu_dir}}MeBaPiNa_q2otupick.log\" >> {output.report}"
+
+
+# ## time
+# find -name "MeBaPiNa_kmermap_q2rereplicate.benchmark.tsv" -exec tail -n 1 {} \; | sort -nr | head -n 1
+# ## de novo clusters
+# for fl in $(find 16S_Metabarcoding/01_processed_data/03_otu_picking/ -name "MeBaPiNa_q2otupick.log" | sort)
+#     do
+#     awk '$1=="Clusters:"{print $2}' $fl
+# done
+#
+# ## number of features, numbr of reads and median reads per feature BEFORE filterng
+# for fl in $(find 16S_Metabarcoding/01_processed_data/03_otu_picking/ -name "cluster_ftable.qza" | sort)
+#     do
+#     qiime tools export --input-path ${fl} --output-path "${fl/.qza/}" > /dev/null
+#     biom convert -i "${fl/.qza/}/feature-table.biom" -o "${fl/.qza/}/feature-table.tsv" --to-tsv > /dev/null
+#     awk '
+#     BEGIN{c=0};
+#     !/^\#/{cnt_sfeat[c++]=$2};
+#     END{
+#         sm = 0;
+#         for(key in cnt_sfeat){ sm = sm + cnt_sfeat[key] };
+#         if((c % 2) == 1){ medn = cnt_sfeat[ int(c/2) ];
+#         }else{ medn = ( cnt_sfeat[c/2] + cnt_sfeat[c/2-1] ) / 2 };
+#         print c"\t"sm"\t"medn"\t" }
+#     ' <(sort -nk2 "${fl/.qza/}/feature-table.tsv")
+# done
+#
+# ## number of features, numbr of reads and median reads per feature AFTER filterng
+# for fl in $(find 16S_Metabarcoding/01_processed_data/03_otu_picking/ -name "filt_ftable.qza" | sort)
+#     do
+#     qiime tools export --input-path ${fl} --output-path "${fl/.qza/}" > /dev/null
+#     biom convert -i "${fl/.qza/}/feature-table.biom" -o "${fl/.qza/}/feature-table.tsv" --to-tsv > /dev/null
+#     awk '
+#     BEGIN{c=0};
+#     !/^\#/{cnt_sfeat[c++]=$2};
+#     END{
+#         sm = 0;
+#         for(key in cnt_sfeat){ sm = sm + cnt_sfeat[key] };
+#         if((c % 2) == 1){ medn = cnt_sfeat[ int(c/2) ];
+#         }else{ medn = ( cnt_sfeat[c/2] + cnt_sfeat[c/2-1] ) / 2 };
+#         print c"\t"sm"\t"medn"\t" }
+#     ' <(sort -nk2 "${fl/.qza/}/feature-table.tsv")
+# done
+#
+# ## time kmer
+# # find -name "MeBaPiNa_kmermap_q2rereplicate.benchmark.tsv" -exec tail -n 1 {} \; | sort -nr | head -n 1
+# for fl in $(find 16S_Metabarcoding/01_processed_data/03_otu_picking/ -name "filtered.kreport2" | sort)
+#     do
+#     awk '
+#     BEGIN{
+#         c=0;
+#         cnt_stax=0;
+#         cnt_htax=0 };
+#     $6=="root"{ cnt_hfeat=$2 };
+#     $3!=0{ cnt_htax++ };
+#     $3!=0&&$4=="S"{
+#         cnt_stax++;
+#         cnt_sfeat[c++]=$3 };
+#     END{
+#         sm = 0;
+#         for(key in cnt_sfeat){ sm = sm + cnt_sfeat[key] };
+#         if((c % 2) == 1){ medn = cnt_sfeat[ int(c/2) ];
+#         }else{ medn = ( cnt_sfeat[c/2] + cnt_sfeat[c/2-1] ) / 2 };
+#         print cnt_htax"\t"cnt_stax"\t"cnt_hfeat"\t"sm"\t"medn"\t" }
+#     ' <(sort -nk3 $fl)
+# done
+#
+#
+#
+# for fl in $(find -name "*.qza")
+#   do
+#   echo ${fl}
+#   qiime tools export --input-path ${fl} --output-path "${fl/.qza/}"
+# done
+# for fl in $(find -name "*.biom")
+#   do
+#   echo ${fl}
+#   biom summarize-table -i ${fl}
+#   biom convert -i ${fl} -o ${fl/.biom/.tsv} --to-tsv
+# done
+
+# for fl in $(find -name "*.biom")
+#   do
+#   echo ${fl}
+#   biom summarize-table -i ${fl}
+#   biom convert -i ${fl} -o ${fl/.biom/.tsv} --to-tsv
+# done
+#
+#
+# ###########
+# ## K-MER ##
+# ###########
+#
 # ## run time
 # # find -name "MeBaPiNa_kmermap_filtered.benchmark.tsv" -exec tail -n 1 {} \; | sort -nr | head -n 1
 # ## number of total and species taxa, total ans species reads and median reads per Species
@@ -190,109 +299,6 @@ rule stat_general_rawreadcount:
 #         print c"\t"sm"\t"medn"\t" }
 #     ' <(sort -nk1 $fl)
 # done
-#
-# #########
-# ## OTU ##
-# #########
-#
-# rule stat_otu:
-#     input:
-#         otutable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_ftable.qza" ## also dummy for MeBaPiNa.log
-#     output:
-#         "{tmp}.tmp/stats/{run}/{barc}/{reference}/otu_counts_counts_{barc}.tsv"
-#     shell:
-#         "otu­_dir={input.otutable}; otu_dir=\"${{otu_dir/cluster_ftable.qza/}}\" > {log} 2>&1; "
-#         "sleep 1;" ## make sure the log file was created
-#         "awk '$1==\"Clusters:\"{{print \"denovo_cluster\\t\"$2}}' \"${{otu_dir}}MeBaPiNa_q2otupick.log\" >> {output}; "
-#         "qiime tools export -i \"${{otu_dir}}cluster_ftable.qza\" -o \"${{otu_dir}}cluster_ftable\" > {log} 2>&1; "
-#         "awk '$2==\"observations:\"{{print \"total otu clusters\\t\"$3}}; $2==\"count:\"{{print \"total otu reads\\t\"$3}}'
-#         "<(biom summarize-table -i \"${{otu_dir}}cluster_ftable\feature-table.biom\"); done"
-#
-# ## time
-# find -name "MeBaPiNa_kmermap_q2rereplicate.benchmark.tsv" -exec tail -n 1 {} \; | sort -nr | head -n 1
-# ## de novo clusters
-# for fl in $(find 16S_Metabarcoding/01_processed_data/03_otu_picking/ -name "MeBaPiNa_q2otupick.log" | sort)
-#     do
-#     awk '$1=="Clusters:"{print $2}' $fl
-# done
-#
-# ## number of features, numbr of reads and median reads per feature BEFORE filterng
-# for fl in $(find 16S_Metabarcoding/01_processed_data/03_otu_picking/ -name "cluster_ftable.qza" | sort)
-#     do
-#     qiime tools export --input-path ${fl} --output-path "${fl/.qza/}" > /dev/null
-#     biom convert -i "${fl/.qza/}/feature-table.biom" -o "${fl/.qza/}/feature-table.tsv" --to-tsv > /dev/null
-#     awk '
-#     BEGIN{c=0};
-#     !/^\#/{cnt_sfeat[c++]=$2};
-#     END{
-#         sm = 0;
-#         for(key in cnt_sfeat){ sm = sm + cnt_sfeat[key] };
-#         if((c % 2) == 1){ medn = cnt_sfeat[ int(c/2) ];
-#         }else{ medn = ( cnt_sfeat[c/2] + cnt_sfeat[c/2-1] ) / 2 };
-#         print c"\t"sm"\t"medn"\t" }
-#     ' <(sort -nk2 "${fl/.qza/}/feature-table.tsv")
-# done
-#
-# ## number of features, numbr of reads and median reads per feature AFTER filterng
-# for fl in $(find 16S_Metabarcoding/01_processed_data/03_otu_picking/ -name "filt_ftable.qza" | sort)
-#     do
-#     qiime tools export --input-path ${fl} --output-path "${fl/.qza/}" > /dev/null
-#     biom convert -i "${fl/.qza/}/feature-table.biom" -o "${fl/.qza/}/feature-table.tsv" --to-tsv > /dev/null
-#     awk '
-#     BEGIN{c=0};
-#     !/^\#/{cnt_sfeat[c++]=$2};
-#     END{
-#         sm = 0;
-#         for(key in cnt_sfeat){ sm = sm + cnt_sfeat[key] };
-#         if((c % 2) == 1){ medn = cnt_sfeat[ int(c/2) ];
-#         }else{ medn = ( cnt_sfeat[c/2] + cnt_sfeat[c/2-1] ) / 2 };
-#         print c"\t"sm"\t"medn"\t" }
-#     ' <(sort -nk2 "${fl/.qza/}/feature-table.tsv")
-# done
-#
-# ## time kmer
-# # find -name "MeBaPiNa_kmermap_q2rereplicate.benchmark.tsv" -exec tail -n 1 {} \; | sort -nr | head -n 1
-# for fl in $(find 16S_Metabarcoding/01_processed_data/03_otu_picking/ -name "filtered.kreport2" | sort)
-#     do
-#     awk '
-#     BEGIN{
-#         c=0;
-#         cnt_stax=0;
-#         cnt_htax=0 };
-#     $6=="root"{ cnt_hfeat=$2 };
-#     $3!=0{ cnt_htax++ };
-#     $3!=0&&$4=="S"{
-#         cnt_stax++;
-#         cnt_sfeat[c++]=$3 };
-#     END{
-#         sm = 0;
-#         for(key in cnt_sfeat){ sm = sm + cnt_sfeat[key] };
-#         if((c % 2) == 1){ medn = cnt_sfeat[ int(c/2) ];
-#         }else{ medn = ( cnt_sfeat[c/2] + cnt_sfeat[c/2-1] ) / 2 };
-#         print cnt_htax"\t"cnt_stax"\t"cnt_hfeat"\t"sm"\t"medn"\t" }
-#     ' <(sort -nk3 $fl)
-# done
-#
-#
-#
-# # for fl in $(find -name "*.qza")
-# #   do
-# #   echo ${fl}
-# #   qiime tools export --input-path ${fl} --output-path "${fl/.qza/}"
-# # done
-# # for fl in $(find -name "*.biom")
-# #   do
-# #   echo ${fl}
-# #   biom summarize-table -i ${fl}
-# #   biom convert -i ${fl} -o ${fl/.biom/.tsv} --to-tsv
-# # done
-#
-# # for fl in $(find -name "*.biom")
-# #   do
-# #   echo ${fl}
-# #   biom summarize-table -i ${fl}
-# #   biom convert -i ${fl} -o ${fl/.biom/.tsv} --to-tsv
-# # done
 #
 # ###################################################################################################################
 #
