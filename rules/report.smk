@@ -40,8 +40,8 @@ def input_report(wildcards):
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/" + barc + "/{reference}_{reftype}/MeBaPiNa_counttax_kmermap.report"]
         if "kmer" in config["methodologie"]]
         for barc in all_barcs]
-    print(input_list)
-    print("\n")
+    ## flatten list of lists
+    input_list = [item for sublist in input_list for item in sublist]
     ## return
     return input_list
 
