@@ -85,7 +85,7 @@ rule trim_basecalled:
         # "--guppy", ## Use Guppy's demultiplexing algorithm (default: false) #!# Multi threading only works with in guppy mode
         ("--kit RAB204" if BAC_KIT == "SQK-RAB204" else "--kit Auto") #!# otherwise there are no barcoding folders
     shell:
-        "input_folder={wildcards.tmp}01_processed_data/01_basecalling/{wildcards.run}/pass/{barc}; " ## input dependency is handled by the all rule
+        "input_folder={wildcards.tmp}01_processed_data/01_basecalling/{wildcards.run}/pass/{wildcards.barc}; " ## input dependency is handled by the all rule
         "output_folder={wildcards.tmp}01_processed_data/02_trimming_filtering/{wildcards.run}/{wildcards.barc}; " ## directory name of barcode
         "find ${{input_folder}} -type f -name \"*.fastq\" -exec cat {{}} \\; | " ## paste whole read content of all fast files to std-in of qcat
         "qcat --threads {threads} {params} "
