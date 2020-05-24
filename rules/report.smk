@@ -75,7 +75,7 @@ rule report_move_raw:
         "all_IDs=( $(echo \"{params}\") ); "
         "for id in ${{all_IDs[@]}}; do echo "
         ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
-        "\"${{id}};{input};$(stat -c '%.19z'{input});NA;MeBaPiNa;General: moved raw fast5 files to path ready for analysis.\" "
+        "\"${{id}};{input};$(stat -c '%.19z' {input});NA;MeBaPiNa;General: moved raw fast5 files to path ready for analysis.\" "
         ">> {output}; done"
 
 rule report_basecall_raw:
@@ -90,7 +90,7 @@ rule report_basecall_raw:
         "{params}"
         "for id in ${{all_IDs[@]}}; do echo "
         ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
-        "\"${{id}};{input};$(stat -c '%.19z'{input[0]});NA;MeBaPiNa;General: basecalled and demultiplexed raw fast5 files into fastq.\" "
+        "\"${{id}};{input};$(stat -c '%.19z' {input[0]});NA;MeBaPiNa;General: basecalled and demultiplexed raw fast5 files into fastq.\" "
         ">> {output}; done"
 
 ## TRIM AND FILTER ##
@@ -110,7 +110,7 @@ rule report_trim_basecalled:
         "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; "
         "done)]}}; echo "
         ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
-        "\"${{id}};{input};$(stat -c '%.19z'{input});NA;MeBaPiNa;General: trimmed adapters and barcodes from reads and demultiplexed a second time.\" "
+        "\"${{id}};{input};$(stat -c '%.19z' {input});NA;MeBaPiNa;General: trimmed adapters and barcodes from reads and demultiplexed a second time.\" "
         ">> {output}"
 
 rule report_filter_trimmed:
@@ -127,7 +127,7 @@ rule report_filter_trimmed:
         "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; "
         "done)]}}; echo "
         ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
-        "\"${{id}};{input};$(stat -c '%.19z'{input});NA;MeBaPiNa;General: length and quality filtered reads.\" "
+        "\"${{id}};{input};$(stat -c '%.19z' {input});NA;MeBaPiNa;General: length and quality filtered reads.\" "
         ">> {output}"
 
 ## OTU ##
@@ -148,7 +148,7 @@ rule report_q2filter_uchime:
         "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; "
         "done)]}}; echo "
         ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
-        "\"${{id}};{input};$(stat -c '%.19z'{input[0]});NA;MeBaPiNa;OTU: dereplication, open-reference clustering, chimera removal and filtering.\" "
+        "\"${{id}};{input};$(stat -c '%.19z' {input[0]});NA;MeBaPiNa;OTU: dereplication, open-reference clustering, chimera removal and filtering.\" "
         ">> {output}"
 
 rule report_counttax_q2kmermap:
@@ -165,7 +165,7 @@ rule report_counttax_q2kmermap:
         "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; "
         "done)]}}; echo "
         ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
-        "\"${{id}};{input};$(stat -c '%.19z'{input[0]});NA;MeBaPiNa;OTU: taxonomic classification and file conversion.\" "
+        "\"${{id}};{input};$(stat -c '%.19z' {input[0]});NA;MeBaPiNa;OTU: taxonomic classification and file conversion.\" "
         ">> {output}"
 
 ## ALIGN ##
@@ -186,7 +186,7 @@ rule report_filter_aligned:
         "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; "
         "done)]}}; echo "
         ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
-        "\"${{id}};{input};$(stat -c '%.19z'{input[0]});NA;MeBaPiNa;Alignment: alignment, extraction of uniquely aligned reads (not fully filtered).\" "
+        "\"${{id}};{input};$(stat -c '%.19z' {input[0]});NA;MeBaPiNa;Alignment: alignment, extraction of uniquely aligned reads (not fully filtered).\" "
         ">> {output}"
 
 rule report_counttax_aligned:
@@ -203,7 +203,7 @@ rule report_counttax_aligned:
         "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; "
         "done)]}}; echo "
         ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
-        "\"${{id}};{input};$(stat -c '%.19z'{input[0]});NA;MeBaPiNa;Alignment: filtering and taxonomic classification.\" "
+        "\"${{id}};{input};$(stat -c '%.19z' {input[0]});NA;MeBaPiNa;Alignment: filtering and taxonomic classification.\" "
         ">> {output}"
 
 ## K-MER MAPPING ##
@@ -224,7 +224,7 @@ rule report_kmermap_filtered:
         "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; "
         "done)]}}; echo "
         ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
-        "\"${{id}};{input};$(stat -c '%.19z'{input[0]});NA;MeBaPiNa;K-mer: taxonomic classification.\" "
+        "\"${{id}};{input};$(stat -c '%.19z' {input[0]});NA;MeBaPiNa;K-mer: taxonomic classification.\" "
         ">> {output}"
 
 rule report_retax_kmermap:
@@ -242,7 +242,7 @@ rule report_retax_kmermap:
         "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; "
         "done)]}}; echo "
         ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
-        "\"${{id}};{input};$(stat -c '%.19z'{input[0]});NA;MeBaPiNa;K-mer: abundance reestimation.\" "
+        "\"${{id}};{input};$(stat -c '%.19z' {input[0]});NA;MeBaPiNa;K-mer: abundance reestimation.\" "
         ">> {output}"
 
 rule report_counttax_kmermap:
@@ -259,7 +259,7 @@ rule report_counttax_kmermap:
         "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; "
         "done)]}}; echo "
         ## "Sample name;File/directory;Completion date;Checksum;Performed by;Description"
-        "\"${{id}};{input};$(stat -c '%.19z'{input[0]});NA;MeBaPiNa;K-mer: fle conversion.\" "
+        "\"${{id}};{input};$(stat -c '%.19z' {input[0]});NA;MeBaPiNa;K-mer: fle conversion.\" "
         ">> {output}"
 
 ## CALIBRATION STRAIN ##
