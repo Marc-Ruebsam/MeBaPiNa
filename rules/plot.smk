@@ -32,7 +32,7 @@ def input_plot(wildcards):
 ## rule for reports
 rule all_plot:
     input:
-        input_report
+        input_plot
     output:
         temp("{tmp}METADATA/{run}-{reference}-{reftype}-plots.csv")
     shell:
