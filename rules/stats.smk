@@ -88,11 +88,11 @@ rule stat_general_readbasecount:
 ## OTU ##
 #########
 
-rule stat_otu:
+rule stat_otu_featureextraction:
     input:
         otutable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_ftable.qza" ## also dummy for MeBaPiNa_q2otupick.log
     output:
-        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/otu_cluster_counts_{reference}.tsv"
+        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/otu_feature_counts_{reference}.tsv"
     conda:
         "../envs/qiime2.yml"
     shell:
@@ -117,7 +117,7 @@ rule stat_otu:
         "qiime tools export --input-path \"${{otu_dir}}filt_ftable.qza\" --output-path \"${{otu_dir}}filt_ftable\"; fi; "
         "awk '$2==\"observations:\"{{gsub(\",\",\"\",$3); clst_cnt=$3}}; "
         "$2==\"count:\"{{gsub(\",\",\"\",$3); read_cnt=$3}}; "
-        "END{{print clst_cnt\"\\ttotal_cluster_count\\n\"read_cnt\"\\ttotal_read_count\\n\"(read_cnt/clst_cnt)\"\\ttotal_mean_abund\"}}' "
+        "END{{print clst_cnt\"\\tfilter_cluster_count\\n\"read_cnt\"\\tfilter_read_count\\n\"(read_cnt/clst_cnt)\"\\tfilter_mean_abund\"}}' "
         "<(biom summarize-table -i \"${{otu_dir}}filt_ftable/feature-table.biom\") >> {output.report}"
 
 # ## time kmer
