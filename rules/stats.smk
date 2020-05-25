@@ -136,60 +136,46 @@ rule stat_otu_taxa:
         "%d\\t{wildcards.reftype}_taxa_count\\n%d\\t{wildcards.reftype}_read_count\\n%.2f\\t{wildcards.reftype}_mean_abund\","
         "cnt_tax,cnt_feat,(cnt_feat/cnt_tax),cnt_stax,cnt_sfeat,(cnt_sfeat/cnt_stax)}}' {input} > {output}"
 
-# ###########
-# ## K-MER ##
-# ###########
-#
-# ## run time
-# # find -name "MeBaPiNa_kmermap_filtered.benchmark.tsv" -exec tail -n 1 {} \; | sort -nr | head -n 1
-# ## number of total and species taxa, total ans species reads and median reads per Species
-# for fl in $(find 16S_Metabarcoding/01_processed_data/03_kmer_mapping/ -name "filtered.kreport2" | sort)
-#     do
-#     awk '
-#     BEGIN{
-#         c=0;
-#         cnt_stax=0;
-#         cnt_htax=0 };
-#     $6=="root"{ cnt_hfeat=$2 };
-#     $3!=0{ cnt_htax++ };
-#     $3!=0&&$4=="S"{
-#         cnt_stax++;
-#         cnt_sfeat[c++]=$3 };
-#     END{
-#         sm = 0;
-#         for(key in cnt_sfeat){ sm = sm + cnt_sfeat[key] };
-#         if((c % 2) == 1){ medn = cnt_sfeat[ int(c/2) ];
-#         }else{ medn = ( cnt_sfeat[c/2] + cnt_sfeat[c/2-1] ) / 2 };
-#         print cnt_htax"\t"cnt_stax"\t"cnt_hfeat"\t"sm"\t"medn"\t" }
-#     ' <(sort -nk3 $fl)
-# done
-# ## number of species taxa, species reads and median reads per Species
-# for fl in $(find 16S_Metabarcoding/02_analysis_results/03_kmer_mapping/ -name "Species.kreport2" | sort)
-#     do
-#     awk '
-#     BEGIN{
-#         c=0;
-#         cnt_stax=0;
-#         cnt_htax=0 };
-#     $6=="root"{ cnt_hfeat=$2 };
-#     $3!=0{ cnt_htax++ };
-#     $3!=0&&$4=="S"{
-#         cnt_stax++;
-#         cnt_sfeat[c++]=$3 };
-#     END{
-#         sm = 0;
-#         for(key in cnt_sfeat){ sm = sm + cnt_sfeat[key] };
-#         if((c % 2) == 1){ medn = cnt_sfeat[ int(c/2) ];
-#         }else{ medn = ( cnt_sfeat[c/2] + cnt_sfeat[c/2-1] ) / 2 };
-#         print cnt_stax"\t"sm"\t"medn"\t" }
-#         # print cnt_htax"\t"cnt_stax"\t"cnt_hfeat"\t"sm"\t"medn"\t" } #!!!# taxa are the same, reads not
-#     ' <(sort -nk3 $fl)
-# done
-#
-# ###############
-# ## ALIGNMENT ##
-# ###############
-#
+###########
+## K-MER ##
+###########
+
+rule stat_kmer_taxa:
+    input:
+        "{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kreport2"
+    output:
+        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/kmer_taxa_counts-{reference}_{reftype}.tsv"
+    shell:
+        ## get initial char of reftype
+        "awk 'BEGIN{{c=0;cnt_stax=0;cnt_tax=0;cnt_sfeat=0;"
+        "lw_rnk=substr(\"{wildcards.reftype}\",1,1)}}; "
+        "$6==\"root\"{{ cnt_feat=$2 }}; "
+        "$3!=0{{ cnt_tax++ }}; "
+        "$3!=0&&$4==lw_rnk{{cnt_stax++;cnt_sfeat=cnt_sfeat+$3}}; "
+        "END{{printf \"%d\\ttotal_taxa_count\\n%d\\ttotal_read_count\\n%.2f\\ttotal_mean_abund\\n"
+        "%d\\t{wildcards.reftype}_taxa_count\\n%d\\t{wildcards.reftype}_read_count\\n%.2f\\t{wildcards.reftype}_mean_abund\","
+        "cnt_tax,cnt_feat,(cnt_feat/cnt_tax),cnt_stax,cnt_sfeat,(cnt_sfeat/cnt_stax)}}' {input} > {output}"
+
+rule stat_kmer_retaxa:
+    input:
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/{reftype}.kreport2"
+    output:
+        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/kmer_retaxa_counts-{reference}_{reftype}.tsv"
+    shell:
+        ## get initial char of reftype
+        "awk 'BEGIN{{c=0;cnt_stax=0;cnt_tax=0;cnt_sfeat=0;"
+        "lw_rnk=substr(\"{wildcards.reftype}\",1,1)}}; "
+        "$6==\"root\"{{ cnt_feat=$2 }}; "
+        "$3!=0{{ cnt_tax++ }}; "
+        "$3!=0&&$4==lw_rnk{{cnt_stax++;cnt_sfeat=cnt_sfeat+$3}}; "
+        "END{{printf \"%d\\ttotal_taxa_count\\n%d\\ttotal_read_count\\n%.2f\\ttotal_mean_abund\\n"
+        "%d\\t{wildcards.reftype}_taxa_count\\n%d\\t{wildcards.reftype}_read_count\\n%.2f\\t{wildcards.reftype}_mean_abund\","
+        "cnt_tax,cnt_feat,(cnt_feat/cnt_tax),cnt_stax,cnt_sfeat,(cnt_sfeat/cnt_stax)}}' {input} > {output}"
+
+###############
+## ALIGNMENT ##
+###############
+
 # rule stat_ref_coverage:
 #     input:
 #         bam=expand("{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/{altype}_filteredsorted.bam",

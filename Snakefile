@@ -101,6 +101,11 @@ def input_stat(wildcards):
         [stat_dir + "otu_feature_counts-{reference}.tsv" for stat_dir in promise_dirs + other_dirs] +
         [stat_dir + "otu_taxa_counts-{reference}_{reftype}.tsv" for stat_dir in promise_dirs + other_dirs]
         if "otu" in config["methodologie"]] + ## if "otu" is selected
+        ## KMER ##
+        [x for x in
+        [stat_dir + "kmer_taxa_counts-{reference}_{reftype}.tsv" for stat_dir in promise_dirs + other_dirs] +
+        [stat_dir + "kmer_retaxa_counts-{reference}_{reftype}.tsv" for stat_dir in promise_dirs + other_dirs]
+        if "kmer" in config["methodologie"]] + ## if "kmer" is selected
         ## REFERENCE DATA ##
         ["{tmp}03_report/Reference_Sequences/{reference}/reference_lengthdist.tsv",
         "{tmp}03_report/Reference_Sequences/{reference}/reference_lengthdist.pdf",
