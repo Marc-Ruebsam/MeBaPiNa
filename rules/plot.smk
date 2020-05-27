@@ -37,7 +37,8 @@ rule all_plot:
         temp("{tmp}METADATA/{run}-{reference}-{reftype}-plots.report")
     shell:
         "indiv_reports=( $(echo \"{input}\") ); "
-        "for rprt in ${{indiv_reports[@]}}; do cat ${{rprt}} >> {output}; done"
+        # "for rprt in ${{indiv_reports[@]}}; do cat ${{rprt}} >> {output}; done" #!# information not helpful
+        "touch {output}"
 
 rule all_plot_barc:
     input:
