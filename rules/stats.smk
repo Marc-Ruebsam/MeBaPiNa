@@ -137,7 +137,7 @@ rule stat_otu_taxa:
         "cnt_tax,cnt_feat,(cnt_feat/cnt_tax),cnt_stax,cnt_sfeat,(cnt_sfeat/cnt_stax)}}' {input} > {output}"
 
 ###########
-## K-MER ##
+## K-MER MAPPING ##
 ###########
 
 rule stat_kmer_taxa:
