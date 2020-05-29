@@ -109,10 +109,10 @@ rule copy_align_output:
         "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_filter_aligned.report", ## REPORT
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_aligned.report" ## REPORT
     output:
-        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment/{reference}_{reftype}-pycoqc.html",
-        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment/{reference}_{reftype}-pycoqc.json",
-        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment/{reference}_{reftype}-krona.html",
-        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment/{reference}_{reftype}-aligned.counttaxlist"
+        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}_{reftype}-pycoqc.html",
+        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}_{reftype}-pycoqc.json",
+        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}_{reftype}-krona.html",
+        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}_{reftype}-aligned.counttaxlist"
     shell:
         "all_input=( $(echo \"{input}\") ); "
         "all_output=( $(echo \"{output}\") ); "
@@ -132,9 +132,9 @@ rule copy_kmer_output:
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_retax_kmermap.report", ## REPORT
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_kmermap.report" ## REPORT
     output:
-        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_kmer_mapping/{reference}_{reftype}-krona.html",
-        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_kmer_mapping/{reference}_{reftype}-krona_bracken.html",
-        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_kmer_mapping/{reference}_{reftype}-kmer.counttaxlist"
+        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_kmer_mapping-{reference}_{reftype}-krona.html",
+        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_kmer_mapping-{reference}_{reftype}-krona_bracken.html",
+        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_kmer_mapping-{reference}_{reftype}-kmer.counttaxlist"
     shell:
         "all_input=( $(echo \"{input}\") ); "
         "all_output=( $(echo \"{output}\") ); "
