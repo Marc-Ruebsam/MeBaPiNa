@@ -35,7 +35,7 @@ wildcard_constraints:
 #############################
 
 ## load run information
-METADATA = pd.read_excel( config["experiments"]["meta"], header = 1 )
+METADATA = pd.read_excel( config["experiments"]["tmp"] + config["experiments"]["meta"], header = 1 )
 ## find meta data for required samples
 METADATA = METADATA.loc[ METADATA['Sample name'].isin(config["experiments"]["samples"]), : ]
 #!# currently only one single run analysis is supported. Use run with most sample overlaps
@@ -45,6 +45,9 @@ METADATA = METADATA.loc[ METADATA['Run ID'].isin(RUNS), : ]
 SAMPLES = pd.Series(METADATA['Sample name'].values,index=METADATA['Barcode']).to_dict()
 TIMEPOINTS = pd.Series(METADATA['Zeitpunkt'].values,index=METADATA['Barcode']).to_dict()
 
+## path to the csv file logs are written to
+LOGS = config["experiments"]["tmp"] + config["experiments"]["meta"]
+
 ## get run information
 FLOWCELL = METADATA['Flow cell product'].unique()[0]
 SEQ_KIT = METADATA['Sequencing kit'].unique()[0]
@@ -52,7 +55,7 @@ BAC_KIT = METADATA['Barcoding kit'].unique()[0]
 LAM_DCS = METADATA['Lambda DCS'].unique()[0]
 
 ## sample depth for downsampling in some plots
-PLOT_SMPL = "100000"
+PLOT_SMPL = config["filtering"]["plot_sample"]
 ## max read lengths in some plots
 PLOT_MAXLEN = config["filtering"]["len_max"]
 

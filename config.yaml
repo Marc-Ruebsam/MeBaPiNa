@@ -7,7 +7,9 @@ experiments:
   project: "/mnt/ag-halama/PROMISE/.tmp" #!# "/mnt/Nanopore/Nanopore_Projects/Internal/NCT/PROMISE/Microbiome/16S_Metabarcoding/"
   tmp: "16S_Metabarcoding/" #!# was required because snakemake does not work when located on the NAS (links are broken). Hence the paths above could not be used, but the execution has to be performed from the base directory (e.g. 16s_Metabarcoding)
   ## path to the excel file containing the metadata
-  meta: "16S_Metabarcoding/METADATA/EXPERIMENT_SEQUENCING.xlsx"
+  meta: "METADATA/EXPERIMENT_SEQUENCING.xlsx"
+  ## path to the csv file logs are written to
+  log: "METADATA/ANALYSIS_PROGRESS_MANAGEMENT.csv"
   ## samples to analyze, matching "Sample name"s in EXPERIMENT_SEQUENCING.xlsx #!# currently only one single run analysis is supported
   samples:
     ["NTC",
@@ -48,7 +50,8 @@ filtering:
   len_max: "2800"
   min_featurereads: "3" ## minimum number of reads per cluster or taxon
   min_readidentity: "0.85" ## minimum read identity for clustering
-  min_confidence: "0.0"
+  min_confidence: "0.0" ## confidence used for calssification of taxa at species level
+  plot_sample: "100000" ## downsampling reads in plots to this number to reduce computational complexity (distorts statistics shown in some plots)
 
 reference:
   source: "silva"

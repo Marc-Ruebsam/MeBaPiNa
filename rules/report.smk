@@ -147,7 +147,7 @@ rule copy_kmer_output:
 
 rule report_initiate:
     output:
-        "{tmp}METADATA/ANALYSIS_PROGRESS_MANAGEMENT.csv"
+        LOGS
     shell:
         "if [[ ! -f \"{output}\" ]]; then "
         "echo \"Sample name;File/Directory;Action;Date;Checksum;Who;Description\""
@@ -160,11 +160,11 @@ rule report_initiate:
 
 rule report_move_raw:
     input:
-        thing="{tmp}00_raw_data/{run}/fast5",
-        report="{tmp}METADATA/ANALYSIS_PROGRESS_MANAGEMENT.csv" ## text directly reported here
+        thing="{tmp}00_raw_data/{run}/fast5"
     output:
         dummy=temp("{tmp}00_raw_data/{run}/MeBaPiNa_move_raw.report") ## for dependencies
     params:
+        "report_log=" + LOGS + "; ", ## text directly reported here
         "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); " ## will be reported for all samples in this run
     shell:
         "{params}"
@@ -172,16 +172,16 @@ rule report_move_raw:
         "for id in ${{all_IDs[@]}}; do echo "
         "\"${{id}};{input.thing};Moved input;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "General: raw fast5 files moved to directory ready for analysis. Checksum was calculated as: find -type f -exec md5sum {{}} \\; | sort -k 2 | awk '{{print \$1}}' | md5sum \" "
-        ">> {input.report}; done; "
+        ">> \"${{report_log}}\"; done; "
         "touch {output.dummy}" ## for dependencies
 
 rule report_basecall_raw_seqsum:
     input:
-        thing="{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary.txt",
-        report="{tmp}METADATA/ANALYSIS_PROGRESS_MANAGEMENT.csv" ## text directly reported here
+        thing="{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary.txt"
     output:
         dummy=temp("{tmp}00_raw_data/{run}/MeBaPiNa_basecall_raw_seqsum.report") ## for dependencies
     params:
+        "report_log=" + LOGS + "; ", ## text directly reported here
         "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); " ## will be reported for all samples in this run
     shell:
         "{params}"
@@ -189,16 +189,16 @@ rule report_basecall_raw_seqsum:
         "for id in ${{all_IDs[@]}}; do echo "
         "\"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "General: basecalling and demultiplexing log per read.\" "
-        ">> {input.report}; done; "
+        ">> \"${{report_log}}\"; done; "
         "touch {output.dummy}" ## for dependencies
 
 rule report_basecall_raw_pass:
     input:
-        thing="{tmp}01_processed_data/01_basecalling/{run}/pass",
-        report="{tmp}METADATA/ANALYSIS_PROGRESS_MANAGEMENT.csv"
+        thing="{tmp}01_processed_data/01_basecalling/{run}/pass"
     output:
         dummy=temp("{tmp}00_raw_data/{run}/MeBaPiNa_basecall_raw_pass.report")
     params:
+        "report_log=" + LOGS + "; ",
         "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); "
     shell:
         "{params}"
@@ -206,18 +206,18 @@ rule report_basecall_raw_pass:
         "for id in ${{all_IDs[@]}}; do echo "
         "\"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "General: basecalled and demultiplexed fastq files. Checksum was calculated as: find -type f -exec md5sum {{}} \\; | sort -k 2 | awk '{{print \$1}}' | md5sum \" "
-        ">> {input.report}; done; "
+        ">> \"${{report_log}}\"; done; "
         "touch {output.dummy}"
 
 ## TRIM AND FILTER ##
 
 rule report_trim_basecalled:
     input:
-        thing="{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/trimmed.fastq",
-        report="{tmp}METADATA/ANALYSIS_PROGRESS_MANAGEMENT.csv"
+        thing="{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/trimmed.fastq"
     output:
         dummy=temp("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trim_basecalled.report")
     params:
+        "report_log=" + LOGS + "; ",
         "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
         "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
@@ -227,16 +227,16 @@ rule report_trim_basecalled:
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "General: trimmed adapters and barcodes from reads and demultiplexed a second time.\" "
-        ">> {input.report}; "
+        ">> \"${{report_log}}\"; "
         "touch {output.dummy}"
 
 rule report_filter_trimmed:
     input:
-        thing="{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq",
-        report="{tmp}METADATA/ANALYSIS_PROGRESS_MANAGEMENT.csv"
+        thing="{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq"
     output:
         dummy=temp("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filter_trimmed.report")
     params:
+        "report_log=" + LOGS + "; ",
         "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
         "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
@@ -246,18 +246,18 @@ rule report_filter_trimmed:
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "General: length and quality filtered reads.\" "
-        ">> {input.report}; "
+        ">> \"${{report_log}}\"; "
         "touch {output.dummy}"
 
 ## OTU ##
 
 rule report_q2filter_uchime_ftable:
     input:
-        thing="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_ftable.qza",
-        report="{tmp}METADATA/ANALYSIS_PROGRESS_MANAGEMENT.csv"
+        thing="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_ftable.qza"
     output:
         dummy=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2filter_uchime_ftable.report")
     params:
+        "report_log=" + LOGS + "; ",
         "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
         "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
@@ -267,16 +267,16 @@ rule report_q2filter_uchime_ftable:
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "OTU: count table of features after: dereplication, open-reference clustering, chimera removal and filtering.\" "
-        ">> {input.report}; "
+        ">> \"${{report_log}}\"; "
         "touch {output.dummy}"
 
 rule report_q2filter_uchime_centseq:
     input:
-        thing="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq.qza",
-        report="{tmp}METADATA/ANALYSIS_PROGRESS_MANAGEMENT.csv"
+        thing="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq.qza"
     output:
         dummy=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2filter_uchime_centseq.report")
     params:
+        "report_log=" + LOGS + "; ",
         "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
         "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
@@ -286,16 +286,16 @@ rule report_q2filter_uchime_centseq:
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "OTU: feature clusters central sequences after: dereplication, open-reference clustering, chimera removal and filtering.\" "
-        ">> {input.report}; "
+        ">> \"${{report_log}}\"; "
         "touch {output.dummy}"
 
 rule report_kmermap_q2rereplicate:
     input:
-        thing="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/filtered.kreport2",
-        report="{tmp}METADATA/ANALYSIS_PROGRESS_MANAGEMENT.csv"
+        thing="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/filtered.kreport2"
     output:
         dummy=temp("{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_q2rereplicate.report")
     params:
+        "report_log=" + LOGS + "; ",
         "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
         "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
@@ -305,16 +305,16 @@ rule report_kmermap_q2rereplicate:
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "OTU: taxonomic classification.\" "
-        ">> {input.report}; "
+        ">> \"${{report_log}}\"; "
         "touch {output.dummy}"
 
 rule report_counttax_q2kmermap:
     input:
-        thing="{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist",
-        report="{tmp}METADATA/ANALYSIS_PROGRESS_MANAGEMENT.csv"
+        thing="{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"
     output:
         dummy=temp("{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_q2kmermap.report")
     params:
+        "report_log=" + LOGS + "; ",
         "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
         "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
@@ -324,18 +324,18 @@ rule report_counttax_q2kmermap:
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "OTU: file conversion.\" "
-        ">> {input.report}; "
+        ">> \"${{report_log}}\"; "
         "touch {output.dummy}"
 
 ## ALIGN ##
 
 rule report_filter_aligned:
     input:
-        thing="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/filteredsorted.bam",
-        report="{tmp}METADATA/ANALYSIS_PROGRESS_MANAGEMENT.csv"
+        thing="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/filteredsorted.bam"
     output:
         dummy=temp("{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_filter_aligned.report")
     params:
+        "report_log=" + LOGS + "; ",
         "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
         "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
@@ -345,16 +345,16 @@ rule report_filter_aligned:
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "Alignment: alignment, extraction of uniquely aligned reads (not fully filtered).\" "
-        ">> {input.report}; "
+        ">> \"${{report_log}}\"; "
         "touch {output.dummy}"
 
 rule report_counttax_aligned:
     input:
-        thing="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/aligned.counttaxlist",
-        report="{tmp}METADATA/ANALYSIS_PROGRESS_MANAGEMENT.csv"
+        thing="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/aligned.counttaxlist"
     output:
         dummy=temp("{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_aligned.report")
     params:
+        "report_log=" + LOGS + "; ",
         "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
         "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
@@ -364,18 +364,18 @@ rule report_counttax_aligned:
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "Alignment: filtering, taxonomic classification and file conversion.\" "
-        ">> {input.report}; "
+        ">> \"${{report_log}}\"; "
         "touch {output.dummy}"
 
 ## K-MER MAPPING ##
 
 rule report_kmermap_filtered:
     input:
-        thing="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kreport2",
-        report="{tmp}METADATA/ANALYSIS_PROGRESS_MANAGEMENT.csv"
+        thing="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kreport2"
     output:
         dummy=temp("{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_filtered.report")
     params:
+        "report_log=" + LOGS + "; ",
         "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
         "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
@@ -385,16 +385,16 @@ rule report_kmermap_filtered:
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "K-mer: taxonomic classification.\" "
-        ">> {input.report}; "
+        ">> \"${{report_log}}\"; "
         "touch {output.dummy}"
 
 rule report_retax_kmermap:
     input:
-        thing="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/{reftype}.kreport2",
-        report="{tmp}METADATA/ANALYSIS_PROGRESS_MANAGEMENT.csv"
+        thing="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/{reftype}.kreport2"
     output:
         dummy=temp("{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_retax_kmermap.report")
     params:
+        "report_log=" + LOGS + "; ",
         "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
         "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
@@ -404,16 +404,16 @@ rule report_retax_kmermap:
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "K-mer: abundance reestimation.\" "
-        ">> {input.report}; "
+        ">> \"${{report_log}}\"; "
         "touch {output.dummy}"
 
 rule report_counttax_kmermap:
     input:
-        thing="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist",
-        report="{tmp}METADATA/ANALYSIS_PROGRESS_MANAGEMENT.csv"
+        thing="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"
     output:
         dummy=temp("{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_kmermap.report")
     params:
+        "report_log=" + LOGS + "; ",
         "all_IDs=( $(echo \"" + " ".join(SAMPLES.values()) + "\") ); ",
         "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
@@ -423,7 +423,7 @@ rule report_counttax_kmermap:
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "K-mer: file conversion.\" "
-        ">> {input.report}; "
+        ">> \"${{report_log}}\"; "
         "touch {output.dummy}"
 
 
