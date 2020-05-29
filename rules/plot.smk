@@ -164,6 +164,7 @@ def input_fastq(wildcards):
     all_barc = listdir(basecall_dir)
     ## retain only barcodes containing one of the selected barcodes from the metadata (not unassigned)
     all_barc = [barc for barc in all_barc if barc in SAMPLES.keys()]
+    all_barc.sort()
 
     ## filtered fastq files for all barcodes
     input_list = ["{tmp}01_processed_data/02_trimming_filtering/{run}/" + barc + "/filtered.fastq" for barc in all_barc]

@@ -86,6 +86,7 @@ def input_all(wildcards):
     all_barc = listdir(basecall_dir)
     ## retain only barcodes containing one of the selected barcodes from the metadata (not unassigned)
     all_barc = [barc for barc in all_barc if barc in SAMPLES.keys()]
+    all_barc.sort()
 
     ## report directories...
     all_barc_dir = (
