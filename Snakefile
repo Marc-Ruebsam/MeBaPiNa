@@ -38,8 +38,8 @@ wildcard_constraints:
 METADATA = pd.read_excel( config["experiments"]["tmp"] + config["experiments"]["meta"], header = 1 )
 ## find meta data for required samples
 METADATA = METADATA.loc[ METADATA['Sample name'].isin(config["experiments"]["samples"]), : ]
-#!# currently only one single run analysis is supported. Use run with most sample overlaps
-RUNS = [METADATA['Run ID'].value_counts().sort_values(ascending=False).keys()[0]]
+## runs used to produce the samples
+RUNS = list(METADATA['Run ID'].value_counts().sort_values(ascending=False).keys())
 METADATA = METADATA.loc[ METADATA['Run ID'].isin(RUNS), : ]
 ## sample barcode information
 SAMPLES = pd.Series(METADATA['Sample name'].values,index=METADATA['Barcode']).to_dict()
@@ -77,9 +77,13 @@ include: "rules/report.smk"
 ## TARGET RULE ##
 #################
 
+print(RUNS)
+
 ## target rule for all output
 def input_all(wildcards):
     from os import listdir
+    ## loop over run ids
+
     ## get "pass" directory
     basecall_dir = checkpoints.basecall_raw.get(tmp=config["experiments"]["tmp"],run=RUNS[0]).output[0]
     ## get barcode directory names within "pass" directory (excludes any barcodes without assigned reads)
