@@ -69,9 +69,7 @@ rule copy_otu_output_I: ## because of different wildcards in output
         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2filter/index.html", ## filtered reads
         ## dummy depencencies
         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2filter_uchime_ftable.report", ## REPORT
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2filter_uchime_centseq.report", ## REPORT
-        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_q2rereplicate.report", ## REPORT
-        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_q2kmermap.report" ## REPORT
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2filter_uchime_centseq.report" ## REPORT
     output:
         "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_otu_picking-{reference}-q2otupick-index.html",
         "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_otu_picking-{reference}-q2filter-index.html"
@@ -87,8 +85,6 @@ rule copy_otu_output_II: ## because of different wildcards in output
         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/krona.html", ## classified taxa
         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist", ## taxonomic classifications
         ## dummy depencencies
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2filter_uchime_ftable.report", ## REPORT
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2filter_uchime_centseq.report", ## REPORT
         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_q2rereplicate.report", ## REPORT
         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_q2kmermap.report" ## REPORT
     output:
