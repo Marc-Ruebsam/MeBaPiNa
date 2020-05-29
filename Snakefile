@@ -137,18 +137,18 @@ def input_all(wildcards):
     if "otu" in config["methodologie"]] + ## if "otu" is selected
     ## ALIGNMENT ##
     [x for x in
-    ["{tmp}{barc_dir}03_alignment/{reference}_{reftype}-pycoqc.html", ## per barcode, intentional downsampling
-    "{tmp}{barc_dir}03_alignment/{reference}_{reftype}-pycoqc.json", ## per barcode, intentional downsampling
-    "{tmp}{barc_dir}03_alignment/{reference}_{reftype}-krona.html", ## taxonomic classification
-    "{tmp}{barc_dir}03_alignment/{reference}_{reftype}-aligned.counttaxlist", ## taxonomic classification
+    ["{tmp}{barc_dir}03_alignment-{reference}_{reftype}-pycoqc.html", ## per barcode, intentional downsampling
+    "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-pycoqc.json", ## per barcode, intentional downsampling
+    "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-krona.html", ## taxonomic classification
+    "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-aligned.counttaxlist", ## taxonomic classification
     "{tmp}{barc_dir}kmer_taxa_counts-{reference}_{reftype}.tsv", ## taxa statistics
     "{tmp}{barc_dir}kmer_retaxa_counts-{reference}_{reftype}.tsv"] ## taxa statistics after abundance reestimation
     if "align" in config["methodologie"]] + ## if "align" is selected
     ## K-MER MAPPING ##
     [x for x in
-    ["{tmp}{barc_dir}03_kmer_mapping/{reference}_{reftype}-krona.html", ## taxonomic composition
-    "{tmp}{barc_dir}03_kmer_mapping/{reference}_{reftype}-krona_bracken.html", ## taxonomic composition after reestimation
-    "{tmp}{barc_dir}03_kmer_mapping/{reference}_{reftype}-kmer.counttaxlist"] ## taxonomic classification
+    ["{tmp}{barc_dir}03_kmer_mapping-{reference}_{reftype}-krona.html", ## taxonomic composition
+    "{tmp}{barc_dir}03_kmer_mapping-{reference}_{reftype}-krona_bracken.html", ## taxonomic composition after reestimation
+    "{tmp}{barc_dir}03_kmer_mapping-{reference}_{reftype}-kmer.counttaxlist"] ## taxonomic classification
     if "kmer" in config["methodologie"]] ) ## if "kmer" is selected
 
     ## expand for all barcodes
