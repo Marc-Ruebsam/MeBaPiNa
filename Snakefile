@@ -46,7 +46,7 @@ SAMPLES = pd.Series(METADATA['Sample name'].values,index=METADATA['Barcode']).to
 TIMEPOINTS = pd.Series(METADATA['Zeitpunkt'].values,index=METADATA['Barcode']).to_dict()
 
 ## path to the csv file logs are written to
-LOGS = config["experiments"]["tmp"] + config["experiments"]["meta"]
+LOGS = config["experiments"]["tmp"] + config["experiments"]["log"]
 
 ## get run information
 FLOWCELL = METADATA['Flow cell product'].unique()[0]
