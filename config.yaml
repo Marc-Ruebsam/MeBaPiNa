@@ -23,16 +23,18 @@ experiments:
     "PROM-01-0003-MS-T1T2",
     "PROM-01-0004-MS-T1T2",
     "PROM-01-0005-MS-T1T2",
-    "PROM-01-0002-MS-T2ERW",
-    "Lu5",
-    "Lu13",
-    "Lu18",
-    "Extraction-control-enriched",
-    "Lu5-enriched",
-    "Lu13-enriched",
-    "Lu18-enriched",
-    "Lu5",
-    "Ov85"]
+    "PROM-01-0002-MS-T2ERW"]
+    # ["NTC",
+    # "Extraction-control",
+    # "ZymoDNA","Lu5",
+    # "Lu13",
+    # "Lu18",
+    # "Extraction-control-enriched",
+    # "Lu5-enriched",
+    # "Lu13-enriched",
+    # "Lu18-enriched",
+    # "Lu5",
+    # "Ov85"]
 
 methodologie:
   ["kmer", "align"] ## one (or multiple of ) ["kmer", "align", "otu"]. The "asv" mehtodolgie is not supported.

@@ -39,20 +39,20 @@ METADATA = pd.read_excel( config["experiments"]["tmp"] + config["experiments"]["
 ## find meta data for required samples
 METADATA = METADATA.loc[ METADATA['Sample name'].isin(config["experiments"]["samples"]), : ]
 ## runs used to produce the samples
-RUNS = list(METADATA['Run ID'].value_counts().sort_values(ascending=False).keys())
+RUNS = list(METADATA['Run ID'].value_counts().sort_values(ascending=False).keys()[0]) #!# only one run id can be used at a time
 METADATA = METADATA.loc[ METADATA['Run ID'].isin(RUNS), : ]
 ## sample barcode information
 SAMPLES = pd.Series(METADATA['Sample name'].values,index=METADATA['Barcode']).to_dict()
 TIMEPOINTS = pd.Series(METADATA['Zeitpunkt'].values,index=METADATA['Barcode']).to_dict()
-
-## path to the csv file logs are written to
-LOGS = config["experiments"]["tmp"] + config["experiments"]["log"]
 
 ## get run information
 FLOWCELL = METADATA['Flow cell product'].unique()[0]
 SEQ_KIT = METADATA['Sequencing kit'].unique()[0]
 BAC_KIT = METADATA['Barcoding kit'].unique()[0]
 LAM_DCS = METADATA['Lambda DCS'].unique()[0]
+
+## path to the csv file logs are written to
+LOGS = config["experiments"]["tmp"] + config["experiments"]["log"]
 
 ## sample depth for downsampling in some plots
 PLOT_SMPL = config["filtering"]["plot_sample"]
@@ -77,13 +77,9 @@ include: "rules/report.smk"
 ## TARGET RULE ##
 #################
 
-print(RUNS)
-
 ## target rule for all output
 def input_all(wildcards):
     from os import listdir
-    ## loop over run ids
-
     ## get "pass" directory
     basecall_dir = checkpoints.basecall_raw.get(tmp=config["experiments"]["tmp"],run=RUNS[0]).output[0]
     ## get barcode directory names within "pass" directory (excludes any barcodes without assigned reads)
