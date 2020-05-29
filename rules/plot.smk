@@ -155,11 +155,26 @@ rule plot_fastqc_fastq_basecall:
 ## TRIM AND FILTER ##
 #####################
 
+## target rule for all output
+def input_fastq(wildcards):
+    from os import listdir
+    ## get "pass" directory
+    basecall_dir = checkpoints.basecall_raw.get(tmp=wildcards.tmp,run=wildcards.run).output[0]
+    ## get barcode directory names within "pass" directory (excludes any barcodes without assigned reads)
+    all_barc = listdir(basecall_dir)
+    ## retain only barcodes containing one of the selected barcodes from the metadata (not unassigned)
+    all_barc = [barc for barc in all_barc if barc in SAMPLES.keys()]
+
+    ## filtered fastq files for all barcodes
+    input_list = ["{tmp}01_processed_data/02_trimming_filtering/{run}/" + barc + "/filtered.fastq" for barc in all_barc]
+    ## return
+    return input_list
+
 ## NANOPLOT ##
 
 rule plot_nanoplot_fastq_filter:
     input:
-        expand("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq", tmp = config["experiments"]["tmp"], run = RUNS, barc = SAMPLES.keys())
+        input_fastq
     output:
         "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoplot/NanoStats.txt",
         "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoplot/NanoPlot-report.html"
@@ -188,7 +203,7 @@ rule plot_nanoplot_fastq_filter:
 
 rule plot_nanocomp_fastq_filter:
     input:
-        expand("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq", tmp = config["experiments"]["tmp"], run = RUNS, barc = SAMPLES.keys())
+        input_fastq
     output:
         "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanocomp/NanoStats.txt",
         "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanocomp/NanoComp-report.html"
@@ -215,7 +230,7 @@ rule plot_nanocomp_fastq_filter:
 
 rule plot_fastq_pipe_filter:
     input:
-        expand("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq", tmp = config["experiments"]["tmp"], run = RUNS, barc = SAMPLES.keys())
+        input_fastq
     output:
         temp("{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoqc/pipe.fastq") ## pipe (snakemake built-in or bash) didn't work neighter did named pipes (no fastq file extension)
     log:
@@ -255,7 +270,7 @@ rule plot_nanoqc_fastq_filter:
 
 rule plot_fastqc_fastq_filter:
     input:
-        expand("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq", tmp = config["experiments"]["tmp"], run = RUNS, barc = SAMPLES.keys())
+        input_fastq
     output:
         "{tmp}02_analysis_results/02_trimming_filtering/{run}/fastqc/stdin_fastqc.html"
     log:
