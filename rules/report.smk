@@ -223,7 +223,7 @@ rule report_trim_basecalled:
     shell:
         "{params}"
         "id=${{all_IDs[$(for idx in \"${{!all_barcs[@]}}\"; do " ## have to find sample name (id) to barcode and are not allowed wildcards as variable keys
-        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
+        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $idx; fi; done)]}}; "
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "General: trimmed adapters and barcodes from reads and demultiplexed a second time.\" "
@@ -242,7 +242,7 @@ rule report_filter_trimmed:
     shell:
         "{params}"
         "id=${{all_IDs[$(for idx in \"${{!all_barcs[@]}}\"; do "
-        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
+        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $idx; fi; done)]}}; "
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "General: length and quality filtered reads.\" "
@@ -263,7 +263,7 @@ rule report_q2filter_uchime_ftable:
     shell:
         "{params}"
         "id=${{all_IDs[$(for idx in \"${{!all_barcs[@]}}\"; do "
-        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
+        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $idx; fi; done)]}}; "
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "OTU: count table of features after: dereplication, open-reference clustering, chimera removal and filtering.\" "
@@ -282,7 +282,7 @@ rule report_q2filter_uchime_centseq:
     shell:
         "{params}"
         "id=${{all_IDs[$(for idx in \"${{!all_barcs[@]}}\"; do "
-        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
+        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $idx; fi; done)]}}; "
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "OTU: feature clusters central sequences after: dereplication, open-reference clustering, chimera removal and filtering.\" "
@@ -301,7 +301,7 @@ rule report_kmermap_q2rereplicate:
     shell:
         "{params}"
         "id=${{all_IDs[$(for idx in \"${{!all_barcs[@]}}\"; do "
-        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
+        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $idx; fi; done)]}}; "
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "OTU: taxonomic classification.\" "
@@ -320,7 +320,7 @@ rule report_counttax_q2kmermap:
     shell:
         "{params}"
         "id=${{all_IDs[$(for idx in \"${{!all_barcs[@]}}\"; do "
-        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
+        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $idx; fi; done)]}}; "
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "OTU: file conversion.\" "
@@ -341,7 +341,7 @@ rule report_filter_aligned:
     shell:
         "{params}"
         "id=${{all_IDs[$(for idx in \"${{!all_barcs[@]}}\"; do "
-        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
+        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $idx; fi; done)]}}; "
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "Alignment: alignment, extraction of uniquely aligned reads (not fully filtered).\" "
@@ -360,7 +360,7 @@ rule report_counttax_aligned:
     shell:
         "{params}"
         "id=${{all_IDs[$(for idx in \"${{!all_barcs[@]}}\"; do "
-        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
+        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $idx; fi; done)]}}; "
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "Alignment: filtering, taxonomic classification and file conversion.\" "
@@ -381,7 +381,7 @@ rule report_kmermap_filtered:
     shell:
         "{params}"
         "id=${{all_IDs[$(for idx in \"${{!all_barcs[@]}}\"; do "
-        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
+        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $idx; fi; done)]}}; "
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "K-mer: taxonomic classification.\" "
@@ -400,7 +400,7 @@ rule report_retax_kmermap:
     shell:
         "{params}"
         "id=${{all_IDs[$(for idx in \"${{!all_barcs[@]}}\"; do "
-        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
+        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $idx; fi; done)]}}; "
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "K-mer: abundance reestimation.\" "
@@ -419,7 +419,7 @@ rule report_counttax_kmermap:
     shell:
         "{params}"
         "id=${{all_IDs[$(for idx in \"${{!all_barcs[@]}}\"; do "
-        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
+        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $idx; fi; done)]}}; "
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "K-mer: file conversion.\" "
