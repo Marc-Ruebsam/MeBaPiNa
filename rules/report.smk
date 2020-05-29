@@ -33,7 +33,7 @@ rule copy_basecall_output:
         "all_input=( $(echo \"{input}\") ); "
         "all_output=( $(echo \"{output}\") ); "
         "for idx in \"${{!all_output[@]}}\"; do " ## loop over index of output array (because of dummy report files)
-        "cp \"${{all_input[$idx]}}\" \"${{all_output[$i]}}\"; done" ## copy input at index idx to output at index idx
+        "cp \"${{all_input[$idx]}}\" \"${{all_output[$idx]}}\"; done" ## copy input at index idx to output at index idx
 
 ## TRIM AND FILTER ##
 
@@ -58,7 +58,7 @@ rule copy_trim_filter_output:
         "all_input=( $(echo \"{input}\") ); "
         "all_output=( $(echo \"{output}\") ); "
         "for idx in \"${{!all_output[@]}}\"; do "
-        "cp \"${{all_input[$idx]}}\" \"${{all_output[$i]}}\"; done"
+        "cp \"${{all_input[$idx]}}\" \"${{all_output[$idx]}}\"; done"
 
 ## OTU ##
 
@@ -77,7 +77,7 @@ rule copy_otu_output_I: ## because of different wildcards in output
         "all_input=( $(echo \"{input}\") ); "
         "all_output=( $(echo \"{output}\") ); "
         "for idx in \"${{!all_output[@]}}\"; do "
-        "cp \"${{all_input[$idx]}}\" \"${{all_output[$i]}}\"; done"
+        "cp \"${{all_input[$idx]}}\" \"${{all_output[$idx]}}\"; done"
 
 rule copy_otu_output_II: ## because of different wildcards in output
     input:
@@ -94,7 +94,7 @@ rule copy_otu_output_II: ## because of different wildcards in output
         "all_input=( $(echo \"{input}\") ); "
         "all_output=( $(echo \"{output}\") ); "
         "for idx in \"${{!all_output[@]}}\"; do "
-        "cp \"${{all_input[$idx]}}\" \"${{all_output[$i]}}\"; done"
+        "cp \"${{all_input[$idx]}}\" \"${{all_output[$idx]}}\"; done"
 
 ## ALIGNMENT ##
 
@@ -117,7 +117,7 @@ rule copy_align_output:
         "all_input=( $(echo \"{input}\") ); "
         "all_output=( $(echo \"{output}\") ); "
         "for idx in \"${{!all_output[@]}}\"; do "
-        "cp \"${{all_input[$idx]}}\" \"${{all_output[$i]}}\"; done"
+        "cp \"${{all_input[$idx]}}\" \"${{all_output[$idx]}}\"; done"
 
 ## K-MER MAPPING ##
 
@@ -139,7 +139,7 @@ rule copy_kmer_output:
         "all_input=( $(echo \"{input}\") ); "
         "all_output=( $(echo \"{output}\") ); "
         "for idx in \"${{!all_output[@]}}\"; do "
-        "cp \"${{all_input[$idx]}}\" \"${{all_output[$i]}}\"; done"
+        "cp \"${{all_input[$idx]}}\" \"${{all_output[$idx]}}\"; done"
 
 
 ## CREATE REPORT FILE ##
@@ -222,8 +222,8 @@ rule report_trim_basecalled:
         "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
         "{params}"
-        "id=${{all_IDs[$(for i in \"${{!all_barcs[@]}}\"; do " ## have to find sample name (id) to barcode and are not allowed wildcards as variable keys
-        "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
+        "id=${{all_IDs[$(for idx in \"${{!all_barcs[@]}}\"; do " ## have to find sample name (id) to barcode and are not allowed wildcards as variable keys
+        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "General: trimmed adapters and barcodes from reads and demultiplexed a second time.\" "
@@ -241,8 +241,8 @@ rule report_filter_trimmed:
         "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
         "{params}"
-        "id=${{all_IDs[$(for i in \"${{!all_barcs[@]}}\"; do "
-        "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
+        "id=${{all_IDs[$(for idx in \"${{!all_barcs[@]}}\"; do "
+        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "General: length and quality filtered reads.\" "
@@ -262,8 +262,8 @@ rule report_q2filter_uchime_ftable:
         "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
         "{params}"
-        "id=${{all_IDs[$(for i in \"${{!all_barcs[@]}}\"; do "
-        "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
+        "id=${{all_IDs[$(for idx in \"${{!all_barcs[@]}}\"; do "
+        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "OTU: count table of features after: dereplication, open-reference clustering, chimera removal and filtering.\" "
@@ -281,8 +281,8 @@ rule report_q2filter_uchime_centseq:
         "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
         "{params}"
-        "id=${{all_IDs[$(for i in \"${{!all_barcs[@]}}\"; do "
-        "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
+        "id=${{all_IDs[$(for idx in \"${{!all_barcs[@]}}\"; do "
+        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "OTU: feature clusters central sequences after: dereplication, open-reference clustering, chimera removal and filtering.\" "
@@ -300,8 +300,8 @@ rule report_kmermap_q2rereplicate:
         "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
         "{params}"
-        "id=${{all_IDs[$(for i in \"${{!all_barcs[@]}}\"; do "
-        "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
+        "id=${{all_IDs[$(for idx in \"${{!all_barcs[@]}}\"; do "
+        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "OTU: taxonomic classification.\" "
@@ -319,8 +319,8 @@ rule report_counttax_q2kmermap:
         "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
         "{params}"
-        "id=${{all_IDs[$(for i in \"${{!all_barcs[@]}}\"; do "
-        "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
+        "id=${{all_IDs[$(for idx in \"${{!all_barcs[@]}}\"; do "
+        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "OTU: file conversion.\" "
@@ -340,8 +340,8 @@ rule report_filter_aligned:
         "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
         "{params}"
-        "id=${{all_IDs[$(for i in \"${{!all_barcs[@]}}\"; do "
-        "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
+        "id=${{all_IDs[$(for idx in \"${{!all_barcs[@]}}\"; do "
+        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "Alignment: alignment, extraction of uniquely aligned reads (not fully filtered).\" "
@@ -359,8 +359,8 @@ rule report_counttax_aligned:
         "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
         "{params}"
-        "id=${{all_IDs[$(for i in \"${{!all_barcs[@]}}\"; do "
-        "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
+        "id=${{all_IDs[$(for idx in \"${{!all_barcs[@]}}\"; do "
+        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "Alignment: filtering, taxonomic classification and file conversion.\" "
@@ -380,8 +380,8 @@ rule report_kmermap_filtered:
         "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
         "{params}"
-        "id=${{all_IDs[$(for i in \"${{!all_barcs[@]}}\"; do "
-        "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
+        "id=${{all_IDs[$(for idx in \"${{!all_barcs[@]}}\"; do "
+        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "K-mer: taxonomic classification.\" "
@@ -399,8 +399,8 @@ rule report_retax_kmermap:
         "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
         "{params}"
-        "id=${{all_IDs[$(for i in \"${{!all_barcs[@]}}\"; do "
-        "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
+        "id=${{all_IDs[$(for idx in \"${{!all_barcs[@]}}\"; do "
+        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "K-mer: abundance reestimation.\" "
@@ -418,8 +418,8 @@ rule report_counttax_kmermap:
         "all_barcs=( $(echo \"" + " ".join(SAMPLES.keys()) + "\") ); "
     shell:
         "{params}"
-        "id=${{all_IDs[$(for i in \"${{!all_barcs[@]}}\"; do "
-        "if [[ \"${{all_barcs[$i]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
+        "id=${{all_IDs[$(for idx in \"${{!all_barcs[@]}}\"; do "
+        "if [[ \"${{all_barcs[$idx]}}\" = \"{wildcards.barc}\" ]]; then echo $i; fi; done)]}}; "
         "md5checksum=$(md5sum \"{input.thing}\" | awk '{{print $1}}'); "
         "echo \"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
         "K-mer: file conversion.\" "
