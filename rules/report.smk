@@ -293,7 +293,7 @@ rule report_q2filter_uchime_centseq:
         ">> {input.report}; "
         "touch {output.dummy}"
 
-rule report_counttax_q2kmermap:
+rule report_kmermap_q2rereplicate:
     input:
         thing="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/filtered.kreport2",
         report="{tmp}METADATA/ANALYSIS_PROGRESS_MANAGEMENT.csv"
