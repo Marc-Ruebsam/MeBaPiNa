@@ -145,7 +145,7 @@ rule copy_kmer_output:
 ## CREATE REPORT FILE ##
 ########################
 
-rule initiate_report:
+rule report_initiate:
     output:
         "{tmp}METADATA/ANALYSIS_PROGRESS_MANAGEMENT.csv"
     shell:
