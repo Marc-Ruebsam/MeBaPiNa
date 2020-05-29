@@ -23,10 +23,7 @@ experiments:
     "PROM-01-0003-MS-T1T2",
     "PROM-01-0004-MS-T1T2",
     "PROM-01-0005-MS-T1T2",
-    "PROM-01-0002-MS-T2ERW"]
-    ["NTC",
-    "Extraction-control",
-    "ZymoDNA",
+    "PROM-01-0002-MS-T2ERW",
     "Lu5",
     "Lu13",
     "Lu18",
