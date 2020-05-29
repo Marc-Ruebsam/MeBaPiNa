@@ -171,7 +171,7 @@ rule report_move_raw:
         "md5checksum=$(find \"{input.thing}\" -type f -exec md5sum {{}} \\; | sort -k 2 | awk '{{print $1}}' | md5sum | awk '{{print $1}}'); " ## md5 of md5s
         "for id in ${{all_IDs[@]}}; do echo "
         "\"${{id}};{input.thing};Moved input;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
-        "General: raw fast5 files moved to directory ready for analysis. Checksum was calculated as: find -type f -exec md5sum {{}} \\; | sort -k 2 | awk '{{print $1}}' | md5sum \" "
+        "General: raw fast5 files moved to directory ready for analysis. Checksum was calculated as: find -type f -exec md5sum {{}} \\; | sort -k 2 | awk '{{print \$1}}' | md5sum \" "
         ">> {input.report}; done; "
         "touch {output.dummy}" ## for dependencies
 
@@ -205,7 +205,7 @@ rule report_basecall_raw_pass:
         "md5checksum=$(find \"{input.thing}\" -type f -exec md5sum {{}} \\; | sort -k 2 | awk '{{print $1}}' | md5sum | awk '{{print $1}}'); "
         "for id in ${{all_IDs[@]}}; do echo "
         "\"${{id}};{input.thing};Created output;$(stat -c '%.19z' {input.thing});${{md5checksum}};MeBaPiNa;"
-        "General: basecalled and demultiplexed fastq files. Checksum was calculated as: find -type f -exec md5sum {{}} \\; | sort -k 2 | awk '{{print $1}}' | md5sum \" "
+        "General: basecalled and demultiplexed fastq files. Checksum was calculated as: find -type f -exec md5sum {{}} \\; | sort -k 2 | awk '{{print \$1}}' | md5sum \" "
         ">> {input.report}; done; "
         "touch {output.dummy}"
 
