@@ -39,7 +39,7 @@ METADATA = pd.read_excel( config["experiments"]["tmp"] + config["experiments"]["
 ## find meta data for required samples
 METADATA = METADATA.loc[ METADATA['Sample name'].isin(config["experiments"]["samples"]), : ]
 ## runs used to produce the samples
-RUNS = list(METADATA['Run ID'].value_counts().sort_values(ascending=False).keys()[0]) #!# only one run id can be used at a time
+RUNS = [METADATA['Run ID'].value_counts().sort_values(ascending=False).keys()[0]] #!# only one run id can be used at a time
 METADATA = METADATA.loc[ METADATA['Run ID'].isin(RUNS), : ]
 ## sample barcode information
 SAMPLES = pd.Series(METADATA['Sample name'].values,index=METADATA['Barcode']).to_dict()
