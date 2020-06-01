@@ -25,7 +25,7 @@ rule samtools_depth:
         "-l " + config['filtering']['len_min'] #!# should be redundant
     shell:
         "samtools depth {params} "
-        "--reference {input.referemce} {input.bam} "
+        "--reference {input.reference} {input.bam} "
         "> {output}"
 
 rule stat_refseq_lenstat:
