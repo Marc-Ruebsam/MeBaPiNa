@@ -9,6 +9,7 @@
 
 rule copy_basecall_output:
     input:
+        ## input to copy
         "{tmp}02_analysis_results/01_basecalling/{run}/nanoplot/NanoPlot-report.html", ## general QC: all reads, including calibtation strads, intentional downsampling
         "{tmp}02_analysis_results/01_basecalling/{run}/nanoplot/NanoStats.txt", ## general QC: all reads, including calibtation strads, intentional downsampling
         "{tmp}02_analysis_results/01_basecalling/{run}/pycoqc/pycoQC_report.html", ## general QC: all reads, forced downsampling
@@ -17,6 +18,7 @@ rule copy_basecall_output:
         "{tmp}02_analysis_results/01_basecalling/{run}/nanocomp/NanoStats.txt", ## barcode QC: per barcode
         "{tmp}02_analysis_results/01_basecalling/{run}/nanoqc/nanoQC.html", ## per base QC: all reads, forced downsampling
         "{tmp}02_analysis_results/01_basecalling/{run}/fastqc/stdin_fastqc.html", ## read QC: all passed reads
+        ## dummy depencencies
         "{tmp}00_raw_data/{run}/MeBaPiNa_move_raw.report", ## REPORT
         "{tmp}00_raw_data/{run}/MeBaPiNa_basecall_raw_seqsum.report", ## REPORT
         "{tmp}00_raw_data/{run}/MeBaPiNa_basecall_raw_pass.report" ## REPORT
@@ -39,12 +41,14 @@ rule copy_basecall_output:
 
 rule copy_trim_filter_output:
     input:
+        ## input to copy
         "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoplot/NanoPlot-report.html", ## general QC: trimed and filtered barcoded reads, intentional downsampling
         "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoplot/NanoStats.txt", ## general QC: trimed and filtered barcoded reads, intentional downsampling
         "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanocomp/NanoComp-report.html", ## barcode QC: trimed and filtered barcoded reads
         "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanocomp/NanoStats.txt", ## barcode QC: trimed and filtered barcoded reads
         "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoqc/nanoQC.html", ## per base QC: trimed and filtered barcoded reads, forced downsampling
         "{tmp}02_analysis_results/02_trimming_filtering/{run}/fastqc/stdin_fastqc.html", ## read QC: trimed and filtered barcoded reads
+        ## dummy depencencies
         "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trim_basecalled.report", ## REPORT
         "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filter_trimmed.report" ## REPORT
     output:

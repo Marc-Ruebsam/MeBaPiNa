@@ -2,7 +2,7 @@
 ## REFERENCE ##
 ###############
 
-rule faidx:
+rule samtools_faidx:
     input:
         "{fasta}"
     output:
@@ -11,6 +11,22 @@ rule faidx:
         "../envs/samtools.yml"
     shell:
         "samtools faidx {input}"
+
+rule samtools_depth:
+    input:
+        bam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/filteredsorted.bam",
+        target="{tmp}METADATA/Reference_Sequences/{reference}/reference.fasta"
+    output:
+        temp("{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/refseq_coverage.tsv")
+    conda:
+        "../envs/samtools.yml"
+    params:
+        "-a",
+        "-l " + config['filtering']['len_min'] #!# should be redundant
+    shell:
+        "samtools depth {params} "
+        "--reference {input.referemce} {input.bam} "
+        "> {output}"
 
 rule stat_refseq_lenstat:
     input:
@@ -136,9 +152,9 @@ rule stat_otu_taxa:
         "%d\\t{wildcards.reftype}_taxa_count\\n%d\\t{wildcards.reftype}_read_count\\n%.2f\\t{wildcards.reftype}_mean_abund\\n\","
         "cnt_tax,cnt_feat,(cnt_feat/cnt_tax),cnt_stax,cnt_sfeat,(cnt_sfeat/cnt_stax)}}' {input} > {output}"
 
-###########
+###################
 ## K-MER MAPPING ##
-###########
+###################
 
 rule stat_kmer_taxa:
     input:
