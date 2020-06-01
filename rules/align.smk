@@ -24,7 +24,7 @@ rule splitting_filtered: #!# only required because of low memory avaialility
 rule aligning_filtered:
     input:
         barc_dir="{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/split",
-        target=expand("{tmp}METADATA/Reference_Sequences/{reference}/reference.mmi", tmp = config["experiments"]["tmp"], reference = config["reference"]["source"])
+        target="{tmp}METADATA/Reference_Sequences/{reference}/reference.mmi"
     output:
         temp("{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/aligned.sam")
     log:
