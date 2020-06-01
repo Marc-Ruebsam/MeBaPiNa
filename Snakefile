@@ -144,14 +144,16 @@ def input_all(wildcards):
     "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-covpos.pdf", ## per barcode, coverage over reference sequence positions
     "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-krona.html", ## taxonomic classification
     "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-aligned.counttaxlist", ## taxonomic classification
-    "{tmp}{barc_dir}kmer_taxa_counts-{reference}_{reftype}.tsv", ## taxa statistics
-    "{tmp}{barc_dir}kmer_retaxa_counts-{reference}_{reftype}.tsv"] ## taxa statistics after abundance reestimation
+    "{tmp}{barc_dir}align_rates-{reference}_{reftype}.tsv", ## alignment statistics
+    "{tmp}{barc_dir}align_taxa_counts-{reference}_{reftype}.tsv"] ## taxa statistics
     if "align" in config["methodologie"]] + ## if "align" is selected
     ## K-MER MAPPING ##
     [x for x in
     ["{tmp}{barc_dir}03_kmer_mapping-{reference}_{reftype}-krona.html", ## taxonomic composition
     "{tmp}{barc_dir}03_kmer_mapping-{reference}_{reftype}-krona_bracken.html", ## taxonomic composition after reestimation
-    "{tmp}{barc_dir}03_kmer_mapping-{reference}_{reftype}-kmer.counttaxlist"] ## taxonomic classification
+    "{tmp}{barc_dir}03_kmer_mapping-{reference}_{reftype}-kmer.counttaxlist", ## taxonomic classification
+    "{tmp}{barc_dir}kmer_taxa_counts-{reference}_{reftype}.tsv", ## taxa statistics
+    "{tmp}{barc_dir}kmer_retaxa_counts-{reference}_{reftype}.tsv"] ## taxa statistics after abundance reestimation
     if "kmer" in config["methodologie"]] ) ## if "kmer" is selected
 
     ## expand for all barcodes
