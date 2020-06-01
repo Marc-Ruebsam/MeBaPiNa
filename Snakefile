@@ -134,7 +134,8 @@ def input_all(wildcards):
     "{tmp}{barc_dir}03_otu_picking-{reference}_{reftype}-krona.html", ## classified taxa
     "{tmp}{barc_dir}03_otu_picking-{reference}_{reftype}-kmer.counttaxlist", ## taxonomic classifications
     "{tmp}{barc_dir}03_otu_picking-{reference}-feature_counts.tsv", ## feature statistics
-    "{tmp}{barc_dir}03_otu_picking-{reference}_{reftype}-taxa_counts.tsv"] ## taxa statistics
+    "{tmp}{barc_dir}03_otu_picking-{reference}_{reftype}-taxa_counts.tsv", ## taxa statistics
+    "{tmp}{barc_dir}03_otu_picking-{reference}_{reftype}-taxa_diversity.tsv"] ## diversity and richness measures
     if "otu" in config["methodologie"]] + ## if "otu" is selected
     ## ALIGNMENT ##
     [x for x in
@@ -145,7 +146,8 @@ def input_all(wildcards):
     "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-krona.html", ## taxonomic classification
     "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-aligned.counttaxlist", ## taxonomic classification
     "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-alignment_rates.tsv", ## alignment statistics
-    "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-taxa_counts.tsv"] ## taxa statistics
+    "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-taxa_counts.tsv", ## taxa statistics
+    "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-taxa_diversity.tsv"] ## diversity and richness measures
     if "align" in config["methodologie"]] + ## if "align" is selected
     ## K-MER MAPPING ##
     [x for x in
@@ -153,7 +155,8 @@ def input_all(wildcards):
     "{tmp}{barc_dir}03_kmer_mapping-{reference}_{reftype}-krona_bracken.html", ## taxonomic composition after reestimation
     "{tmp}{barc_dir}03_kmer_mapping-{reference}_{reftype}-kmer.counttaxlist", ## taxonomic classification
     "{tmp}{barc_dir}03_kmer_mapping-{reference}_{reftype}-taxa_counts.tsv", ## taxa statistics
-    "{tmp}{barc_dir}03_kmer_mapping-{reference}_{reftype}-retaxa_counts.tsv"] ## taxa statistics after abundance reestimation
+    "{tmp}{barc_dir}03_kmer_mapping-{reference}_{reftype}-retaxa_counts.tsv", ## taxa statistics after abundance reestimation
+    "{tmp}{barc_dir}03_kmer_mapping-{reference}_{reftype}-taxa_diversity.tsv"] ## diversity and richness measures
     if "kmer" in config["methodologie"]] ) ## if "kmer" is selected
 
     ## expand for all barcodes

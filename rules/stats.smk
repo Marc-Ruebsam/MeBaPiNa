@@ -151,6 +151,17 @@ rule stat_otu_taxa:
         "%d\\t{wildcards.reftype}_taxa_count\\n%d\\t{wildcards.reftype}_read_count\\n%.2f\\t{wildcards.reftype}_mean_abund\\n\","
         "cnt_tax,cnt_feat,(cnt_feat/cnt_tax),cnt_stax,cnt_sfeat,(cnt_sfeat/cnt_stax)}}' {input} > {output}"
 
+rule stat_otu_taxa_diversity:
+    input:
+        taxlist="{tmp}METADATA/Reference_Sequences/{reference}/krona/{reftype}/taxlist.txt",
+        sample_file="{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"
+    output:
+        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_otu_picking-{reference}_{reftype}-taxa_diversity.tsv"
+    conda:
+        "../envs/r-diversity.yml"
+    script:
+        "../scripts/phyloseq_vegan.R"
+
 ###############
 ## ALIGNMENT ##
 ###############
@@ -188,6 +199,17 @@ rule stat_align_taxa:
         "%d\\t{wildcards.reftype}_taxa_count\\n%d\\t{wildcards.reftype}_read_count\\n%.2f\\t{wildcards.reftype}_mean_abund\\n\","
         "cnt_tax,cnt_feat,(cnt_feat/cnt_tax),cnt_stax,cnt_sfeat,(cnt_sfeat/cnt_stax)}}' {input} > {output}"
 
+rule stat_align_taxa_diversity:
+    input:
+        taxlist="{tmp}METADATA/Reference_Sequences/{reference}/krona/{reftype}/taxlist.txt",
+        sample_file="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/aligned.counttaxlist"
+    output:
+        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}_{reftype}-taxa_diversity.tsv"
+    conda:
+        "../envs/r-diversity.yml"
+    script:
+        "../scripts/phyloseq_vegan.R"
+
 ###################
 ## K-MER MAPPING ##
 ###################
@@ -221,3 +243,14 @@ rule stat_kmer_retaxa:
         "END{{printf \"%d\\ttotal_taxa_count\\n%d\\ttotal_read_count\\n%.2f\\ttotal_mean_abund\\n"
         "%d\\t{wildcards.reftype}_taxa_count\\n%d\\t{wildcards.reftype}_read_count\\n%.2f\\t{wildcards.reftype}_mean_abund\\n\","
         "cnt_tax,cnt_feat,(cnt_feat/cnt_tax),cnt_stax,cnt_sfeat,(cnt_sfeat/cnt_stax)}}' {input} > {output}"
+
+rule stat_kmer_taxa_diversity:
+    input:
+        taxlist="{tmp}METADATA/Reference_Sequences/{reference}/krona/{reftype}/taxlist.txt",
+        sample_file="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"
+    output:
+        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_kmer_mapping-{reference}_{reftype}-taxa_diversity.tsv"
+    conda:
+        "../envs/r-diversity.yml"
+    script:
+        "../scripts/phyloseq_vegan.R"
