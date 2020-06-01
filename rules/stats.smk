@@ -108,7 +108,7 @@ rule stat_otu_feature:
     input:
         otutable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_ftable.qza" ## also dummy for MeBaPiNa_q2otupick.log
     output:
-        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/otu_feature_counts-{reference}.tsv"
+        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_otu_picking-{reference}-feature_counts.tsv"
     conda:
         "../envs/qiime2.yml"
     shell:
@@ -140,7 +140,7 @@ rule stat_otu_taxa:
     input:
         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/filtered.kreport2"
     output:
-        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/otu_taxa_counts-{reference}_{reftype}.tsv"
+        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_otu_picking-{reference}_{reftype}-taxa_counts.tsv"
     shell:
         "awk 'BEGIN{{cnt_stax=0;cnt_tax=0;cnt_sfeat=0;" ## initialize variables
         "lw_rnk=substr(\"{wildcards.reftype}\",1,1)}}; " ## get first character of reference type (e.g. "S" for Species)
@@ -159,7 +159,7 @@ rule stat_align_readsrates:
     input:
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc.json"
     output:
-        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/align_rates-{reference}_{reftype}.tsv"
+        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}_{reftype}-alignment_rates.tsv"
     shell:
         "awk 'BEGIN{{prnt=0;cnt=0;strt_cnt=0}};" ## initialize variables
         "/\"alignment\"/{{prnt=1}};" ## inside the alignment section...
@@ -177,7 +177,7 @@ rule stat_align_taxa:
     input:
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/aligned.counttaxlist"
     output:
-        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/align_taxa_counts-{reference}_{reftype}.tsv"
+        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}_{reftype}-taxa_counts.tsv"
     shell:
         "awk -F\"\\t\" 'BEGIN{{ cnt_stax=0;cnt_tax=0;cnt_sfeat=0;cnt_feat=0; "
         "lw_rnk=substr(\"{wildcards.reftype}\",1,1);"
@@ -196,7 +196,7 @@ rule stat_kmer_taxa:
     input:
         "{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kreport2"
     output:
-        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/kmer_taxa_counts-{reference}_{reftype}.tsv"
+        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_kmer_mapping-{reference}_{reftype}-taxa_counts.tsv"
     shell:
         "awk 'BEGIN{{cnt_stax=0;cnt_tax=0;cnt_sfeat=0;"
         "lw_rnk=substr(\"{wildcards.reftype}\",1,1)}}; "
@@ -211,7 +211,7 @@ rule stat_kmer_retaxa:
     input:
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/{reftype}.kreport2"
     output:
-        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/kmer_retaxa_counts-{reference}_{reftype}.tsv"
+        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_kmer_mapping-{reference}_{reftype}-retaxa_counts.tsv"
     shell:
         "awk 'BEGIN{{cnt_stax=0;cnt_tax=0;cnt_sfeat=0;"
         "lw_rnk=substr(\"{wildcards.reftype}\",1,1)}}; "
