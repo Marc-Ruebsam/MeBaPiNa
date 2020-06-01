@@ -396,6 +396,33 @@ rule plot_pycoqc_aligned:
         "--html_outfile {output.html} "
         "--json_outfile {output.json} > {log} 2>&1"
 
+rule plot_samtools_depth:
+    input:
+        bam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/filteredsorted.bam",
+        target="{tmp}METADATA/Reference_Sequences/{reference}/reference.fasta"
+    output:
+        temp("{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/refseq_coverage.tsv")
+    conda:
+        "../envs/samtools.yml"
+    params:
+        "-a",
+        "-l " + config['filtering']['len_min'] #!# should be redundant
+    shell:
+        "samtools depth {params} "
+        "--reference {input.referemce} {input.bam} "
+        "> {output}"
+
+rule plot_refseq_coverage:
+    input:
+        "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/refseq_coverage.tsv"
+    output:
+        covdist_plot="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/covdist.pdf",
+        covpos_plot="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/covpos.pdf"
+    conda:
+        "../envs/r-diversity.yml"
+    script:
+        "../scripts/bam_coverage.R"
+
 rule plot_krona_aligned_text:
     input:
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/aligned.counttaxlist"

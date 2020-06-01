@@ -140,6 +140,8 @@ def input_all(wildcards):
     [x for x in
     ["{tmp}{barc_dir}03_alignment-{reference}_{reftype}-pycoqc.html", ## per barcode, intentional downsampling
     "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-pycoqc.json", ## per barcode, intentional downsampling
+    "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-covdist.pdf", ## per barcode, reads per reference sequence histogram
+    "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-covpos.pdf", ## per barcode, coverage over reference sequence positions
     "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-krona.html", ## taxonomic classification
     "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-aligned.counttaxlist", ## taxonomic classification
     "{tmp}{barc_dir}kmer_taxa_counts-{reference}_{reftype}.tsv", ## taxa statistics
