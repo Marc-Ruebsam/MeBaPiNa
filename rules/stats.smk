@@ -15,7 +15,7 @@ rule samtools_faidx:
 rule samtools_depth:
     input:
         bam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/filteredsorted.bam",
-        target="{tmp}METADATA/Reference_Sequences/{reference}/reference.fasta"
+        reference="{tmp}METADATA/Reference_Sequences/{reference}/reference.fasta"
     output:
         temp("{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/refseq_coverage.tsv")
     conda:
