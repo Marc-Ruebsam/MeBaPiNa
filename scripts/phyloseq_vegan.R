@@ -3,6 +3,7 @@
 ## load packages
 suppressPackageStartupMessages(library("phyloseq"))
 suppressPackageStartupMessages(library("vegan"))
+suppressPackageStartupMessages(library("ggplot2"))
 
 ## set variables
 below_flt <- snakemake@config[["filtering"]][["min_featurereads"]]
