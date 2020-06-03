@@ -25,6 +25,7 @@ workdir: config["experiments"]["project"]
 
 ## prevent unwanted extension of wildcards
 wildcard_constraints:
+    tmp="[a-zA-Z0-9_]+/",
     barc="[a-zA-Z0-9]+",
     run="\w+", ## is equalt to [a-zA-Z0-9_]+
     reftype="[a-zA-Z0-9]+",
