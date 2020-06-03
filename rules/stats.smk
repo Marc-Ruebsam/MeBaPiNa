@@ -22,6 +22,7 @@ rule samtools_depth:
         "../envs/samtools.yml"
     params:
         "-a",
+        "-d 0", ## maximum coverage depth [8000]. If 0, depth is set to the maximum
         "-l " + config['filtering']['len_min'] #!# should be redundant
     shell:
         "samtools depth {params} "
