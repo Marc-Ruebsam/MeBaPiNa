@@ -108,7 +108,7 @@ rule copy_align_output_I:
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}/pycoqc.html", ## per barcode, intentional downsampling
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}/pycoqc.json", ## per barcode, intentional downsampling
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}/covdist.pdf", ## per barcode, reads per reference sequence histogram
-        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}/covpos.pdf" ## per barcode, coverage over reference sequence positions
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}/covpos.pdf", ## per barcode, coverage over reference sequence positions
         ## dummy depencencies
         "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_filter_aligned.report" ## REPORT
     output:
