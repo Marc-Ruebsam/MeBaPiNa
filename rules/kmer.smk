@@ -31,12 +31,8 @@ rule retax_kmermap:
         output="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kraken2",
         krakdb="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database.kraken"
     output:
-        # rankF="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/Family.bracken",
-        # tableF="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/Family.kreport2",
-        rankG="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/Genus.bracken",
-        tableG="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/Genus.kreport2",
-        rankS="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/Species.bracken",
-        tableS="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/Species.kreport2"
+        rank="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/{reftype}.bracken",
+        table="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/{reftype}.kreport2"
     log:
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_retax_kmermap.log"
     benchmark:
@@ -49,24 +45,13 @@ rule retax_kmermap:
     shell:
         "target={input.krakdb}; target=\"${{target/database.kraken/}}\" > {log} 2>&1; "
         "in_dir={input.report}; in_dir=\"${{in_dir/filtered.kreport2/}}\" > {log} 2>&1; "
-        # "bracken {params} "
-        # "-l F " ## [Default = 'S', Options = 'D','P','C','O','F','G','S']:: specifies the taxonomic rank to analyze. Each classification at this specified rank will receive an estimated number of reads belonging to that rank after abundance estimation.
-        # "-d ${{target}} "
-        # "-i {input.report} "
-        # "-o {output.rankF} >> {log} 2>&1; "
-        # "mv ${{in_dir}}filtered_bracken.kreport2 {output.tableF} >> {log} 2>&1; "
+        "reftype=\"{wldcards.reftype}\"; "
         "bracken {params} "
-        "-l G "
+        "-l \"${{reftype:0:1}}\" " ## [Default = 'S', Options = 'D','P','C','O','F','G','S']:: specifies the taxonomic rank to analyze. Each classification at this specified rank will receive an estimated number of reads belonging to that rank after abundance estimation.
         "-d ${{target}} "
         "-i {input.report} "
-        "-o {output.rankG} >> {log} 2>&1; "
-        "mv ${{in_dir}}filtered_bracken.kreport2 {output.tableG} >> {log} 2>&1; "
-        "bracken {params} "
-        "-l S "
-        "-d ${{target}} "
-        "-i {input.report} "
-        "-o {output.rankS} >> {log} 2>&1; "
-        "mv ${{in_dir}}/filtered_bracken.kreport2 {output.tableS} >> {log} 2>&1"
+        "-o {output.rank} >> {log} 2>&1; "
+        "mv ${{in_dir}}filtered_bracken.kreport2 {output.table} >> {log} 2>&1"
 
 rule counttax_kmermap:
     input:
