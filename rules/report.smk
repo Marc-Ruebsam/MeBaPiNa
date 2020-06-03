@@ -88,12 +88,14 @@ rule copy_otu_output_II: ## because of different wildcards in output
         ## input to copy
         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/krona.html", ## classified taxa
         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist", ## taxonomic classifications
+        "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/covdist.pdf", ## distribution of taxa abundance
         ## dummy depencencies
         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_q2rereplicate.report", ## REPORT
         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_q2kmermap.report" ## REPORT
     output:
         "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_otu_picking-{reference}_{reftype}-krona.html",
-        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_otu_picking-{reference}_{reftype}-kmer.counttaxlist"
+        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_otu_picking-{reference}_{reftype}-kmer.counttaxlist",
+        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_otu_picking-{reference}_{reftype}-taxa_covdist.pdf"
     shell:
         "all_input=( $(echo \"{input}\") ); "
         "all_output=( $(echo \"{output}\") ); "
@@ -111,6 +113,7 @@ rule copy_align_output:
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/covpos.pdf", ## per barcode, coverage over reference sequence positions
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/krona.html", ## taxonomic classification
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/aligned.counttaxlist", ## taxonomic classification
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/covdist.pdf", ## distribution of taxa abundance
         ## dummy depencencies
         "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_filter_aligned.report", ## REPORT
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_aligned.report" ## REPORT
@@ -120,7 +123,8 @@ rule copy_align_output:
         "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}_{reftype}-covdist.pdf",
         "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}_{reftype}-covpos.pdf",
         "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}_{reftype}-krona.html",
-        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}_{reftype}-aligned.counttaxlist"
+        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}_{reftype}-aligned.counttaxlist",
+        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}_{reftype}-taxa_covdist.pdf"
     shell:
         "all_input=( $(echo \"{input}\") ); "
         "all_output=( $(echo \"{output}\") ); "
@@ -135,6 +139,7 @@ rule copy_kmer_output:
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona.html", ## taxonomic composition
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/krona_bracken.html", ## taxonomic composition after reestimation
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist", ## taxonomic classification
+        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/covdist.pdf", ## distribution of taxa abundance
         ## dummy depencencies
         "{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_filtered.report", ## REPORT
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_retax_kmermap.report", ## REPORT
@@ -142,7 +147,8 @@ rule copy_kmer_output:
     output:
         "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_kmer_mapping-{reference}_{reftype}-krona.html",
         "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_kmer_mapping-{reference}_{reftype}-krona_bracken.html",
-        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_kmer_mapping-{reference}_{reftype}-kmer.counttaxlist"
+        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_kmer_mapping-{reference}_{reftype}-kmer.counttaxlist",
+        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_kmer_mapping-{reference}_{reftype}-taxa_covdist.pdf"
     shell:
         "all_input=( $(echo \"{input}\") ); "
         "all_output=( $(echo \"{output}\") ); "

@@ -4,6 +4,9 @@
 suppressPackageStartupMessages(library("phyloseq"))
 suppressPackageStartupMessages(library("vegan"))
 
+## set variables
+below_flt <- snakemake@config[["filtering"]][["min_featurereads"]]
+above_flt <- 1000 ## group references above or equal to this mean (rounded down) coverage
 
 ## LOAD INPUT ##
 
@@ -39,7 +42,7 @@ input_df <- read.csv(snakemake@input[["sample_file"]], sep="\t", header = FALSE,
     col.names = c( "counts", paste0("depth", c(1:(cols[1]-1))) ),
     ## we know the number of rows to expect
     nrows = cols[2] )
-## sanity checks
+## curration
 input_df[input_df == ""] <- NA
 input_df <- input_df[input_df$counts != 0,]
 
@@ -60,6 +63,29 @@ attr(specs_name,"names") <- NULL
 ## count table
 counts_df <- data.frame(t(input_df$counts))
 colnames(counts_df) <- specs_name
+
+
+## PLOT ##
+
+## get count values
+plot_df <- input_df$counts
+## get numbers max coverage number
+plot_flt <- c( max = max(plot_df) )
+## group values above threshold
+idx <- plot_df >= above_flt
+plot_flt["above"] <- sum(idx)
+plot_df[ idx ] <- 1000
+
+## plot coverage distribution
+covdist_plot <- ggplot() + theme_bw() +
+  geom_bar( data = data.frame(coverage=covlist_chunks[[1]]), aes( x = coverage), width = 0.02 ) +
+  geom_label( aes( x = max(covlist_chunks[[1]]), y = max(table(covlist_chunks[[1]])),
+    label = paste0("exclude: refs < ",below_flt,"\ngroup: ",plot_flt["above"]," refs >= ",above_flt,"\nwith max cov of ",plot_flt["max"]) ),
+    hjust = 1, vjust = 1) +
+  xlab("taxa abundance") + ylab("occurence") +
+  scale_x_log10()
+## save
+ggsave( snakemake@output[["covdist_plot"]], covdist_plot, units = "cm", height = 12 , width = 21 )
 
 
 ## DIVERSITY INDICES ##

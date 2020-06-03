@@ -156,7 +156,8 @@ rule stat_otu_taxa_diversity:
         taxlist="{tmp}METADATA/Reference_Sequences/{reference}/krona/{reftype}/taxlist.txt",
         sample_file="{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"
     output:
-        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_otu_picking-{reference}_{reftype}-taxa_diversity.tsv"
+        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_otu_picking-{reference}_{reftype}-taxa_diversity.tsv",
+        covdist_plot="{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/covdist.pdf"
     conda:
         "../envs/r-diversity.yml"
     script:
@@ -204,7 +205,8 @@ rule stat_align_taxa_diversity:
         taxlist="{tmp}METADATA/Reference_Sequences/{reference}/krona/{reftype}/taxlist.txt",
         sample_file="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/aligned.counttaxlist"
     output:
-        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}_{reftype}-taxa_diversity.tsv"
+        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}_{reftype}-taxa_diversity.tsv",
+        covdist_plot="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/covdist.pdf"
     conda:
         "../envs/r-diversity.yml"
     script:
@@ -249,7 +251,8 @@ rule stat_kmer_taxa_diversity:
         taxlist="{tmp}METADATA/Reference_Sequences/{reference}/krona/{reftype}/taxlist.txt",
         sample_file="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"
     output:
-        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_kmer_mapping-{reference}_{reftype}-taxa_diversity.tsv"
+        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_kmer_mapping-{reference}_{reftype}-taxa_diversity.tsv",
+        covdist_plot="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/covdist.pdf"
     conda:
         "../envs/r-diversity.yml"
     script:
