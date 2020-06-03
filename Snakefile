@@ -140,14 +140,14 @@ def input_all(wildcards):
     if "otu" in config["methodologie"]] + ## if "otu" is selected
     ## ALIGNMENT ##
     [x for x in
-    ["{tmp}{barc_dir}03_alignment-{reference}_{reftype}-pycoqc.html", ## per barcode, intentional downsampling
-    "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-pycoqc.json", ## per barcode, intentional downsampling
-    "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-covdist.pdf", ## per barcode, reads per reference sequence histogram
-    "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-covpos.pdf", ## per barcode, coverage over reference sequence positions
+    ["{tmp}{barc_dir}03_alignment-{reference}-pycoqc.html", ## per barcode, intentional downsampling
+    "{tmp}{barc_dir}03_alignment-{reference}-pycoqc.json", ## per barcode, intentional downsampling
+    "{tmp}{barc_dir}03_alignment-{reference}-covdist.pdf", ## per barcode, reads per reference sequence histogram
+    "{tmp}{barc_dir}03_alignment-{reference}-covpos.pdf", ## per barcode, coverage over reference sequence positions
     "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-krona.html", ## taxonomic classification
     "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-aligned.counttaxlist", ## taxonomic classification
     "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-taxa_covdist.pdf", ## distribution of taxa abundance
-    "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-alignment_rates.tsv", ## alignment statistics
+    "{tmp}{barc_dir}03_alignment-{reference}-alignment_rates.tsv", ## alignment statistics
     "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-taxa_counts.tsv", ## taxa statistics
     "{tmp}{barc_dir}03_alignment-{reference}_{reftype}-taxa_diversity.tsv"] ## diversity and richness measures
     if "align" in config["methodologie"]] + ## if "align" is selected

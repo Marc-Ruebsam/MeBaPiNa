@@ -104,24 +104,35 @@ rule copy_otu_output_II: ## because of different wildcards in output
 
 ## ALIGNMENT ##
 
-rule copy_align_output:
+rule copy_align_output_I:
     input:
         ## input to copy
-        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc.html", ## per barcode, intentional downsampling
-        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc.json", ## per barcode, intentional downsampling
-        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/covdist.pdf", ## per barcode, reads per reference sequence histogram
-        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/covpos.pdf", ## per barcode, coverage over reference sequence positions
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}/pycoqc.html", ## per barcode, intentional downsampling
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}/pycoqc.json", ## per barcode, intentional downsampling
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}/covdist.pdf", ## per barcode, reads per reference sequence histogram
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}/covpos.pdf" ## per barcode, coverage over reference sequence positions
+        ## dummy depencencies
+        "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_filter_aligned.report" ## REPORT
+    output:
+        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}-pycoqc.html",
+        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}-pycoqc.json",
+        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}-covdist.pdf",
+        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}-covpos.pdf"
+    shell:
+        "all_input=( $(echo \"{input}\") ); "
+        "all_output=( $(echo \"{output}\") ); "
+        "for idx in \"${{!all_output[@]}}\"; do "
+        "cp \"${{all_input[$idx]}}\" \"${{all_output[$idx]}}\"; done"
+
+rule copy_align_output_II:
+    input:
+        ## input to copy
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/krona.html", ## taxonomic classification
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/aligned.counttaxlist", ## taxonomic classification
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/covdist.pdf", ## distribution of taxa abundance
         ## dummy depencencies
-        "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_filter_aligned.report", ## REPORT
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_aligned.report" ## REPORT
     output:
-        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}_{reftype}-pycoqc.html",
-        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}_{reftype}-pycoqc.json",
-        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}_{reftype}-covdist.pdf",
-        "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}_{reftype}-covpos.pdf",
         "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}_{reftype}-krona.html",
         "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}_{reftype}-aligned.counttaxlist",
         "{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}_{reftype}-taxa_covdist.pdf"

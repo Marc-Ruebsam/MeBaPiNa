@@ -374,12 +374,12 @@ rule plot_pycoqc_aligned:
         seqsum="{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/split", ## only folder is specified as output in splitting rule
         bam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/filteredsorted.bam"
     output:
-        html="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc.html",
-        json="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc.json"
+        html="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}/pycoqc.html",
+        json="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}/pycoqc.json"
     log:
-        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_pycoqc_aligned.log"
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_pycoqc_aligned.log"
     benchmark:
-        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_pycoqc_aligned.benchmark.tsv"
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_pycoqc_aligned.benchmark.tsv"
     conda:
         "../envs/pycoqc.yml"
     params:
@@ -400,8 +400,8 @@ rule plot_refseq_coverage:
     input:
         "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/refseq_coverage.tsv"
     output:
-        covdist_plot="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/covdist.pdf",
-        covpos_plot="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/covpos.pdf"
+        covdist_plot="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}/covdist.pdf",
+        covpos_plot="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}/covpos.pdf"
     conda:
         "../envs/r-diversity.yml"
     script:
@@ -497,12 +497,12 @@ rule plot_krona_kmermap_kraken:
 #         seqsum="{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/split", ## only folder is specified as output in splitting rule
 #         bam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/lambda/filteredsorted.bam"
 #     output:
-#         html="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc/calibration.html",
-#         json="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc/calibration.json"
+#         html="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}/pycoqc/calibration.html",
+#         json="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}/pycoqc/calibration.json"
 #     log:
-#         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc/MeBaPiNa_pycoqc_bam_calib.log"
+#         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}/pycoqc/MeBaPiNa_pycoqc_bam_calib.log"
 #     benchmark:
-#         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc/MeBaPiNa_pycoqc_bam_calib.tsv"
+#         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}/pycoqc/MeBaPiNa_pycoqc_bam_calib.tsv"
 #     conda:
 #         "../envs/pycoqc.yml"
 #     params:

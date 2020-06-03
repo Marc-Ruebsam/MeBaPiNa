@@ -170,9 +170,9 @@ rule stat_otu_taxa_diversity:
 
 rule stat_align_readsrates:
     input:
-        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/pycoqc.json"
+        "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}/pycoqc.json"
     output:
-        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}_{reftype}-alignment_rates.tsv"
+        report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_alignment-{reference}-alignment_rates.tsv"
     shell:
         "awk 'BEGIN{{prnt=0;cnt=0;strt_cnt=0}};" ## initialize variables
         "/\"alignment\"/{{prnt=1}};" ## inside the alignment section...
