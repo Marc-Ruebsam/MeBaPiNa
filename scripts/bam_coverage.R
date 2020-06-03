@@ -47,26 +47,39 @@ covlist_chunks[[1]][ idx ] <- 1000
 
 ## get median in chunks
 cov_mean <- rowMeans(covlist_chunks[[2]])
-## melt data frame 
+## melt data frame
 covlist_chunks[[2]]$pos <- seq(0,1,length.out = n_chunks)
 covlist_chunks[[2]] <- melt( covlist_chunks[[2]], id.vars = "pos", value.name = "cov" )
 
 ## plot coverage distribution
-covdist_plot <- ggplot() + theme_bw() +
-  geom_bar( data = data.frame(coverage=covlist_chunks[[1]]), aes( x = coverage), width = 0.02 ) +
-  geom_label( aes( x = max(covlist_chunks[[1]]), y = max(table(covlist_chunks[[1]])),
-    label = paste0("exclude: ",cov_flt["below"]," refs < ",below_flt,"\ngroup: ",cov_flt["above"]," refs >= ",above_flt,"\nwith max cov of ",cov_flt["max"]) ),
-    hjust = 1, vjust = 1) +
-  xlab("mean reference coverage") + ylab("occurence") + 
-  scale_x_log10()
+if( length(covlist_chunks[[1]]) != 0 ){
+  covdist_plot <- ggplot() + theme_bw() +
+    geom_bar( data = data.frame(coverage=covlist_chunks[[1]]), aes( x = coverage), width = 0.02 ) +
+    geom_label( aes( x = max(covlist_chunks[[1]]), y = max(table(covlist_chunks[[1]])),
+      label = paste0("exclude: ",cov_flt["below"]," refs < ",below_flt,"\ngroup: ",cov_flt["above"]," refs >= ",above_flt,"\nwith max cov of ",cov_flt["max"]) ),
+      hjust = 1, vjust = 1) +
+    xlab("mean reference coverage") + ylab("occurence") +
+    scale_x_log10()
+}else{
+  covdist_plot <- ggplot() + theme_bw() +
+    geom_label( aes( x = above_flt, y = 1, label = "no data passed thresholds" ), hjust = 1, vjust = 1) +
+    xlab("mean reference coverage") + ylab("occurence") +
+    scale_x_log10()
+}
 ## save
 ggsave( snakemake@output[["covdist_plot"]], covdist_plot, units = "cm", height = 12 , width = 21 )
 
 ## plot positional coverage
-covpos_plot <- ggplot() + theme_bw() +
-geom_bin2d( data = covlist_chunks[[2]], aes( x = pos, y = cov ), bins = n_chunks ) +
-  scale_fill_gradientn( colours = viridis(256, option = "D"), trans = "log", labels = trans_format("identity", function(x) round((x))) ) + 
-  geom_line( aes( x = seq(0,1,length.out = n_chunks), y = cov_mean ), color = "darkred", size = 0.7 ) + 
-  xlab("relative position") + ylab("relative coverage")
+if( length(covlist_chunks[[1]]) != 0 ){
+  covpos_plot <- ggplot() + theme_bw() +
+    geom_bin2d( data = covlist_chunks[[2]], aes( x = pos, y = cov ), bins = n_chunks ) +
+    scale_fill_gradientn( colours = viridis(256, option = "D"), trans = "log", labels = trans_format("identity", function(x) round((x))) ) +
+    geom_line( aes( x = seq(0,1,length.out = n_chunks), y = cov_mean ), color = "darkred", size = 0.7 ) +
+    xlab("relative position") + ylab("relative coverage")
+}else{
+  covpos_plot <- ggplot() + theme_bw() +
+    geom_label( aes( x = 0.5, y = 1, label = "no data passed thresholds" ), hjust = 1, vjust = 1) +
+    xlab("relative position") + ylab("relative coverage")
+}
 ## save
 ggsave( snakemake@output[["covpos_plot"]], covpos_plot, units = "cm", height = 12 , width = 21 )
