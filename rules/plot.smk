@@ -162,7 +162,7 @@ def input_fastq(wildcards):
     basecall_dir = checkpoints.basecall_raw.get(tmp=wildcards.tmp,run=wildcards.run).output[0]
     ## get barcode directory names within "pass" directory (excludes any barcodes without assigned reads)
     all_barc = listdir(basecall_dir)
-    ## retain only barcodes containing one of the selected barcodes from the metadata (not unassigned)
+    ## retain only barcodes containing one of the selected barcodes from the metadata (not unwanted barcodes)
     all_barc = [barc for barc in all_barc if barc in SAMPLES.keys()]
     all_barc.sort()
 

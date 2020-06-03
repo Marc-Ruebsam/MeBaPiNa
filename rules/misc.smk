@@ -196,12 +196,12 @@ rule construct_reftax:
         slvmap="{tmp}METADATA/Reference_Sequences/silva/slvmap.txt",
         dups="{tmp}METADATA/Reference_Sequences/silva/reference.dups"
     output:
-        kraknames_S="{tmp}METADATA/Reference_Sequences/silva/kraken2/species/taxonomy/names.dmp",
-        kraknodes_S="{tmp}METADATA/Reference_Sequences/silva/kraken2/species/taxonomy/nodes.dmp",
-        krakseq2tax_S="{tmp}METADATA/Reference_Sequences/silva/kraken2/species/seqid2taxid.map",
-        kraknames_G="{tmp}METADATA/Reference_Sequences/silva/kraken2/genus/taxonomy/names.dmp",
-        kraknodes_G="{tmp}METADATA/Reference_Sequences/silva/kraken2/genus/taxonomy/nodes.dmp",
-        krakseq2tax_G="{tmp}METADATA/Reference_Sequences/silva/kraken2/genus/seqid2taxid.map",
+        kraknames_S="{tmp}METADATA/Reference_Sequences/silva/kraken2/species/taxonomy/names.dmp", ## removed after reference build
+        kraknodes_S="{tmp}METADATA/Reference_Sequences/silva/kraken2/species/taxonomy/nodes.dmp", ## removed after reference build
+        krakseq2tax_S="{tmp}METADATA/Reference_Sequences/silva/kraken2/species/seqid2taxid.map", ## removed after reference build
+        kraknames_G="{tmp}METADATA/Reference_Sequences/silva/kraken2/genus/taxonomy/names.dmp", ## removed after reference build
+        kraknodes_G="{tmp}METADATA/Reference_Sequences/silva/kraken2/genus/taxonomy/nodes.dmp", ## removed after reference build
+        krakseq2tax_G="{tmp}METADATA/Reference_Sequences/silva/kraken2/genus/seqid2taxid.map", ## removed after reference build
         kronataxtab_S="{tmp}METADATA/Reference_Sequences/silva/krona/species/taxonomy.tab",
         kronataxlist_S="{tmp}METADATA/Reference_Sequences/silva/krona/species/taxlist.txt",
         kronaseq2tax_S="{tmp}METADATA/Reference_Sequences/silva/krona/species/seqid2taxid.map",
@@ -263,7 +263,7 @@ rule q2import_refseq:
         "--output-path {output} "
         "> {log} 2>&1"
 
-rule q2train_classifyer:
+rule q2train_classifyer: #!# failed repeatedly because of high memory requirements
     input:
         reftax="{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/taxonomy.qza",
         refseq="{tmp}METADATA/Reference_Sequences/silva/qiime/reference.qza"
@@ -351,32 +351,31 @@ rule building_database:
         ">> {log} 2>&1; "
         "kraken2-build --clean --db ${{out_dir}} >> {log} 2>&1"
 
-rule building_database_plain:
-    output:
-        krakdb="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database.kraken", ## reftype wildcard has no influence on this rule, but is used for silva species database (rule building_database_fromreffiles)
-        krakhash="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/hash.k2d",
-        krakopts="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/opts.k2d",
-        kraktaxo="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/taxo.k2d",
-        brakdb="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database1451mers.kraken",
-        brakdist="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database1451mers.kmer_distrib"
-    log:
-        "{tmp}METADATA/Reference_Sequences/{reference}/kraken2/MeBaPiNa_building_{reftype}_database.log"
-    benchmark:
-        "{tmp}METADATA/Reference_Sequences/{reference}/kraken2/MeBaPiNa_building_{reftype}_database.benchmark.tsv"
-    conda:
-        "../envs/kraken2.yml"
-    threads:
-        4
-    params:
-        "35" ## k-mer length
-    shell:
-        "out_dir={output.krakdb}; out_dir=\"${{out_dir/database.kraken/}}\" > {log} 2>&1; "
-        "kraken2-build --threads {threads} " ## unfortunately --kmer-len {params} is ignored by when --special is used
-        "--special {wildcards.reference} --db ${{out_dir}} " ## reference can be one of "greengenes", "silva", "rdp"
-        ">> {log} 2>&1; "
-        "bracken-build -t {threads} -k {params} -l 1451 -d ${{out_dir}} " ## 1451 ismedian read length after filtering in 20191007_1559_MN31344_FAK76605_2bf006ff
-        ">> {log} 2>&1; "
-        "rm -rf ${{out_dir}}/data "
-        "kraken2-build --clean --db ${{out_dir}} >> {log} 2>&1"
-
-ruleorder: building_database > building_database_plain
+# rule building_database_plain:
+#     output:
+#         krakdb="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database.kraken", ## reftype wildcard has no influence on this rule, but is used for silva species database (rule building_database)
+#         krakhash="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/hash.k2d",
+#         krakopts="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/opts.k2d",
+#         kraktaxo="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/taxo.k2d",
+#         brakdb="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database1451mers.kraken",
+#         brakdist="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database1451mers.kmer_distrib"
+#     log:
+#         "{tmp}METADATA/Reference_Sequences/{reference}/kraken2/MeBaPiNa_building_{reftype}_database.log"
+#     benchmark:
+#         "{tmp}METADATA/Reference_Sequences/{reference}/kraken2/MeBaPiNa_building_{reftype}_database.benchmark.tsv"
+#     conda:
+#         "../envs/kraken2.yml"
+#     threads:
+#         4
+#     params:
+#         "35" ## k-mer length
+#     shell:
+#         "out_dir={output.krakdb}; out_dir=\"${{out_dir/database.kraken/}}\" > {log} 2>&1; "
+#         "kraken2-build --threads {threads} " ## unfortunately --kmer-len {params} is ignored by when --special is used
+#         "--special {wildcards.reference} --db ${{out_dir}} " ## reference can be one of "greengenes", "silva", "rdp"
+#         ">> {log} 2>&1; "
+#         "bracken-build -t {threads} -k {params} -l 1451 -d ${{out_dir}} " ## 1451 ismedian read length after filtering in 20191007_1559_MN31344_FAK76605_2bf006ff
+#         ">> {log} 2>&1; "
+#         "rm -rf ${{out_dir}}/data "
+#         "kraken2-build --clean --db ${{out_dir}} >> {log} 2>&1"
+# ruleorder: building_database > building_database_plain

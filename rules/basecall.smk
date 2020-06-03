@@ -49,8 +49,8 @@ checkpoint basecall_raw:
         + "--chunks_per_caller 10000 "
         + "--num_barcode_threads 8"
         if config["workstation"]["gpu"] else ""),
-        # "--compress_fastq",
-        "--fast5_out", #!#
+        # "--compress_fastq", #!# if commented does not compress fastq, because of downstream processing
+        # "--fast5_out", #!# if commented, does not save basecalled fast5 files
         "--progress_stats_frequency 1800" ## every 30 minutes
     shell:
         "guppy_basecaller --num_callers {threads} {params} "
