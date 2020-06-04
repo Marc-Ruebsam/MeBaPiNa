@@ -20,7 +20,8 @@ rule stat_refseq_taxaranks:
         "{tmp}03_report/Reference_Sequences/{reference}/reference_taxaranks.tsv"
     shell:
         "awk -F \"\\t\" '$3==\"root\"{{cnt[\"root\"]++;next}}; $3==\"domain\"{{cnt[\"domain\"]++;next}}; $3==\"phylum\"{{cnt[\"phylum\"]++;next}}; $3==\"class\"{{cnt[\"class\"]++;next}}; $3==\"order\"{{cnt[\"order\"]++;next}}; $3==\"family\"{{cnt[\"family\"]++;next}}; $3==\"genus\"{{cnt[\"genus\"]++;next}}; $3==\"species\"{{cnt[\"species\"]++;next}}; {{cnt[\"other\"]++}};"
-        "END{{ print \"root\\t\"cnt[\"root\"]; print \"domain\\t\"cnt[\"domain\"]; print \"phylum\\t\"cnt[\"phylum\"]; print \"class\\t\"cnt[\"class\"]; print \"order\\t\"cnt[\"order\"]; print \"family\\t\"cnt[\"family\"]; print \"genus\\t\"cnt[\"genus\"]; print \"species\\t\"cnt[\"species\"]; print \"other\\t\"cnt[\"other\"] }}' "
+        "END{{ printf \"%d\\troot\\n%d\\tdomain\\n%d\\tphylum\\n%d\\tclass\\n%d\\torder\\n%d\\tfamily\\n%d\\tgenus\\n%d\\tspecies\\n%d\\tother\\n\","
+        "cnt[\"root\"],cnt[\"domain\"],cnt[\"phylum\"],cnt[\"class\"],cnt[\"order\"],cnt[\"family\"],cnt[\"genus\"],cnt[\"species\"],cnt[\"other\"] }}' "
         "{input} > {output}"
 
 ###############
@@ -94,20 +95,26 @@ rule stat_otu_feature:
         "qiime tools export --input-path \"${{otu_dir}}cluster_ftable.qza\" --output-path \"${{otu_dir}}cluster_ftable\"; fi; " ## ...create it
         "awk '$2==\"observations:\"{{gsub(\",\",\"\",$3); clst_cnt=$3}}; "
         "$2==\"count:\"{{gsub(\",\",\"\",$3); read_cnt=$3}}; "
-        "END{{print clst_cnt\"\\ttotal_cluster_count\\n\"read_cnt\"\\ttotal_read_count\\n\"(read_cnt/clst_cnt)\"\\ttotal_mean_abund\"}}' "
+        "END {{ if(clst_cnt==0){{mean_cnt=0}}else{{mean_cnt=(read_cnt/clst_cnt)}}; "
+        "printf \"%d\\ttotal_cluster_count\\n%d\\ttotal_read_count\\n%d\\ttotal_mean_abund\\n\","
+        "clst_cnt,read_cnt,mean_cnt }}' "
         "<(biom summarize-table -i \"${{otu_dir}}cluster_ftable/feature-table.biom\") > {output.report}; "
         ## get number of de-novo: clusters and reads and mean reads per cluster (abundance)
         "awk 'BEGIN{{prnt_once=0}}"
         "$1==\"Clusters:\"{{clst_cnt=$2}}; "
         "$2==\"nt\"&&$3==\"in\"&&prnt_once==0{{read_cnt=$4;prnt_once++}}; "
-        "END{{print clst_cnt\"\\tdenovo_cluster_count\\n\"read_cnt\"\\tdenovo_read_count\\n\"(read_cnt/clst_cnt)\"\\tdenovo_mean_abund\"}}' "
+        "END {{ if(clst_cnt==0){{mean_cnt=0}}else{{mean_cnt=(read_cnt/clst_cnt)}}; "
+        "printf \"%d\\tdenovo_cluster_count\\n%d\\tdenovo_read_count\\n%d\\tdenovo_mean_abund\\n\","
+        "clst_cnt,read_cnt,mean_cnt }}' "
         "\"${{otu_dir}}MeBaPiNa_q2otupick.log\" >> {output.report}; "
         ## get number of total after filtering: clusters and reads and mean reads per cluster (abundance)
         "if [[ ! -f \"${{otu_dir}}filt_ftable/feature-table.biom\" ]]; then "
         "qiime tools export --input-path \"${{otu_dir}}filt_ftable.qza\" --output-path \"${{otu_dir}}filt_ftable\"; fi; "
         "awk '$2==\"observations:\"{{gsub(\",\",\"\",$3); clst_cnt=$3}}; "
         "$2==\"count:\"{{gsub(\",\",\"\",$3); read_cnt=$3}}; "
-        "END{{print clst_cnt\"\\tfilter_cluster_count\\n\"read_cnt\"\\tfilter_read_count\\n\"(read_cnt/clst_cnt)\"\\tfilter_mean_abund\"}}' "
+        "END {{ if(clst_cnt==0){{mean_cnt=0}}else{{mean_cnt=(read_cnt/clst_cnt)}}; "
+        "printf \"%d\\tfilter_cluster_count\\n%d\\tfilter_read_count\\n%d\\tfilter_mean_abund\\n\","
+        "clst_cnt,read_cnt,mean_cnt }}' "
         "<(biom summarize-table -i \"${{otu_dir}}filt_ftable/feature-table.biom\") >> {output.report}"
 
 rule stat_otu_taxa:
@@ -121,9 +128,11 @@ rule stat_otu_taxa:
         "$6==\"root\"{{ cnt_feat=$2 }}; " ## get number of reads mapped to all taxa (i.e. root taxa and below)
         "$3!=0{{ cnt_tax++ }}; " ## if reads are mapped to this taxon, add one to the total number of taxa
         "$3!=0&&$4==lw_rnk{{cnt_stax++;cnt_sfeat=cnt_sfeat+$3}}; " ## ... if the current rank also is the reference type, add one here as well
-        "END{{printf \"%d\\ttotal_taxa_count\\n%d\\ttotal_read_count\\n%.2f\\ttotal_mean_abund\\n" ## print...
+        "END {{ if(cnt_tax==0){{mean_cnt=0}}else{{mean_cnt=(cnt_feat/cnt_tax)}}; " ## ensure no division by zero
+        "if(cnt_stax==0){{mean_scnt=0}}else{{mean_scnt=(cnt_sfeat/cnt_stax)}}; "
+        "printf \"%d\\ttotal_taxa_count\\n%d\\ttotal_read_count\\n%.2f\\ttotal_mean_abund\\n" ## print
         "%d\\t{wildcards.reftype}_taxa_count\\n%d\\t{wildcards.reftype}_read_count\\n%.2f\\t{wildcards.reftype}_mean_abund\\n\","
-        "cnt_tax,cnt_feat,(cnt_feat/cnt_tax),cnt_stax,cnt_sfeat,(cnt_sfeat/cnt_stax)}}' {input} > {output}"
+        "cnt_tax,cnt_feat,mean_cnt,cnt_stax,cnt_sfeat,mean_scnt }}' {input} > {output}"
 
 rule stat_otu_taxa_diversity:
     input:
@@ -170,9 +179,11 @@ rule stat_align_taxa:
         "if(lw_rnk==\"S\"){{nf_rnk=8}}else if(lw_rnk==\"G\"){{nf_rnk=7}} }}; " #!# when Species, expect 8 columns, when Genus, expect 7
         "NF==nf_rnk{{cnt_stax++;cnt_sfeat=cnt_sfeat+$1}}; " ## when number of columns matches expected number...
         "{{cnt_tax++;cnt_feat=cnt_feat+$1}}; " ## ...count to reference type
-        "END{{printf \"%d\\ttotal_taxa_count\\n%d\\ttotal_read_count\\n%.2f\\ttotal_mean_abund\\n"
+        "END {{ if(cnt_tax==0){{mean_cnt=0}}else{{mean_cnt=(cnt_feat/cnt_tax)}}; "
+        "if(cnt_stax==0){{mean_scnt=0}}else{{mean_scnt=(cnt_sfeat/cnt_stax)}}; "
+        "printf \"%d\\ttotal_taxa_count\\n%d\\ttotal_read_count\\n%.2f\\ttotal_mean_abund\\n"
         "%d\\t{wildcards.reftype}_taxa_count\\n%d\\t{wildcards.reftype}_read_count\\n%.2f\\t{wildcards.reftype}_mean_abund\\n\","
-        "cnt_tax,cnt_feat,(cnt_feat/cnt_tax),cnt_stax,cnt_sfeat,(cnt_sfeat/cnt_stax)}}' {input} > {output}"
+        "cnt_tax,cnt_feat,mean_cnt,cnt_stax,cnt_sfeat,mean_scnt }}' {input} > {output}"
 
 rule stat_align_taxa_diversity:
     input:
@@ -201,9 +212,11 @@ rule stat_kmer_taxa:
         "$6==\"root\"{{ cnt_feat=$2 }}; "
         "$3!=0{{ cnt_tax++ }}; "
         "$3!=0&&$4==lw_rnk{{cnt_stax++;cnt_sfeat=cnt_sfeat+$3}}; "
-        "END{{printf \"%d\\ttotal_taxa_count\\n%d\\ttotal_read_count\\n%.2f\\ttotal_mean_abund\\n"
+        "END {{ if(cnt_tax==0){{mean_cnt=0}}else{{mean_cnt=(cnt_feat/cnt_tax)}}; "
+        "if(cnt_stax==0){{mean_scnt=0}}else{{mean_scnt=(cnt_sfeat/cnt_stax)}}; "
+        "printf \"%d\\ttotal_taxa_count\\n%d\\ttotal_read_count\\n%.2f\\ttotal_mean_abund\\n"
         "%d\\t{wildcards.reftype}_taxa_count\\n%d\\t{wildcards.reftype}_read_count\\n%.2f\\t{wildcards.reftype}_mean_abund\\n\","
-        "cnt_tax,cnt_feat,(cnt_feat/cnt_tax),cnt_stax,cnt_sfeat,(cnt_sfeat/cnt_stax)}}' {input} > {output}"
+        "cnt_tax,cnt_feat,mean_cnt,cnt_stax,cnt_sfeat,mean_scnt }}' {input} > {output}"
 
 rule stat_kmer_retaxa:
     input:
@@ -216,9 +229,11 @@ rule stat_kmer_retaxa:
         "$6==\"root\"{{ cnt_feat=$2 }}; "
         "$3!=0{{ cnt_tax++ }}; "
         "$3!=0&&$4==lw_rnk{{cnt_stax++;cnt_sfeat=cnt_sfeat+$3}}; "
-        "END{{printf \"%d\\ttotal_taxa_count\\n%d\\ttotal_read_count\\n%.2f\\ttotal_mean_abund\\n"
+        "END {{ if(cnt_tax==0){{mean_cnt=0}}else{{mean_cnt=(cnt_feat/cnt_tax)}}; "
+        "if(cnt_stax==0){{mean_scnt=0}}else{{mean_scnt=(cnt_sfeat/cnt_stax)}}; "
+        "printf \"%d\\ttotal_taxa_count\\n%d\\ttotal_read_count\\n%.2f\\ttotal_mean_abund\\n"
         "%d\\t{wildcards.reftype}_taxa_count\\n%d\\t{wildcards.reftype}_read_count\\n%.2f\\t{wildcards.reftype}_mean_abund\\n\","
-        "cnt_tax,cnt_feat,(cnt_feat/cnt_tax),cnt_stax,cnt_sfeat,(cnt_sfeat/cnt_stax)}}' {input} > {output}"
+        "cnt_tax,cnt_feat,mean_cnt,cnt_stax,cnt_sfeat,mean_scnt }}' {input} > {output}"
 
 rule stat_kmer_taxa_diversity:
     input:
