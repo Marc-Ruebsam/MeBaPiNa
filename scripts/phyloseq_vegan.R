@@ -7,7 +7,7 @@ suppressPackageStartupMessages(library("ggplot2"))
 
 ## set variables
 below_flt <- snakemake@config[["filtering"]][["min_featurereads"]]
-above_flt <- 1000 ## group references above or equal to this mean (rounded down) coverage
+above_flt <- 10000 ## group references above or equal to this mean (rounded down) coverage
 
 ## LOAD INPUT ##
 
