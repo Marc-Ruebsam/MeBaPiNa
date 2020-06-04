@@ -31,7 +31,7 @@ if( cols[2] == 0 ){
         "NA","evenness_J",
         "NA","fishers_alpha"),ncol=2,byrow=TRUE)
     ## return
-    write.table(div_df, file = snakemake@output[[1]], quote = FALSE, sep = "\t", row.names = FALSE, col.names = FALSE)
+    write.table(div_df, file = snakemake@output[["report"]], quote = FALSE, sep = "\t", row.names = FALSE, col.names = FALSE)
     ## exit
     quit(save = "no", status = 0)
 }
@@ -137,7 +137,7 @@ div_df <- rbind(
         "fishers_alpha")
 )
 ## save
-write.table(div_df, file = snakemake@output[[1]], quote = FALSE, sep = "\t", row.names = FALSE, col.names = FALSE)
+write.table(div_df, file = snakemake@output[["report"]], quote = FALSE, sep = "\t", row.names = FALSE, col.names = FALSE)
 
 
 # ## TAXONOMIC DIVERSITY ##
