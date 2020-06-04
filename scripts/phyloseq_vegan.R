@@ -78,7 +78,7 @@ plot_flt["above"] <- sum(idx)
 plot_df[ idx ] <- 1000
 
 ## plot coverage distribution
-if( length(covlist_chunks[[1]]) != 0 ){
+if( length(plot_df) != 0 ){
   covdist_plot <- ggplot() + theme_bw() +
     geom_bar( data = data.frame(abundance=plot_df), aes( x = abundance), width = 0.02 ) +
     geom_label( aes( x = max(plot_df), y = max(table(plot_df)),
