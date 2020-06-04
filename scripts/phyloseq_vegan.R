@@ -32,6 +32,15 @@ if( cols[2] == 0 ){
         "NA","fishers_alpha"),ncol=2,byrow=TRUE)
     ## return
     write.table(div_df, file = snakemake@output[["report"]], quote = FALSE, sep = "\t", row.names = FALSE, col.names = FALSE)
+
+    ## plot
+    covdist_plot <- ggplot() + theme_bw() +
+      geom_label( aes( x = above_flt, y = 1, label = "no data passed thresholds" ), hjust = 1, vjust = 1) +
+      xlab("taxa abundance") + ylab("occurence") +
+      scale_x_log10()
+    ## save
+    ggsave( snakemake@output[["covdist_plot"]], covdist_plot, units = "cm", height = 12 , width = 21 )
+
     ## exit
     quit(save = "no", status = 0)
 }
