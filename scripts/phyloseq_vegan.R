@@ -91,7 +91,7 @@ if( length(plot_df) != 0 ){
   covdist_plot <- ggplot() + theme_bw() +
     geom_bar( data = data.frame(abundance=plot_df), aes( x = abundance), width = 0.02 ) +
     geom_label( aes( x = max(plot_df), y = max(table(plot_df)),
-      label = paste0("exclude: refs < ",below_flt,"\ngroup: ",plot_flt["above"]," refs >= ",above_flt,"\nwith max cov of ",plot_flt["max"]) ),
+      label = paste0("exclude: taxa < ",below_flt,"\ngroup: ",plot_flt["above"]," taxa >= ",above_flt,"\nwith max cov of ",plot_flt["max"]) ),
       hjust = 1, vjust = 1) +
     xlab("taxa abundance") + ylab("occurence") +
     scale_x_log10()

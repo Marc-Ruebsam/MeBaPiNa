@@ -67,7 +67,9 @@ if( length(covlist_chunks[[1]]) != 0 ){
     scale_x_log10()
 }
 ## save
+Sys.sleep(3) #!# attempt to correctly save plots
 ggsave( snakemake@output[["covdist_plot"]], covdist_plot, units = "cm", height = 12 , width = 21 )
+Sys.sleep(3) #!# attempt to correctly save plots
 
 ## plot positional coverage
 if( length(covlist_chunks[[1]]) != 0 ){
