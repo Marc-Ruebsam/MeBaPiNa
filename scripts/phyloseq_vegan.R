@@ -78,13 +78,20 @@ plot_flt["above"] <- sum(idx)
 plot_df[ idx ] <- 1000
 
 ## plot coverage distribution
-covdist_plot <- ggplot() + theme_bw() +
-  geom_bar( data = data.frame(abundance=plot_df), aes( x = abundance), width = 0.02 ) +
-  geom_label( aes( x = max(plot_df), y = max(table(plot_df)),
-    label = paste0("exclude: refs < ",below_flt,"\ngroup: ",plot_flt["above"]," refs >= ",above_flt,"\nwith max cov of ",plot_flt["max"]) ),
-    hjust = 1, vjust = 1) +
-  xlab("taxa abundance") + ylab("occurence") +
-  scale_x_log10()
+if( length(covlist_chunks[[1]]) != 0 ){
+  covdist_plot <- ggplot() + theme_bw() +
+    geom_bar( data = data.frame(abundance=plot_df), aes( x = abundance), width = 0.02 ) +
+    geom_label( aes( x = max(plot_df), y = max(table(plot_df)),
+      label = paste0("exclude: refs < ",below_flt,"\ngroup: ",plot_flt["above"]," refs >= ",above_flt,"\nwith max cov of ",plot_flt["max"]) ),
+      hjust = 1, vjust = 1) +
+    xlab("taxa abundance") + ylab("occurence") +
+    scale_x_log10()
+}else{
+  covdist_plot <- ggplot() + theme_bw() +
+    geom_label( aes( x = above_flt, y = 1, label = "no data passed thresholds" ), hjust = 1, vjust = 1) +
+    xlab("taxa abundance") + ylab("occurence") +
+    scale_x_log10()
+}
 ## save
 ggsave( snakemake@output[["covdist_plot"]], covdist_plot, units = "cm", height = 12 , width = 21 )
 
