@@ -23,7 +23,7 @@ output_dict = {
 }
 
 # input_dict = {
-#     'sam' : "01_processed_data/03_alignment/20191007_1559_MN31344_FAK76605_2bf006ff/barcode03/silva/filtered_filtered.sam",
+#     'sam' : "01_processed_data/03_alignment/20191007_1559_MN31344_FAK76605_2bf006ff/barcode03/silva/filtered.sam",
 #     'kronataxlist' : "METADATA/Reference_Sequences/silva/krona/species/taxlist.txt",
 #     'kronaseq2tax' : "METADATA/Reference_Sequences/silva/krona/species/seqid2taxid.map"
 # }
@@ -47,7 +47,7 @@ names=['accID','taxID_slv'])
 n_sam_header = int(subprocess.check_output(("awk 'BEGIN{count=0}; $1~/^@/{count++}; $1~!/^@/{exit}; END{print count}' " + input_dict['sam']),shell=True).decode("utf-8").rstrip())
 ## results from alignment
 df_sam = pd.read_csv(input_dict['sam'], sep='\t',
-names=['QNAME','FLAG','RNAME','POS','MAPQ','CIGAR','RNEXT','PNEXT','TLEN','SEQ','QUAL','NM','ms','AS','nn','tp','cm','s1','s2','de','rl'],
+names=['QNAME','FLAG','RNAME','POS','MAPQ','CIGAR','RNEXT','PNEXT','TLEN','SEQ','QUAL','NM','ms','AS','nn','tp','cm','s1','s2','de','SA/rl','rl/empty'],
 usecols=['QNAME','RNAME','POS','MAPQ','CIGAR','SEQ','NM','ms','de'],
 skiprows=n_sam_header)
 
