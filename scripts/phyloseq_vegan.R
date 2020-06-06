@@ -84,7 +84,7 @@ plot_flt <- c( max = max(plot_df) )
 ## group values above threshold
 idx <- plot_df >= above_flt
 plot_flt["above"] <- sum(idx)
-plot_df[ idx ] <- 1000
+plot_df[ idx ] <- above_flt
 
 ## plot coverage distribution
 if( length(plot_df) != 0 ){

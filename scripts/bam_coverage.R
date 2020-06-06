@@ -43,7 +43,7 @@ covlist_chunks[[2]] <- covlist_chunks[[2]][!idx] ## also for chunks
 ## group values above threshold
 idx <- covlist_chunks[[1]] >= above_flt
 cov_flt["above"] <- sum(idx)
-covlist_chunks[[1]][ idx ] <- 1000
+covlist_chunks[[1]][ idx ] <- above_flt
 
 ## get median in chunks
 cov_mean <- rowMeans(covlist_chunks[[2]])
