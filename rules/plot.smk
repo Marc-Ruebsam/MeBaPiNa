@@ -44,9 +44,9 @@ rule plot_pycoqc_seqsum_basecall:
         html="{tmp}02_analysis_results/01_basecalling/{run}/pycoqc/pycoQC_report.html",
         json="{tmp}02_analysis_results/01_basecalling/{run}/pycoqc/pycoQC_report.json"
     log:
-        "{tmp}02_analysis_results/01_basecalling/{run}/pycoqc/pycoqc_seqsum_basecall.log"
+        "{tmp}02_analysis_results/01_basecalling/{run}/pycoqc/MeBaPiNa_pycoqc_seqsum_basecall.log"
     benchmark:
-        "{tmp}02_analysis_results/01_basecalling/{run}/pycoqc/pycoqc_seqsum_basecall.benchmark.tsv"
+        "{tmp}02_analysis_results/01_basecalling/{run}/pycoqc/MeBaPiNa_pycoqc_seqsum_basecall.benchmark.tsv"
     conda:
         "../envs/pycoqc.yml"
     params:
