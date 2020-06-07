@@ -31,8 +31,8 @@ rule retax_kmermap:
         output="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kraken2",
         krakdb="{tmp}METADATA/Reference_Sequences/{reference}/kraken2/{reftype}/database.kraken"
     output:
-        rank="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/{reftype}.bracken",
-        table="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/{reftype}.kreport2"
+        rank="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/{reftype}.bracken",
+        table="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/{reftype}.kreport2"
     log:
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_retax_kmermap.log"
     benchmark:
@@ -43,20 +43,20 @@ rule retax_kmermap:
         "-t " + config['filtering']['min_featurereads'], ## [Default = 10]:: specifies the minimum number of reads required for a classification at the specified rank. Any classifications with less than the specified threshold will not receive additional reads from higher taxonomy levels when distributing reads for abundance estimation.
         "-r 1451" ## median read length after filtering in 20191007_1559_MN31344_FAK76605_2bf006ff
     shell:
-        "target={input.krakdb}; target=\"${{target/database.kraken/}}\" > {log} 2>&1; "
-        "in_dir={input.report}; in_dir=\"${{in_dir/filtered.kreport2/}}\" > {log} 2>&1; "
+        "target={input.krakdb}; target=\"${{target/database.kraken/}}\" > {log} 2>&1; " ## specify full directory as reference aka target
+        "in_dir={input.report}; in_dir=\"${{in_dir/filtered.kreport2/}}\" > {log} 2>&1; " ## get directory name of the input
         "reftype=\"{wildcards.reftype}\"; " ## get desired reference rank; first capital letter is used to select rank for reestimation below
         "bracken {params} "
         "-l \"${{reftype:0:1}}\" " ## [Default = 'S', Options = 'D','P','C','O','F','G','S']:: specifies the taxonomic rank to analyze. Each classification at this specified rank will receive an estimated number of reads belonging to that rank after abundance estimation.
         "-d ${{target}} "
         "-i {input.report} "
         "-o {output.rank} >> {log} 2>&1; "
-        "mv ${{in_dir}}filtered_bracken.kreport2 {output.table} >> {log} 2>&1"
+        "mv ${{in_dir}}filtered_bracken.kreport2 {output.table} >> {log} 2>&1" ## rename kreport2 of bracken
 
 rule counttax_kmermap:
     input:
         # kreport="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kreport2", ## kraken2
-        kreport="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/{reftype}.kreport2", ## bracken
+        kreport="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/{reftype}.kreport2", ## bracken
         kronataxlist="{tmp}METADATA/Reference_Sequences/{reference}/krona/{reftype}/taxlist.txt"
     output:
         counttaxlist="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"

@@ -220,7 +220,7 @@ rule stat_kmer_taxa:
 
 rule stat_kmer_retaxa:
     input:
-        "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/{reftype}.kreport2"
+        "{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/{reftype}.kreport2"
     output:
         report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_kmer_mapping-{reference}_{reftype}-retaxa_counts.tsv"
     shell:

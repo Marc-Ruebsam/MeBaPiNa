@@ -409,7 +409,7 @@ rule report_kmermap_filtered:
 
 rule report_retax_kmermap:
     input:
-        thing="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/{reftype}.kreport2"
+        thing="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/{reftype}.kreport2"
     output:
         dummy=temp("{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_retax_kmermap.report")
     params:
