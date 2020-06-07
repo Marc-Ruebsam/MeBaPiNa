@@ -17,7 +17,6 @@ import pandas as pd
 min_version("5.4")
 
 ## location of configuration and report specifications
-configfile: "../../METADATA/PIPELINE_CONFIG.yaml"
 report: "report/workflow.rst" #!# not yet implemented
 
 ## set working directory to specified data location
