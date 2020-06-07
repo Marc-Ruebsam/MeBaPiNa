@@ -461,7 +461,8 @@ rule plot_krona_kmermap_kraken:
         "-d 7" ## Maximum depth of wedges to include in the chart.
     shell:
         "reference={input.kronataxtab}; reference=\"${{reference/taxonomy.tab/}}\" > {log} 2>&1; "
-        "ktImportTaxonomy {params} -tax  ${{reference}} {input.output} -o {output} > {log} 2>&1"
+        "ktImportTaxonomy {params} -tax  ${{reference}} {input.output} -o {output} >> {log} 2>&1; "
+        "rm -rf \"{output}.files\" >> {log} 2>&1"  ## remove large unwanted ile with reads per node
 
 ## CALIBRATION STRAIN ##
 ########################
