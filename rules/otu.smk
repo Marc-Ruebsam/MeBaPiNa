@@ -6,7 +6,7 @@ rule generate_manifestfile:
     input:
         "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq"
     output:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/samplemanifest.tsv"
+        temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/samplemanifest.tsv")
     run:
         ## import
         import re
@@ -23,7 +23,7 @@ rule q2import_filtered:
     input:
         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/samplemanifest.tsv"
     output:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/filtered.qza"
+        temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/filtered.qza")
     log:
         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/MeBaPiNa_q2import_filtered.log"
     benchmark:
@@ -48,8 +48,8 @@ rule q2derep_imported:
     input:
         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/filtered.qza"
     output:
-        derepseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/filtered_derep.qza",
-        dereptable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/filtered_derep_table.qza"
+        derepseq=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/filtered_derep.qza"),
+        dereptable=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/filtered_derep_table.qza")
     log:
         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/MeBaPiNa_q2derep_imported.log"
     benchmark:
@@ -73,9 +73,9 @@ rule q2otupick:
         dereptable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/filtered_derep_table.qza",
         q2ref="{tmp}METADATA/Reference_Sequences/{reference}/qiime/reference.qza"
     output:
-        otuseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_centseq.qza", ## FeatureData[Sequence]
-        otutable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_ftable.qza", ## FeatureTable[Frequency]
-        otunewref="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_newrefseq.qza" ## The new reference sequences. This can be used for subsequent runs of open-reference clustering for consistent definitions of features across open-reference feature tables.
+        otuseq=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_centseq.qza"), ## FeatureData[Sequence]
+        otutable=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_ftable.qza"), ## FeatureTable[Frequency]
+        otunewref=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_newrefseq.qza") ## The new reference sequences. This can be used for subsequent runs of open-reference clustering for consistent definitions of features across open-reference feature tables.
     log:
         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2otupick.log"
     benchmark:
@@ -105,9 +105,9 @@ rule q2uchime_otus:
         otuseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_centseq.qza",
         otutable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_ftable.qza"
     output:
-        nonchim="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/nochim_centseq.qza",
-        chimera="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/chim_centseq.qza",
-        stats="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/chim_stats.qza"
+        nonchim=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/nochim_centseq.qza"),
+        chimera=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/chim_centseq.qza"),
+        stats=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/chim_stats.qza")
     log:
         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2uchime_otus.log"
     benchmark:
@@ -195,9 +195,9 @@ rule convert_q2filter:
         ftable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_ftable.qza",
         centseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq.qza"
     output:
-        ftable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_ftable/feature-table.tsv",
-        ftablebiom="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_ftable/feature-table.biom",
-        centseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq/dna-sequences.fasta"
+        ftable=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_ftable/feature-table.tsv"),
+        ftablebiom=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_ftable/feature-table.biom"),
+        centseq=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq/dna-sequences.fasta")
     log:
         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_convert_q2filter.log"
     benchmark:
@@ -218,7 +218,7 @@ rule rereplicate_q2filter:
         ftable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_ftable/feature-table.tsv",
         centseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq/dna-sequences.fasta"
     output:
-        rerep="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq/dna-sequences-rerep.fasta"
+        rerep=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq/dna-sequences-rerep.fasta")
     log:
         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_rereplicate_q2filter.log"
     benchmark:

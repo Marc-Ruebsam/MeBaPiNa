@@ -9,7 +9,7 @@ rule sorting_seqsum_barc:
     input:
         "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary.txt"
     output:
-        "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/sequencing_summary_sorted.txt"
+        temp("{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/sequencing_summary_sorted.txt")
     log:
         "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/MeBaPiNa_sorting_seqsum_barc.log"
     benchmark:
@@ -31,7 +31,7 @@ rule splitting_seqsum_barc:
     input:
         "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/sequencing_summary_sorted.txt"
     output:
-        directory("{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/split")
+        temp(directory("{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/split"))
     log:
         "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/MeBaPiNa_splitting_seqsum_barc.log"
     benchmark:
@@ -58,7 +58,7 @@ rule downsampling_seqsum: #!#
     input:
         "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/sequencing_summary_sorted.txt"
     output:
-        "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/sequencing_summary_downsampled.txt"
+        temp("{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/sequencing_summary_downsampled.txt")
     log:
         "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/MeBaPiNa_downsampling_seqsum.log"
     benchmark:
@@ -78,7 +78,7 @@ rule samtools_faidx:
     input:
         "{fasta}"
     output:
-        "{fasta}.fai"
+        temp("{fasta}.fai")
     conda:
         "../envs/samtools.yml"
     shell:
@@ -226,7 +226,7 @@ rule q2import_reftax:
     input:
         "{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/taxonomy.tsv"
     output:
-        "{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/taxonomy.qza"
+        temp("{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/taxonomy.qza")
     log:
         "{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/MeBaPiNa_q2import_reftax.log"
     benchmark:
@@ -247,7 +247,7 @@ rule q2import_refseq:
     input:
         "{tmp}METADATA/Reference_Sequences/silva/reference.fasta"
     output:
-        "{tmp}METADATA/Reference_Sequences/silva/qiime/reference.qza"
+        temp("{tmp}METADATA/Reference_Sequences/silva/qiime/reference.qza")
     log:
         "{tmp}METADATA/Reference_Sequences/silva/qiime/MeBaPiNa_q2import_refseq.log"
     benchmark:
