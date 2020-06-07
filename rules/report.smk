@@ -42,12 +42,12 @@ rule copy_basecall_output:
 rule copy_trim_filter_output:
     input:
         ## input to copy
-        "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoplot/NanoPlot-report.html", ## general QC: trimed and filtered barcoded reads, intentional downsampling
-        "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoplot/NanoStats.txt", ## general QC: trimed and filtered barcoded reads, intentional downsampling
-        "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanocomp/NanoComp-report.html", ## barcode QC: trimed and filtered barcoded reads
-        "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanocomp/NanoStats.txt", ## barcode QC: trimed and filtered barcoded reads
-        "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoqc/nanoQC.html", ## per base QC: trimed and filtered barcoded reads, forced downsampling
-        "{tmp}02_analysis_results/02_trimming_filtering/{run}/fastqc/stdin_fastqc.html", ## read QC: trimed and filtered barcoded reads
+        "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoplot/NanoPlot-report.html", ## general QC: trimmed and filtered barcoded reads, intentional downsampling
+        "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoplot/NanoStats.txt", ## general QC: trimmed and filtered barcoded reads, intentional downsampling
+        "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanocomp/NanoComp-report.html", ## barcode QC: trimmed and filtered barcoded reads
+        "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanocomp/NanoStats.txt", ## barcode QC: trimmed and filtered barcoded reads
+        "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoqc/nanoQC.html", ## per base QC: trimmed and filtered barcoded reads, forced downsampling
+        "{tmp}02_analysis_results/02_trimming_filtering/{run}/fastqc/stdin_fastqc.html", ## read QC: trimmed and filtered barcoded reads
         ## dummy depencencies
         "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trim_basecalled.report", ## REPORT
         "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filter_trimmed.report" ## REPORT
