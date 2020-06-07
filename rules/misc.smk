@@ -123,7 +123,7 @@ rule download_reffiles:
 rule construct_refseq:
     input:
         refseq="{tmp}METADATA/Reference_Sequences/silva/reference_aligned.fasta",
-        primers="{tmp}METADATA/Reference_Sequences/primers/ONT_16S/primers.fasta"
+        primers="{tmp}METADATA/Reference_Sequences/primers/" + config['primers'] + "/primers.fasta"
     output:
         refseq="{tmp}METADATA/Reference_Sequences/silva/reference.fasta",
         dups=temp("{tmp}METADATA/Reference_Sequences/silva/reference.dups")
