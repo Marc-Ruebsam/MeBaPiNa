@@ -45,7 +45,7 @@ rule retax_kmermap:
     shell:
         "target={input.krakdb}; target=\"${{target/database.kraken/}}\" > {log} 2>&1; "
         "in_dir={input.report}; in_dir=\"${{in_dir/filtered.kreport2/}}\" > {log} 2>&1; "
-        "reftype=\"{wldcards.reftype}\"; "
+        "reftype=\"{wildcards.reftype}\"; " ## get desired reference rank; first capital letter is used to select rank for reestimation below
         "bracken {params} "
         "-l \"${{reftype:0:1}}\" " ## [Default = 'S', Options = 'D','P','C','O','F','G','S']:: specifies the taxonomic rank to analyze. Each classification at this specified rank will receive an estimated number of reads belonging to that rank after abundance estimation.
         "-d ${{target}} "
