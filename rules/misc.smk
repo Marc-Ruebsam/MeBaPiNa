@@ -226,7 +226,7 @@ rule q2import_reftax:
     input:
         "{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/taxonomy.tsv"
     output:
-        temp("{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/taxonomy.qza")
+        "{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/taxonomy.qza"
     log:
         "{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/MeBaPiNa_q2import_reftax.log"
     benchmark:
@@ -247,7 +247,7 @@ rule q2import_refseq:
     input:
         "{tmp}METADATA/Reference_Sequences/silva/reference.fasta"
     output:
-        temp("{tmp}METADATA/Reference_Sequences/silva/qiime/reference.qza")
+        "{tmp}METADATA/Reference_Sequences/silva/qiime/reference.qza"
     log:
         "{tmp}METADATA/Reference_Sequences/silva/qiime/MeBaPiNa_q2import_refseq.log"
     benchmark:
