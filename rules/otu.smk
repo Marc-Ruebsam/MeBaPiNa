@@ -73,9 +73,9 @@ rule q2otupick:
         dereptable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/filtered_derep_table.qza",
         q2ref="{tmp}METADATA/Reference_Sequences/{reference}/qiime/reference.qza"
     output:
-        otuseq=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_centseq.qza"), ## FeatureData[Sequence]
-        otutable=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_ftable.qza"), ## FeatureTable[Frequency]
-        otunewref=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_newrefseq.qza") ## The new reference sequences. This can be used for subsequent runs of open-reference clustering for consistent definitions of features across open-reference feature tables.
+        otuseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_centseq.qza", ## FeatureData[Sequence]
+        otutable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_ftable.qza", ## FeatureTable[Frequency]
+        otunewref="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_newrefseq.qza" ## The new reference sequences. This can be used for subsequent runs of open-reference clustering for consistent definitions of features across open-reference feature tables.
     log:
         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2otupick.log"
     benchmark:
