@@ -224,13 +224,13 @@ rule construct_reftax:
 
 rule q2import_reftax:
     input:
-        "{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/taxonomy.tsv"
+        "{tmp}METADATA/Reference_Sequences/{reference}/qiime/{reftype}/taxonomy.tsv"
     output:
-        "{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/taxonomy.qza"
+        "{tmp}METADATA/Reference_Sequences/{reference}/qiime/{reftype}/taxonomy.qza"
     log:
-        "{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/MeBaPiNa_q2import_reftax.log"
+        "{tmp}METADATA/Reference_Sequences/{reference}/qiime/{reftype}/MeBaPiNa_q2import_reftax.log"
     benchmark:
-        "{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/MeBaPiNa_q2import_reftax.benchmark.tsv"
+        "{tmp}METADATA/Reference_Sequences/{reference}/qiime/{reftype}/MeBaPiNa_q2import_reftax.benchmark.tsv"
     conda:
         "../envs/qiime2.yml"
     threads:
@@ -245,13 +245,13 @@ rule q2import_reftax:
 
 rule q2import_refseq:
     input:
-        "{tmp}METADATA/Reference_Sequences/silva/reference.fasta"
+        "{tmp}METADATA/Reference_Sequences/{reference}/reference.fasta"
     output:
-        "{tmp}METADATA/Reference_Sequences/silva/qiime/reference.qza"
+        "{tmp}METADATA/Reference_Sequences/{reference}/qiime/reference.qza"
     log:
-        "{tmp}METADATA/Reference_Sequences/silva/qiime/MeBaPiNa_q2import_refseq.log"
+        "{tmp}METADATA/Reference_Sequences/{reference}/qiime/MeBaPiNa_q2import_refseq.log"
     benchmark:
-        "{tmp}METADATA/Reference_Sequences/silva/qiime/MeBaPiNa_q2import_refseq.benchmark.tsv"
+        "{tmp}METADATA/Reference_Sequences/{reference}/qiime/MeBaPiNa_q2import_refseq.benchmark.tsv"
     conda:
         "../envs/qiime2.yml"
     threads:
@@ -265,14 +265,14 @@ rule q2import_refseq:
 
 rule q2train_classifyer: #!# failed repeatedly because of high memory requirements
     input:
-        reftax="{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/taxonomy.qza",
-        refseq="{tmp}METADATA/Reference_Sequences/silva/qiime/reference.qza"
+        reftax="{tmp}METADATA/Reference_Sequences/{reference}/qiime/{reftype}/taxonomy.qza",
+        refseq="{tmp}METADATA/Reference_Sequences/{reference}/qiime/reference.qza"
     output:
-        "{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/classifyer.qza"
+        "{tmp}METADATA/Reference_Sequences/{reference}/qiime/{reftype}/classifyer.qza"
     log:
-        "{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/MeBaPiNa_q2train_classifyer.log"
+        "{tmp}METADATA/Reference_Sequences/{reference}/qiime/{reftype}/MeBaPiNa_q2train_classifyer.log"
     benchmark:
-        "{tmp}METADATA/Reference_Sequences/silva/qiime/{reftype}/MeBaPiNa_q2train_classifyer.benchmark.tsv"
+        "{tmp}METADATA/Reference_Sequences/{reference}/qiime/{reftype}/MeBaPiNa_q2train_classifyer.benchmark.tsv"
     conda:
         "../envs/qiime2.yml"
     threads:
