@@ -105,7 +105,7 @@ def input_all(wildcards):
     ## REFERENCE ##
     ["{tmp}03_report/Reference_Sequences/{reference}/reference_lengthdist.tsv", ## reference lenth distribution
     "{tmp}03_report/Reference_Sequences/{reference}/reference_lengthdist.pdf", ## reference lenth distribution
-    "{tmp}03_report/Reference_Sequences/{reference}/reference_taxaranks.tsv"] + ## reference taxa distribution
+    "{tmp}03_report/Reference_Sequences/{reference}_{reftype}/reference_taxaranks.tsv"] + ## reference taxa distribution
     ## RAW READS ##
     ["{tmp}{barc_dir}read_base_counts.tsv"] + ## raw read statistics
     ## BASECALL ##

@@ -15,9 +15,9 @@ rule stat_refseq_lenstat:
 
 rule stat_refseq_taxaranks:
     input:
-        "{tmp}METADATA/Reference_Sequences/{reference}/krona/Species/taxlist.txt"
+        "{tmp}METADATA/Reference_Sequences/{reference}/krona/{reftype}/taxlist.txt"
     output:
-        "{tmp}03_report/Reference_Sequences/{reference}/reference_taxaranks.tsv"
+        "{tmp}03_report/Reference_Sequences/{reference}_{reftype}/reference_taxaranks.tsv"
     shell:
         "awk -F \"\\t\" '$3==\"root\"{{cnt[\"root\"]++;next}}; $3==\"domain\"{{cnt[\"domain\"]++;next}}; $3==\"phylum\"{{cnt[\"phylum\"]++;next}}; $3==\"class\"{{cnt[\"class\"]++;next}}; $3==\"order\"{{cnt[\"order\"]++;next}}; $3==\"family\"{{cnt[\"family\"]++;next}}; $3==\"genus\"{{cnt[\"genus\"]++;next}}; $3==\"species\"{{cnt[\"species\"]++;next}}; {{cnt[\"other\"]++}};"
         "END{{ printf \"%d\\troot\\n%d\\tdomain\\n%d\\tphylum\\n%d\\tclass\\n%d\\torder\\n%d\\tfamily\\n%d\\tgenus\\n%d\\tspecies\\n%d\\tother\\n\","
