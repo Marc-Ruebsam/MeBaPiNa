@@ -211,7 +211,7 @@ rule convert_q2centseq:
     conda:
         "../envs/qiime2.yml"
     shell:
-        "centseq={input.centseq}; centseq=\"${{centseq/.qza/}}\"; " ## get path without file extention
+        "centseq={input}; centseq=\"${{centseq/.qza/}}\"; " ## get path without file extention
         "qiime tools export --input-path {input} --output-path \"${{centseq}}/\""
 
 rule rereplicate_q2filter:
