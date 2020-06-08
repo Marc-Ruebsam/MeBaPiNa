@@ -190,28 +190,29 @@ rule q2filter_uchime:
 #         "--p-n-jobs {threads} "
 #         "--verbose {params} >> {log} 2>&1"
 
-rule convert_q2filter:
+rule convert_q2ftable
     input:
-        ftable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_ftable.qza",
-        centseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq.qza"
+        "{ftable}_ftable.qza"
     output:
-        ftable=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_ftable/feature-table.tsv"),
-        ftablebiom=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_ftable/feature-table.biom"),
-        centseq=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq/dna-sequences.fasta")
-    log:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_convert_q2filter.log"
-    benchmark:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_convert_q2filter.benchmark.tsv"
+        ftable=temp("{ftable}_ftable/feature-table.tsv"),
+        ftablebiom=temp("{ftable}_ftable/feature-table.biom")
     conda:
         "../envs/qiime2.yml"
-    threads:
-        1
     shell:
-        "centseq={input.centseq}; centseq=\"${{centseq/.qza/}}\" > {log} 2>&1; "
-        "ftable={input.ftable}; ftable=\"${{ftable/.qza/}}\" >> {log} 2>&1; "
-        "qiime tools export --input-path \"${{centseq}}.qza\" --output-path \"${{centseq}}/\" >> {log} 2>&1; "
-        "qiime tools export --input-path \"${{ftable}}.qza\" --output-path \"${{ftable}}/\" >> {log} 2>&1; "
-        "biom convert --input-fp {output.ftablebiom} --output-fp {output.ftable} --to-tsv >> {log} 2>&1"
+        "ftable={input}; ftable=\"${{ftable/.qza/}}\"; " ## get path without file extention
+        "qiime tools export --input-path {input} --output-path \"${{ftable}}/\"; "
+        "biom convert --input-fp {output.ftablebiom} --output-fp {output.ftable} --to-tsv"
+
+rule convert_q2centseq
+    input:
+        "{centseq}_centseq.qza"
+    output:
+        centseq=temp("{centseq}_centseq/dna-sequences.fasta")
+    conda:
+        "../envs/qiime2.yml"
+    shell:
+        "centseq={input.centseq}; centseq=\"${{centseq/.qza/}}\"; " ## get path without file extention
+        "qiime tools export --input-path {input} --output-path \"${{centseq}}/\""
 
 rule rereplicate_q2filter:
     input:

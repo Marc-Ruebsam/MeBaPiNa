@@ -81,24 +81,23 @@ rule stat_general_readbasecount:
 
 rule stat_otu_feature:
     input:
-        otutable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_ftable.qza" ## also dummy for MeBaPiNa_q2otupick.log
+        otutable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_ftable/feature-table.biom", ## also dummy for MeBaPiNa_q2otupick.log
+        nochimtable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_ftable/feature-table.biom"
     output:
         report="{tmp}03_report/{timepoint}/{sample}/{run}-{barc}/03_otu_picking-{reference}-feature_counts.tsv"
     conda:
         "../envs/qiime2.yml"
     shell:
         ## path to directory with files
-        "otu_dir={input.otutable}; otu_dir=\"${{otu_dir/cluster_ftable.qza/}}\"; "
+        "otu_dir={input.otutable}; otu_dir=${{otu_dir/\"cluster_ftable/feature-table.biom\"/}}; "
         "sleep 1; " ## make sure the log file was created
         ## get number of total: clusters and reads and mean reads per cluster (abundance)
-        "if [[ ! -f \"${{otu_dir}}cluster_ftable/feature-table.biom\" ]]; then " ## if file doesnt exsist...
-        "qiime tools export --input-path \"${{otu_dir}}cluster_ftable.qza\" --output-path \"${{otu_dir}}cluster_ftable\"; fi; " ## ...create it
         "awk '$2==\"observations:\"{{gsub(\",\",\"\",$3); clst_cnt=$3}}; "
         "$2==\"count:\"{{gsub(\",\",\"\",$3); read_cnt=$3}}; "
         "END {{ if(clst_cnt==0){{mean_cnt=0}}else{{mean_cnt=(read_cnt/clst_cnt)}}; "
         "printf \"%d\\ttotal_cluster_count\\n%d\\ttotal_read_count\\n%d\\ttotal_mean_abund\\n\","
         "clst_cnt,read_cnt,mean_cnt }}' "
-        "<(biom summarize-table -i \"${{otu_dir}}cluster_ftable/feature-table.biom\") > {output.report}; "
+        "<(biom summarize-table -i {input.otutable}) > {output.report}; "
         ## get number of de-novo: clusters and reads and mean reads per cluster (abundance)
         "awk 'BEGIN{{prnt_once=0}}"
         "$1==\"Clusters:\"{{clst_cnt=$2}}; "
@@ -108,14 +107,12 @@ rule stat_otu_feature:
         "clst_cnt,read_cnt,mean_cnt }}' "
         "\"${{otu_dir}}MeBaPiNa_q2otupick.log\" >> {output.report}; "
         ## get number of total after filtering: clusters and reads and mean reads per cluster (abundance)
-        "if [[ ! -f \"${{otu_dir}}filt_ftable/feature-table.biom\" ]]; then "
-        "qiime tools export --input-path \"${{otu_dir}}filt_ftable.qza\" --output-path \"${{otu_dir}}filt_ftable\"; fi; "
         "awk '$2==\"observations:\"{{gsub(\",\",\"\",$3); clst_cnt=$3}}; "
         "$2==\"count:\"{{gsub(\",\",\"\",$3); read_cnt=$3}}; "
         "END {{ if(clst_cnt==0){{mean_cnt=0}}else{{mean_cnt=(read_cnt/clst_cnt)}}; "
         "printf \"%d\\tfilter_cluster_count\\n%d\\tfilter_read_count\\n%d\\tfilter_mean_abund\\n\","
         "clst_cnt,read_cnt,mean_cnt }}' "
-        "<(biom summarize-table -i \"${{otu_dir}}filt_ftable/feature-table.biom\") >> {output.report}"
+        "<(biom summarize-table -i {input.nochimtable}) >> {output.report}"
 
 rule stat_otu_taxa:
     input:
