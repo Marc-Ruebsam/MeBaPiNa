@@ -65,7 +65,7 @@ checkpoint basecall_raw:
 rule trim_basecalled:
     ## input dependency is handled by the all_report rule
     output:
-        temp("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/trimmed.fastq")
+        "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/trimmed.fastq"
     log:
         "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trim_basecalled.log"
     benchmark:
