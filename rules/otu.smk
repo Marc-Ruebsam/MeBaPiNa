@@ -190,7 +190,7 @@ rule q2filter_uchime:
 #         "--p-n-jobs {threads} "
 #         "--verbose {params} >> {log} 2>&1"
 
-rule convert_q2ftable
+rule convert_q2ftable:
     input:
         "{ftable}_ftable.qza"
     output:
@@ -203,7 +203,7 @@ rule convert_q2ftable
         "qiime tools export --input-path {input} --output-path \"${{ftable}}/\"; "
         "biom convert --input-fp {output.ftablebiom} --output-fp {output.ftable} --to-tsv"
 
-rule convert_q2centseq
+rule convert_q2centseq:
     input:
         "{centseq}_centseq.qza"
     output:
