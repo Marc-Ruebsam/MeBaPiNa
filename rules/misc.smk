@@ -52,9 +52,7 @@ rule downsampling_seqsum: #!#
     benchmark:
         "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/MeBaPiNa_downsampling_seqsum.benchmark.tsv"
     shell:
-        "touch {output[0]}; "
-        "lg={log}; "
-        "cat ${{lg/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} > {log}"
+        "touch {output[0]}"
 
 ##############
 ## SAMTOOLS ##
