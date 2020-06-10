@@ -16,8 +16,7 @@ rule splitting_filtered: #!# only required because of low memory avaialility
         "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_splitting_filtered.benchmark.tsv"
     shell:
         "touch {output[0]}; "
-        "lg={log}; "
-        "cat ${{lg/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} > {log}"
+        "touch {log}"
 
 rule aligning_filtered:
     input:
