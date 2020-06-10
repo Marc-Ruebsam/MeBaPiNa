@@ -122,8 +122,10 @@ rule convert_q2ftable:
         ftable=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/feature-table.tsv"),
         ftablebiom=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/feature-table.biom")
     shell:
-        "touch {output[0]}; "
-        "touch {output[1]}"
+        "out1={output[0]}; "
+        "cp ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
+        "out2={output[1]}; "
+        "cp ${{out2/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out2}}"
 
 rule convert_q2centseq:
     input:
@@ -131,7 +133,8 @@ rule convert_q2centseq:
     output:
         centseq=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{centseq}_centseq/dna-sequences.fasta")
     shell:
-        "touch {output[0]}"
+        "out1={output[0]}; "
+        "cp ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
 
 rule rereplicate_q2filter:
     input:
