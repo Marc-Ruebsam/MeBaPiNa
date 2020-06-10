@@ -9,7 +9,7 @@ rule sorting_seqsum_barc:
     input:
         "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary.txt"
     output:
-        temp("{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/sequencing_summary_sorted.txt")
+        "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/sequencing_summary_sorted.txt"
     log:
         "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/MeBaPiNa_sorting_seqsum_barc.log"
     benchmark:
