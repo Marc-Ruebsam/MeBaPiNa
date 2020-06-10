@@ -37,7 +37,7 @@ rule splitting_seqsum_barc:
     benchmark:
         "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/MeBaPiNa_splitting_seqsum_barc.benchmark.tsv"
     shell:
-        "touch {output[0]}"
+        "mkdir {output[0]}"
 
 ## DOWNSAMPLING ##
 ##################

@@ -15,7 +15,7 @@ rule splitting_filtered: #!# only required because of low memory avaialility
     benchmark:
         "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_splitting_filtered.benchmark.tsv"
     shell:
-        "touch {output[0]}; "
+        "mkdir {output[0]}; "
         "touch {log}"
 
 rule aligning_filtered:
