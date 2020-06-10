@@ -299,9 +299,7 @@ rule plot_refseq_coverage:
         covpos_plot="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}/covpos.pdf"
     shell:
         "out1={output[0]}; "
-        "cp ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
-        "lg={log}; "
-        "cat ${{lg/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} > {log}"
+        "cp ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}"
 
 rule plot_krona_aligned_text:
     input:
