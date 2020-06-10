@@ -66,7 +66,7 @@ rule samtools_faidx:
     conda:
         "../envs/samtools.yml"
     shell:
-        "touch {output[0]}"
+        "samtools faidx {input}"
 
 rule samtools_depth:
     input:
@@ -74,8 +74,16 @@ rule samtools_depth:
         reference="{tmp}METADATA/Reference_Sequences/{reference}/reference.fasta"
     output:
         temp("{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/refseq_coverage.tsv")
+    conda:
+        "../envs/samtools.yml"
+    params:
+        "-a",
+        "-d 0", ## maximum coverage depth [8000]. If 0, depth is set to the maximum
+        "-l " + config['filtering']['len_min'] #!# should be redundant
     shell:
-        "touch {output[0]}"
+        "samtools depth {params} "
+        "--reference {input.reference} {input.bam} "
+        "> {output}"
 
 ################
 ## REFERENCES ##
