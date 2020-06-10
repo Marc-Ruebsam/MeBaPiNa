@@ -19,9 +19,9 @@ rule plot_nanoplot_seqsum_basecall:
         "{tmp}02_analysis_results/01_basecalling/{run}/nanoplot/MeBaPiNa_nanoplot_seqsum_basecall.benchmark.tsv"
     shell:
         "out1={output[0]}; "
-        "mv ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
+        "cp ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
         "out2={output[1]}; "
-        "mv ${{out2/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out2}}; "
+        "cp ${{out2/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out2}}; "
         "lg={log}; "
         "cat ${{lg/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} > {log}"
 
@@ -39,9 +39,9 @@ rule plot_pycoqc_seqsum_basecall:
         "{tmp}02_analysis_results/01_basecalling/{run}/pycoqc/MeBaPiNa_pycoqc_seqsum_basecall.benchmark.tsv"
     shell:
         "out1={output[0]}; "
-        "mv ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
+        "cp ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
         "out2={output[1]}; "
-        "mv ${{out2/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out2}}; "
+        "cp ${{out2/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out2}}; "
         "lg={log}; "
         "cat ${{lg/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} > {log}"
 
@@ -59,9 +59,9 @@ rule plot_nanocomp_seqsum_basecall:
         "{tmp}02_analysis_results/01_basecalling/{run}/nanocomp/MeBaPiNa_nanocomp_seqsum_basecall.benchmark.tsv"
     shell:
         "out1={output[0]}; "
-        "mv ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
+        "cp ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
         "out2={output[1]}; "
-        "mv ${{out2/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out2}}; "
+        "cp ${{out2/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out2}}; "
         "lg={log}; "
         "cat ${{lg/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} > {log}"
 
@@ -92,7 +92,7 @@ rule plot_nanoqc_fastq_basecall:
         "{tmp}02_analysis_results/01_basecalling/{run}/nanoqc/MeBaPiNa_nanoqc_fastq_basecall.benchmark.tsv"
     shell:
         "out1={output[0]}; "
-        "mv ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
+        "cp ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
         "lg={log}; "
         "cat ${{lg/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} > {log}"
 
@@ -109,7 +109,7 @@ rule plot_fastqc_fastq_basecall:
         "{tmp}02_analysis_results/01_basecalling/{run}/fastqc/MeBaPiNa_fastqc_fastq_basecall.benchmark.tsv"
     shell:
         "out1={output[0]}; "
-        "mv ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
+        "cp ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
         "lg={log}; "
         "cat ${{lg/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} > {log}"
 
@@ -146,9 +146,9 @@ rule plot_nanoplot_fastq_filter:
         "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoplot/MeBaPiNa_nanoplot_fastq_filter.benchmark.tsv"
     shell:
         "out1={output[0]}; "
-        "mv ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
+        "cp ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
         "out2={output[1]}; "
-        "mv ${{out2/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out2}}; "
+        "cp ${{out2/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out2}}; "
         "lg={log}; "
         "cat ${{lg/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} > {log}"
 
@@ -166,7 +166,7 @@ rule plot_nanocomp_fastq_filter:
         "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanocomp/MeBaPiNa_nanocomp_fastq_filter.benchmark.tsv"
     shell:
         "out1={output[0]}; "
-        "mv ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
+        "cp ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
         "lg={log}; "
         "cat ${{lg/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} > {log}"
 
@@ -197,7 +197,7 @@ rule plot_nanoqc_fastq_filter:
         "{tmp}02_analysis_results/02_trimming_filtering/{run}/nanoqc/MeBaPiNa_nanoqc_fastq_filter.benchmark.tsv"
     shell:
         "out1={output[0]}; "
-        "mv ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
+        "cp ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
         "lg={log}; "
         "cat ${{lg/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} > {log}"
 
@@ -214,7 +214,7 @@ rule plot_fastqc_fastq_filter:
         "{tmp}02_analysis_results/02_trimming_filtering/{run}/fastqc/MeBaPiNa_fastqc_fastq_filter.benchmark.tsv"
     shell:
         "out1={output[0]}; "
-        "mv ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
+        "cp ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
         "lg={log}; "
         "cat ${{lg/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} > {log}"
 
@@ -232,7 +232,7 @@ rule plot_qiime2_q2otupick:
         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2otupick/MeBaPiNa_qiime2_q2otupick.benchmark.tsv"
     shell:
         "out1={output[0]}; "
-        "mv ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
+        "cp ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
         "lg={log}; "
         "cat ${{lg/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} > {log}"
 
@@ -247,7 +247,7 @@ rule plot_qiime2_q2filter:
         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2filter/MeBaPiNa_qiime2_q2filter.benchmark.tsv"
     shell:
         "out1={output[0]}; "
-        "mv ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
+        "cp ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
         "lg={log}; "
         "cat ${{lg/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} > {log}"
 
@@ -263,7 +263,7 @@ rule plot_krona_q2rerep:
         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_krona_q2rerep.benchmark.tsv"
     shell:
         "out1={output[0]}; "
-        "mv ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
+        "cp ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
         "lg={log}; "
         "cat ${{lg/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} > {log}"
 
@@ -283,9 +283,9 @@ rule plot_pycoqc_aligned:
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_pycoqc_aligned.benchmark.tsv"
     shell:
         "out1={output[0]}; "
-        "mv ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
+        "cp ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
         "out2={output[1]}; "
-        "mv ${{out2/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out2}}; "
+        "cp ${{out2/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out2}}; "
         "lg={log}; "
         "cat ${{lg/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} > {log}"
 
@@ -297,7 +297,7 @@ rule plot_refseq_coverage:
         covpos_plot="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}/covpos.pdf"
     shell:
         "out1={output[0]}; "
-        "mv ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
+        "cp ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
         "lg={log}; "
         "cat ${{lg/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} > {log}"
 
@@ -312,7 +312,7 @@ rule plot_krona_aligned_text:
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_krona_aligned.benchmark.tsv"
     shell:
         "out1={output[0]}; "
-        "mv ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
+        "cp ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
         "lg={log}; "
         "cat ${{lg/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} > {log}"
 
@@ -330,7 +330,7 @@ rule plot_krona_kmermap_text:
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_krona_kmermap_bracken.benchmark.tsv"
     shell:
         "out1={output[0]}; "
-        "mv ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
+        "cp ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
         "lg={log}; "
         "cat ${{lg/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} > {log}"
 
@@ -346,6 +346,6 @@ rule plot_krona_kmermap_kraken:
         "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_krona_kmermap.benchmark.tsv"
     shell:
         "out1={output[0]}; "
-        "mv ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
+        "cp ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
         "lg={log}; "
         "cat ${{lg/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} > {log}"

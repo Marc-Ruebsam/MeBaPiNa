@@ -89,7 +89,7 @@ rule trim_basecalled:
         "qcat --threads {threads} {params} "
         "--barcode_dir ${{output_folder}} "
         "> {log} 2>&1; "
-        "mv ${{output_folder}}/{wildcards.barc}.fastq {output} >> {log} 2>&1; " ## rename barcode fastq to "trimmed.fastq"
+        "cp ${{output_folder}}/{wildcards.barc}.fastq {output} >> {log} 2>&1; " ## rename barcode fastq to "trimmed.fastq"
         "mkdir -p ${{output_folder}}/others >> {log} 2>&1; " ## create folder for all other barcode files sorted out during demultiplexing
         "find ${{output_folder}} -type f \( -name \"*barcode*\" -o -name \"*none*\" \) " ## move other barcodes to "others" directory
         "-exec mv {{}} ${{output_folder}}/others \; >> {log} 2>&1"
