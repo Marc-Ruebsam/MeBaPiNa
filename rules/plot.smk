@@ -167,6 +167,8 @@ rule plot_nanocomp_fastq_filter:
     shell:
         "out1={output[0]}; "
         "cp ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
+        "out2={output[1]}; "
+        "cp ${{out2/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out2}}; "
         "lg={log}; "
         "cat ${{lg/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} > {log}"
 
