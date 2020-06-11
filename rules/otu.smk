@@ -162,6 +162,43 @@ rule q2filter_uchime:
         "--verbose "
         ">> {log} 2>&1"
 
+################
+## CONVERSION ##
+################
+
+rule convert_q2ftable:
+    input:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable.qza"
+    output:
+        ftable=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/feature-table.tsv"),
+        ftablebiom=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/temp.biom") #!# separated coversion rules to prevent rerunning of rules rereplicate_q2filte, ... when rerunning rule stat_otu_feature
+    conda:
+        "../envs/qiime2.yml"
+    shell:
+        "qiime tools export --input-path {input} --output-path {output.ftablebiom}; "
+        "biom convert --input-fp {output.ftablebiom} --output-fp {output.ftable} --to-tsv"
+
+rule convert_q2ftable_biom:
+    input:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable.qza"
+    output:
+        temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/feature-table.biom")
+    conda:
+        "../envs/qiime2.yml"
+    shell:
+        "qiime tools export --input-path {input} --output-path {output}"
+
+rule convert_q2centseq:
+    input:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{centseq}_centseq.qza"
+    output:
+        centseq=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{centseq}_centseq/dna-sequences.fasta")
+    conda:
+        "../envs/qiime2.yml"
+    shell:
+        "centseq={input}; centseq=\"${{centseq/.qza/}}\"; " ## get path without file extention
+        "qiime tools export --input-path {input} --output-path \"${{centseq}}/\""
+
 ##########################
 ## TAXONOMIC ASSIGNMENT ##
 ##########################
@@ -189,41 +226,6 @@ rule q2filter_uchime:
 #         "--o-classification {output} "
 #         "--p-n-jobs {threads} "
 #         "--verbose {params} >> {log} 2>&1"
-
-rule convert_q2ftable:
-    input:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable.qza"
-    output:
-        ftable=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/feature-table.tsv"),
-        ftablebiom=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/feature-table_temp.biom") #!# separated coversion rules to prevent rerunning of rules rereplicate_q2filte, ... when rerunning rule stat_otu_feature
-    conda:
-        "../envs/qiime2.yml"
-    shell:
-        "ftable={input}; ftable=\"${{ftable/.qza/}}\"; " ## get path without file extention
-        "qiime tools export --input-path {input} --output-path \"${{ftable}}/feature-table_temp.biom\"; "
-        "biom convert --input-fp {output.ftablebiom} --output-fp {output.ftable} --to-tsv"
-
-rule convert_q2ftable_biom:
-    input:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable.qza"
-    output:
-        ftablebiom=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/feature-table.biom")
-    conda:
-        "../envs/qiime2.yml"
-    shell:
-        "ftable={input}; ftable=\"${{ftable/.qza/}}\"; " ## get path without file extention
-        "qiime tools export --input-path {input} --output-path \"${{ftable}}/\""
-
-rule convert_q2centseq:
-    input:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{centseq}_centseq.qza"
-    output:
-        centseq=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{centseq}_centseq/dna-sequences.fasta")
-    conda:
-        "../envs/qiime2.yml"
-    shell:
-        "centseq={input}; centseq=\"${{centseq/.qza/}}\"; " ## get path without file extention
-        "qiime tools export --input-path {input} --output-path \"${{centseq}}/\""
 
 rule rereplicate_q2filter:
     input:

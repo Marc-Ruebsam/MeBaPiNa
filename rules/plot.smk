@@ -295,9 +295,19 @@ rule plot_fastqc_fastq_filter:
 ## OTU ##
 #########
 
+rule plot_convert_q2ftable:
+    input:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable.qza"
+    output:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/feature-table.qzv"
+    conda:
+        "../envs/qiime2.yml"
+    shell:
+        "qiime feature-table summarize --i-table {input} --o-visualization {output}"
+
 rule plot_qiime2_q2otupick:
     input:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_ftable.qza"
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/cluster_ftable/feature-table.qzv"
     output:
         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2otupick/index.html"
     log:
@@ -307,10 +317,6 @@ rule plot_qiime2_q2otupick:
     conda:
         "../envs/qiime2.yml"
     shell:
-        "qiime feature-table summarize "
-        "--i-table {input} "
-        "--o-visualization {input}.qzv "
-        "--verbose > {log} 2>&1; "
         "out_dir={output}; out_dir=\"${{out_dir/index.html/}}\" > {log} 2>&1; "
         "qiime tools export "
         "--input-path {input}.qzv "
@@ -320,7 +326,7 @@ rule plot_qiime2_q2otupick:
 
 rule plot_qiime2_q2filter:
     input:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_ftable.qza"
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_ftable/feature-table.qzv"
     output:
         "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}/q2filter/index.html"
     log:
@@ -330,10 +336,6 @@ rule plot_qiime2_q2filter:
     conda:
         "../envs/qiime2.yml"
     shell:
-        "qiime feature-table summarize "
-        "--i-table {input} "
-        "--o-visualization {input}.qzv "
-        "--verbose > {log} 2>&1; "
         "out_dir={output}; out_dir=\"${{out_dir/index.html/}}\" > {log} 2>&1; "
         "qiime tools export "
         "--input-path {input}.qzv "
