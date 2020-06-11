@@ -119,8 +119,15 @@ rule convert_q2ftable:
     input:
         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable.qza"
     output:
-        ftable="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/feature-table.tsv",
-        ftablebiom="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/feature-table.biom"
+        ftable=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/feature-table.tsv"),
+        ftablebiom=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/feature-table_temp.biom") #!# separated coversion rules to prevent rerunning of rules rereplicate_q2filte, ... when rerunning rule stat_otu_feature
+    shell:
+
+rule convert_q2ftable_biom:
+    input:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable.qza"
+    output:
+        ftablebiom=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/feature-table.biom")
     shell:
         "out1={output[0]}; "
         "cp ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
@@ -131,7 +138,7 @@ rule convert_q2centseq:
     input:
         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{centseq}_centseq.qza"
     output:
-        centseq="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{centseq}_centseq/dna-sequences.fasta"
+        centseq=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{centseq}_centseq/dna-sequences.fasta")
     shell:
         "out1={output[0]}; "
         "cp ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
