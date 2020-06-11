@@ -220,10 +220,11 @@ rule plot_nanocomp_fastq_filter:
         "--maxlength " + PLOT_MAXLEN,
         "--plot violin", ## violin,box,ridge
         "--format png",
-        "--verbose", ## or nothing to log
-        "--names " + " ".join(SAMPLES.keys()) ## join(SAMPLES.values()) works only with short names
+        "--verbose"## or nothing to log
     shell:
+        "all_input=( {input} ); " ## use barcodes from input paths for naming
         "NanoComp --threads {threads} {params} "
+        "--names $(for fl in ${{all_input[@]}}; do echo ${{fl}} | awk -F'/' '{{print $(NF-1)}}'; done) "
         "--outdir {wildcards.tmp}02_analysis_results/02_trimming_filtering/{wildcards.run}/nanocomp "
         "--fastq {input} > {log} 2>&1"
 
