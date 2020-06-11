@@ -47,9 +47,11 @@ names=['accID','taxID_slv'])
 n_sam_header = int(subprocess.check_output(("awk 'BEGIN{count=0}; $1~/^@/{count++}; $1~!/^@/{exit}; END{print count}' " + input_dict['sam']),shell=True).decode("utf-8").rstrip())
 ## results from alignment
 df_sam = pd.read_csv(input_dict['sam'], sep='\t',
-names=['QNAME','FLAG','RNAME','POS','MAPQ','CIGAR','RNEXT','PNEXT','TLEN','SEQ','QUAL','NM','ms','AS','nn','tp','cm','s1','s2','de','SA/rl','rl/empty'],
-usecols=['QNAME','RNAME','POS','MAPQ','CIGAR','SEQ','NM','ms','de'],
+header=None, usecols=[0, 2, 3, 4, 5, 9, 11, 12, 19],
+#names=['QNAME','FLAG','RNAME','POS','MAPQ','CIGAR','RNEXT','PNEXT','TLEN','SEQ','QUAL','NM','ms','AS','nn','tp','cm','s1','s2','de','SA/rl','rl/empty'],
+#usecols=['QNAME','RNAME','POS','MAPQ','CIGAR','SEQ','NM','ms','de'], #!# sam files have differnent numbers of columns depending on SA, rl and zd flag
 skiprows=n_sam_header)
+df_sam.columns=['QNAME','RNAME','POS','MAPQ','CIGAR','SEQ','NM','ms','de']
 
 
 ## FILTERING READS ##
