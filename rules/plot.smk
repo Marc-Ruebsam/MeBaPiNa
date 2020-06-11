@@ -295,15 +295,19 @@ rule plot_fastqc_fastq_filter:
 ## OTU ##
 #########
 
-rule plot_convert_q2ftable:
+rule plot_convert_q2ftable_viz:
     input:
         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable.qza"
     output:
         temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/feature-table.qzv")
+    log:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/MeBaPiNa_convert_q2ftable_viz.log"
+    benchmark:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/MeBaPiNa_convert_q2ftable_viz.benchmark.tsv"
     conda:
         "../envs/qiime2.yml"
     shell:
-        "qiime feature-table summarize --i-table {input} --o-visualization {output}"
+        "qiime feature-table summarize --i-table {input} --o-visualization {output} > {log} 2>&1"
 
 rule plot_qiime2_q2otupick:
     input:

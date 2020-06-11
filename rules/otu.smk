@@ -172,31 +172,43 @@ rule convert_q2ftable:
     output:
         ftable=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/feature-table.tsv"),
         ftablebiom=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/temp.biom") #!# separated coversion rules to prevent rerunning of rules rereplicate_q2filte, ... when rerunning rule stat_otu_feature
+    log:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/MeBaPiNa_convert_q2ftable.log"
+    benchmark:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/MeBaPiNa_convert_q2ftable.benchmark.tsv"
     conda:
         "../envs/qiime2.yml"
     shell:
-        "qiime tools export --input-path {input} --output-path {output.ftablebiom}; "
-        "biom convert --input-fp {output.ftablebiom} --output-fp {output.ftable} --to-tsv"
+        "qiime tools export --input-path {input} --output-path {output.ftablebiom} > {log} 2>&1; "
+        "biom convert --input-fp {output.ftablebiom} --output-fp {output.ftable} --to-tsv >> {log} 2>&1"
 
 rule convert_q2ftable_biom:
     input:
         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable.qza"
     output:
-        temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/feature-table.biom")
+        temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/feature-table.biom") #!# separated coversion rules to prevent rerunning of rules rereplicate_q2filte, ... when rerunning rule stat_otu_feature
+    log:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/MeBaPiNa_convert_q2ftable_biom.log"
+    benchmark:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/MeBaPiNa_convert_q2ftable_biom.benchmark.tsv"
     conda:
         "../envs/qiime2.yml"
     shell:
-        "qiime tools export --input-path {input} --output-path {output}"
+        "qiime tools export --input-path {input} --output-path {output} > {log} 2>&1"
 
 rule convert_q2centseq:
     input:
         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{centseq}_centseq.qza"
     output:
         centseq=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{centseq}_centseq/dna-sequences.fasta")
+    log:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/MeBaPiNa_convert_q2centseq.log"
+    benchmark:
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/MeBaPiNa_convert_q2centseq.benchmark.tsv"
     conda:
         "../envs/qiime2.yml"
     shell:
-        "qiime tools export --input-path {input} --output-path {output}"
+        "qiime tools export --input-path {input} --output-path {output} > {log} 2>&1"
 
 ##########################
 ## TAXONOMIC ASSIGNMENT ##
