@@ -162,6 +162,8 @@ def input_fastq(wildcards):
     basecall_dir = checkpoints.basecall_raw.get(tmp=wildcards.tmp,run=wildcards.run).output[0]
     ## get barcode directory names within "pass" directory (excludes any barcodes without assigned reads)
     all_barc = listdir(basecall_dir)
+    ## only barcode or unclassified and sort
+    all_barc = [barc for barc in all_barc if "barcode" in barc or barc=="unclassified"]
     all_barc.sort()
 
     ## filtered fastq files for all barcodes
