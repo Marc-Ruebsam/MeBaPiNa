@@ -15,8 +15,11 @@ rule splitting_filtered: #!# only required because of low memory avaialility
     benchmark:
         "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_splitting_filtered.benchmark.tsv"
     shell:
-        "mkdir {output[0]}; "
-        "touch {log}"
+        "mkdir -p {output}; "
+        "awk 'BEGIN{{ file_num=0 }}; " ## split output into files with <=4000 sequences each
+        "NR%16000==1{{ file_num++ }}; "
+        "{{ print $0 > \"{output}/\" file_num \".fastq\" }}' {input} "
+        ">> {log} 2>&1"
 
 rule aligning_filtered:
     input:
@@ -28,10 +31,20 @@ rule aligning_filtered:
         "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_aligning_filtered.log"
     benchmark:
         "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_aligning_filtered.benchmark.tsv"
+    conda:
+        "../envs/minimap2.yml"
+    params:
+        "-x map-ont", ## naopore specific
+        "-a", ## possition accurate CIGAR alignment in SAM output; much slower <- maybe use -c for PAF instead?
+        "-p 1", ## only retain multi mappings with same highest score
+        "-N 1" ## one secondary alignment is enough to identify multimapping reads
+    threads:
+        8
     shell:
-        "touch {output[0]}; "
-        "lg={log}; "
-        "cat ${{lg/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} > {log}"
+        "minimap2 -t {threads} {params} -o {output} "
+        "{input.target} "
+        "$(find {input.barc_dir} -type f -name \"*.fastq\") " #!# because of split input
+        "> {log} 2>&1"
 
 ## FILE CONVERSION ##
 #####################
@@ -47,14 +60,18 @@ rule filter_aligned:
         "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_filter_aligned.log"
     benchmark:
         "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_filter_aligned.benchmark.tsv"
+    conda:
+        "../envs/samtools.yml"
+    params:
+        "-F 2048", ## exclude chimeric/supplementary alignments
+        "-q 1" ## MAPQ >= 1 filters out all multimapping reads as they always have MAPQ=0
+    threads:
+        4
     shell:
-        "touch {output[0]}; "
-        "out2={output[1]}; "
-        "cp ${{out2/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out2}}; "
-        "out3={output[2]}; "
-        "cp ${{out3/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out3}}; "
-        "lg={log}; "
-        "cat ${{lg/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} > {log}"
+        "samtools view -h -@ $(({threads} / 2)) {params} 2> {log} {input} | "
+        "tee {output.sam} | "
+        "samtools sort --threads $(({threads} / 2)) -o {output.bam} >> {log} 2>&1; "
+        "samtools index -@ {threads} {output.bam} >> {log} 2>&1"
 
 rule convert_bambacktosam: #!# used in case of rerunning
     input:
@@ -65,10 +82,12 @@ rule convert_bambacktosam: #!# used in case of rerunning
         "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_bambacktosam.log"
     benchmark:
         "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_bambacktosam.benchmark.tsv"
+    conda:
+        "../envs/samtools.yml"
+    threads:
+        1
     shell:
-        "touch {output[0]}; "
-        "lg={log}; "
-        "cat ${{lg/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} > {log}"
+        "samtools view -h -@ $(({threads} / 2)) {params} -o {output} {input} > {log} 2>&1"
 ruleorder: convert_bambacktosam > filter_aligned
 
 rule counttax_aligned:
@@ -82,8 +101,57 @@ rule counttax_aligned:
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_aligned.log"
     benchmark:
         "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_aligned.benchmark.tsv"
-    shell:
-        "out1={output[0]}; "
-        "cp ${{out1/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} ${{out1}}; "
-        "lg={log}; "
-        "cat ${{lg/16S_Metabarcoding/\"16S_Metabarcoding/_Temp\"}} > {log}"
+    conda:
+        "../envs/python.yml"
+    script:
+        "../scripts/convert_sam.py" ## filters by read length and average base diversion
+
+## CALIBRATION STRAND ##
+########################
+
+# rule aligning_calibstr:
+#     input:
+#         calib_dir="{tmp}01_processed_data/01_basecalling/{run}/calibration_strands",
+#         target="{tmp}METADATA/Reference_Sequences/lambda_3.6kb/reference.mmi"
+#     output:
+#         temp("{tmp}01_processed_data/03_alignment/{run}/{reference}/lambda/calibration.sam")
+#     log:
+#         "{tmp}01_processed_data/03_alignment/{run}/{reference}/lambda/MeBaPiNa_aligning_calibstr.log"
+#     benchmark:
+#         "{tmp}01_processed_data/03_alignment/{run}/{reference}/lambda/MeBaPiNa_aligning_calibstr.benchmark.tsv"
+#     params:
+#         "-x map-ont", ## naopore specific
+#         "-a" ## possition accurate CIGAR alignment in SAM output; much slower <- maybe skip?
+#     conda:
+#         "../envs/minimap2.yml"
+#     threads:
+#         8
+#     shell:
+#         "minimap2 -t {threads} {params} -o {output} "
+#         "{input.target} "
+#         "$(find {input.calib_dir} -type f -name \"*.fastq\") "
+#         "> {log} 2>&1"
+#
+# rule filter_aligned_calibstr:
+#     input:
+#         "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/lambda/calibration.sam"
+#     output:
+#         sam=temp("{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/lambda/filtered.sam"),
+#         bam="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/lambda/filteredsorted.bam",
+#         bai="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/lambda/filteredsorted.bam.bai"
+#     log:
+#         "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/lambda/MeBaPiNa_filter_aligned.log"
+#     benchmark:
+#         "{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/lambda/MeBaPiNa_filter_aligned.benchmark.tsv"
+#     conda:
+#         "../envs/samtools.yml"
+#     params:
+#         "-F 2048", ## exclude chimeric/supplementary alignments
+#         "-q 1" ## MAPQ >= 1 filters out all multimapping reads as they always have MAPQ=0
+#     threads:
+#         4
+#     shell:
+#         "samtools view -h -@ $(({threads} / 2)) {params} 2> {log} {input} | "
+#         "tee {output.sam} | "
+#         "samtools sort --threads $(({threads} / 2)) -o {output.bam} >> {log} 2>&1; "
+#         "samtools index -@ {threads} {output.bam} >> {log} 2>&1"
