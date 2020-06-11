@@ -196,8 +196,7 @@ rule convert_q2centseq:
     conda:
         "../envs/qiime2.yml"
     shell:
-        "centseq={input}; centseq=\"${{centseq/.qza/}}\"; " ## get path without file extention
-        "qiime tools export --input-path {input} --output-path \"${{centseq}}/\""
+        "qiime tools export --input-path {input} --output-path {output}"
 
 ##########################
 ## TAXONOMIC ASSIGNMENT ##

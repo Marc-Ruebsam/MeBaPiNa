@@ -299,7 +299,7 @@ rule plot_convert_q2ftable:
     input:
         "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable.qza"
     output:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/feature-table.qzv"
+        temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/feature-table.qzv")
     conda:
         "../envs/qiime2.yml"
     shell:
@@ -318,11 +318,8 @@ rule plot_qiime2_q2otupick:
         "../envs/qiime2.yml"
     shell:
         "out_dir={output}; out_dir=\"${{out_dir/index.html/}}\" > {log} 2>&1; "
-        "qiime tools export "
-        "--input-path {input}.qzv "
-        "--output-path ${{out_dir}} "
-        ">> {log} 2>&1; "
-        "rm {input}.qzv >> {log} 2>&1"
+        "qiime tools export --input-path {input} --output-path \"${{out_dir}}/\" "
+        ">> {log} 2>&1"
 
 rule plot_qiime2_q2filter:
     input:
@@ -337,11 +334,8 @@ rule plot_qiime2_q2filter:
         "../envs/qiime2.yml"
     shell:
         "out_dir={output}; out_dir=\"${{out_dir/index.html/}}\" > {log} 2>&1; "
-        "qiime tools export "
-        "--input-path {input}.qzv "
-        "--output-path ${{out_dir}} "
-        ">> {log} 2>&1; "
-        "rm {input}.qzv >> {log} 2>&1"
+        "qiime tools export --input-path {input} --output-path \"${{out_dir}}/\" "
+        ">> {log} 2>&1"
 
 rule plot_krona_q2rerep:
     input:
