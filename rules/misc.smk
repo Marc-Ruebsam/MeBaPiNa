@@ -31,7 +31,7 @@ rule splitting_seqsum_barc:
     input:
         "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/sequencing_summary_sorted.txt"
     output:
-        temp(directory("{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/split"))
+        directory("{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/split")
     log:
         "{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary/MeBaPiNa_splitting_seqsum_barc.log"
     benchmark:
