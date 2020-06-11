@@ -318,7 +318,7 @@ rule plot_qiime2_q2otupick:
         "../envs/qiime2.yml"
     shell:
         "out_dir={output}; out_dir=\"${{out_dir/index.html/}}\" > {log} 2>&1; "
-        "qiime tools export --input-path {input} --output-path \"${{out_dir}}/\" "
+        "qiime tools export --input-path {input} --output-path \"${{out_dir}}\" "
         ">> {log} 2>&1"
 
 rule plot_qiime2_q2filter:
@@ -334,7 +334,7 @@ rule plot_qiime2_q2filter:
         "../envs/qiime2.yml"
     shell:
         "out_dir={output}; out_dir=\"${{out_dir/index.html/}}\" > {log} 2>&1; "
-        "qiime tools export --input-path {input} --output-path \"${{out_dir}}/\" "
+        "qiime tools export --input-path {input} --output-path \"${{out_dir}}\" "
         ">> {log} 2>&1"
 
 rule plot_krona_q2rerep:
