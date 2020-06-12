@@ -179,6 +179,7 @@ rule report_initiate:
 
 rule report_move_raw:
     input:
+        LOGS,
         thing="{tmp}00_raw_data/{run}/fast5"
     output:
         dummy=temp("{tmp}00_raw_data/{run}/MeBaPiNa_move_raw.report") ## for dependencies
@@ -196,6 +197,7 @@ rule report_move_raw:
 
 rule report_basecall_raw_seqsum:
     input:
+        LOGS,
         thing="{tmp}01_processed_data/01_basecalling/{run}/sequencing_summary.txt"
     output:
         dummy=temp("{tmp}00_raw_data/{run}/MeBaPiNa_basecall_raw_seqsum.report") ## for dependencies
@@ -213,6 +215,7 @@ rule report_basecall_raw_seqsum:
 
 rule report_basecall_raw_pass:
     input:
+        LOGS,
         thing="{tmp}01_processed_data/01_basecalling/{run}/pass"
     output:
         dummy=temp("{tmp}00_raw_data/{run}/MeBaPiNa_basecall_raw_pass.report")
@@ -232,6 +235,7 @@ rule report_basecall_raw_pass:
 
 rule report_trim_basecalled:
     input:
+        LOGS,
         thing="{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/trimmed.fastq"
     output:
         dummy=temp("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trim_basecalled.report")
@@ -251,6 +255,7 @@ rule report_trim_basecalled:
 
 rule report_filter_trimmed:
     input:
+        LOGS,
         thing="{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/filtered.fastq"
     output:
         dummy=temp("{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filter_trimmed.report")
@@ -272,6 +277,7 @@ rule report_filter_trimmed:
 
 rule report_q2filter_uchime_ftable:
     input:
+        LOGS,
         thing="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_ftable.qza"
     output:
         dummy=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2filter_uchime_ftable.report")
@@ -291,6 +297,7 @@ rule report_q2filter_uchime_ftable:
 
 rule report_q2filter_uchime_centseq:
     input:
+        LOGS,
         thing="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/filt_centseq.qza"
     output:
         dummy=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2filter_uchime_centseq.report")
@@ -310,6 +317,7 @@ rule report_q2filter_uchime_centseq:
 
 rule report_kmermap_q2rereplicate:
     input:
+        LOGS,
         thing="{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}_{reftype}/filtered.kreport2"
     output:
         dummy=temp("{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_q2rereplicate.report")
@@ -329,6 +337,7 @@ rule report_kmermap_q2rereplicate:
 
 rule report_counttax_q2kmermap:
     input:
+        LOGS,
         thing="{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"
     output:
         dummy=temp("{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_q2kmermap.report")
@@ -350,6 +359,7 @@ rule report_counttax_q2kmermap:
 
 rule report_filter_aligned:
     input:
+        LOGS,
         thing="{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/filteredsorted.bam"
     output:
         dummy=temp("{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_filter_aligned.report")
@@ -369,6 +379,7 @@ rule report_filter_aligned:
 
 rule report_counttax_aligned:
     input:
+        LOGS,
         thing="{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/aligned.counttaxlist"
     output:
         dummy=temp("{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_aligned.report")
@@ -390,6 +401,7 @@ rule report_counttax_aligned:
 
 rule report_kmermap_filtered:
     input:
+        LOGS,
         thing="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/filtered.kreport2"
     output:
         dummy=temp("{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_filtered.report")
@@ -409,6 +421,7 @@ rule report_kmermap_filtered:
 
 rule report_retax_kmermap:
     input:
+        LOGS,
         thing="{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/{reftype}.kreport2"
     output:
         dummy=temp("{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_retax_kmermap.report")
@@ -428,6 +441,7 @@ rule report_retax_kmermap:
 
 rule report_counttax_kmermap:
     input:
+        LOGS,
         thing="{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/kmer.counttaxlist"
     output:
         dummy=temp("{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_kmermap.report")
