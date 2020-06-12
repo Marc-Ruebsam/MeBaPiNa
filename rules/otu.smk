@@ -202,9 +202,9 @@ rule convert_q2centseq:
     output:
         centseq=temp("{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{centseq}_centseq/dna-sequences.fasta")
     log:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/MeBaPiNa_convert_q2centseq.log"
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{centseq}_ftable/MeBaPiNa_convert_q2centseq.log"
     benchmark:
-        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{ftable}_ftable/MeBaPiNa_convert_q2centseq.benchmark.tsv"
+        "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/{centseq}_ftable/MeBaPiNa_convert_q2centseq.benchmark.tsv"
     conda:
         "../envs/qiime2.yml"
     shell:
