@@ -100,7 +100,7 @@ def input_all(wildcards):
 
     ## requested files...
     input_list = (
-    ## REPORT ##
+    ## LOGS ##
     ["{tmp}METADATA/ANALYSIS_PROGRESS_MANAGEMENT.csv"] +
     ## REFERENCE ##
     ["{tmp}03_report/Reference_Sequences/{reference}/reference_lengthdist.tsv", ## reference lenth distribution
@@ -173,6 +173,67 @@ def input_all(wildcards):
     return input_list
 
 rule all_target:
+    input:
+        input_all
+    shell:
+        "awk 'NR == 1; NR > 1 {{print $0 | \"sort -n | uniq\"}}' \"{input[0]}\" > \"{input[0]}.temp\"; " ## store unique lines in temporary output
+        "cat \"{input[0]}.temp\" > \"{input[0]}\"; rm \"{input[0]}.temp\"" ## convert temporary back to file
+
+## UPDATE REPORT ##
+#################
+
+## target rule for all output
+def input_all(wildcards):
+    from os import listdir
+    ## get "pass" directory
+    basecall_dir = checkpoints.basecall_raw.get(tmp=config["experiments"]["tmp"],run=RUNS[0]).output[0]
+    ## get barcode directory names within "pass" directory (excludes any barcodes without assigned reads)
+    all_barc = listdir(basecall_dir)
+    ## retain only barcodes containing one of the selected barcodes from the metadata (not unwanted barcodes)
+    all_barc = [barc for barc in all_barc if barc in SAMPLES.keys()]
+    all_barc.sort()
+
+    ## requested files...
+    input_list = (
+    ## LOGS ##
+    ["{tmp}METADATA/ANALYSIS_PROGRESS_MANAGEMENT.csv"] +
+    ## RAW READS ##
+    ["{tmp}00_raw_data/{run}/MeBaPiNa_move_raw.report"] + ## REPORT
+    ## BASECALL ##
+    ["{tmp}00_raw_data/{run}/MeBaPiNa_basecall_raw_seqsum.report", ## REPORT
+    "{tmp}00_raw_data/{run}/MeBaPiNa_basecall_raw_pass.report"] + ## REPORT
+    ## TRIM AND FILTER ##
+    ["{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_trim_basecalled.report", ## REPORT
+    "{tmp}01_processed_data/02_trimming_filtering/{run}/{barc}/MeBaPiNa_filter_trimmed.report"] + ## REPORT
+    ## OTU ##
+    [x for x in
+    ["{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2filter_uchime_ftable.report", ## REPORT
+    "{tmp}01_processed_data/03_otu_picking/{run}/{barc}/{reference}/MeBaPiNa_q2filter_uchime_centseq.report", ## REPORT
+    "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_q2rereplicate.report", ## REPORT
+    "{tmp}02_analysis_results/03_otu_picking/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_q2kmermap.report"] ## REPORT
+    if "otu" in config["methodologie"]] + ## if "otu" is selected
+    ## ALIGNMENT ##
+    [x for x in
+    ["{tmp}01_processed_data/03_alignment/{run}/{barc}/{reference}/MeBaPiNa_filter_aligned.report",
+    "{tmp}02_analysis_results/03_alignment/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_aligned.report"]
+    if "align" in config["methodologie"]] + ## if "align" is selected
+    ## K-MER MAPPING ##
+    [x for x in
+    ["{tmp}01_processed_data/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_kmermap_filtered.report", ## REPORT
+    "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_retax_kmermap.report", ## REPORT
+    "{tmp}02_analysis_results/03_kmer_mapping/{run}/{barc}/{reference}_{reftype}/MeBaPiNa_counttax_kmermap.report"] ## REPORT
+    if "kmer" in config["methodologie"]] ) ## if "kmer" is selected
+
+    ## expand for all barcodes
+    input_list = expand(input_list,
+    tmp = config["experiments"]["tmp"],
+    barc = all_barc,
+    reference = config['reference']['source'],
+    reftype = config['reference']['rank'] )
+    ## return
+    return input_list
+
+rule update_report:
     input:
         input_all
     shell:
