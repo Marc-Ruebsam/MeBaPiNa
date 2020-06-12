@@ -66,12 +66,13 @@ PLOT_MAXLEN = config["filtering"]["len_max"]
 
 ## load rule set
 include: "rules/basecall.smk"
+include: "rules/readqc.smk"
 include: "rules/align.smk"
 include: "rules/kmer.smk"
 include: "rules/otu.smk"
+include: "rules/misc.smk"
 include: "rules/stats.smk"
 include: "rules/plot.smk"
-include: "rules/misc.smk"
 include: "rules/report.smk"
 
 
