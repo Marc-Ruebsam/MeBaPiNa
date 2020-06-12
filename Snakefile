@@ -228,6 +228,7 @@ def input_all(wildcards):
     ## expand for all barcodes
     input_list = expand(input_list,
     tmp = config["experiments"]["tmp"],
+    run = RUNS,
     barc = all_barc,
     reference = config['reference']['source'],
     reftype = config['reference']['rank'] )
