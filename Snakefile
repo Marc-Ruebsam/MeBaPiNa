@@ -176,7 +176,8 @@ rule all_target:
     input:
         input_all
     shell:
-        "awk 'NR == 1; NR > 1 {{print $0 | \"sort -n | uniq\"}}' \"{input[0]}\" > \"{input[0]}.temp\"; " ## store unique lines in temporary output
+        "echo \"Sample name;File/Directory;Action;Date;Checksum;Who;Description\" > \"{input[0]}.temp\"; " ## store header in temporary output
+        "grep -v \"Sample name;File/Directory;Action;Date;Checksum;Who;Description\" \"{input[0]}\"  | sort -n | uniq >> \"{input[0]}.temp\"; " ## store unique lines in temporary output
         "cat \"{input[0]}.temp\" > \"{input[0]}\"; rm \"{input[0]}.temp\"" ## convert temporary back to file
 
 ## UPDATE REPORT ##
@@ -237,5 +238,6 @@ rule update_report:
     input:
         input_all
     shell:
-        "awk 'NR == 1; NR > 1 {{print $0 | \"sort -n | uniq\"}}' \"{input[0]}\" > \"{input[0]}.temp\"; " ## store unique lines in temporary output
+        "echo \"Sample name;File/Directory;Action;Date;Checksum;Who;Description\" > \"{input[0]}.temp\"; " ## store header in temporary output
+        "grep -v \"Sample name;File/Directory;Action;Date;Checksum;Who;Description\" \"{input[0]}\"  | sort -n | uniq >> \"{input[0]}.temp\"; " ## store unique lines in temporary output
         "cat \"{input[0]}.temp\" > \"{input[0]}\"; rm \"{input[0]}.temp\"" ## convert temporary back to file
