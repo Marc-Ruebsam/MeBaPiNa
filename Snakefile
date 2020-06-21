@@ -80,7 +80,7 @@ include: "rules/report.smk"
 #################
 
 ## target rule for all output
-def input_all(wildcards):
+def input_all_target(wildcards):
     from os import listdir
     ## get "pass" directory
     basecall_dir = checkpoints.basecall_raw.get(tmp=config["experiments"]["tmp"],run=RUNS[0]).output[0]
@@ -175,7 +175,63 @@ def input_all(wildcards):
 
 rule all_target:
     input:
-        input_all
+        input_all_target
+    shell:
+        "echo \"Sample name;File/Directory;Action;Date;Checksum;Who;Description\" > \"{input[0]}.temp\"; " ## store header in temporary output
+        "grep -v \"Sample name;File/Directory;Action;Date;Checksum;Who;Description\" \"{input[0]}\"  | sort -n | uniq >> \"{input[0]}.temp\"; " ## store unique lines in temporary output
+        "cat \"{input[0]}.temp\" > \"{input[0]}\"; rm \"{input[0]}.temp\"" ## convert temporary back to file
+
+## ONLY BASECALL ##
+###################
+
+## target rule for completing basecalling only
+def input_only_basecall(wildcards):
+    from os import listdir
+    ## get "pass" directory
+    basecall_dir = checkpoints.basecall_raw.get(tmp=config["experiments"]["tmp"],run=RUNS[0]).output[0]
+    ## get barcode directory names within "pass" directory (excludes any barcodes without assigned reads)
+    all_barc = listdir(basecall_dir)
+    ## retain only barcodes containing one of the selected barcodes from the metadata (not unwanted barcodes)
+    all_barc = [barc for barc in all_barc if barc in SAMPLES.keys()]
+    all_barc.sort()
+
+    ## report directories...
+    all_barc_dir = (
+    ## ...per PROMISE timepoint and sample as specified in the METADATA
+    ["03_report/" + TPs + "/" + IDs + "/" + RUNs + "-" + barc + "/"
+    for TPs,IDs,barc,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), SAMPLES.keys(), METADATA['Run ID']) if ("PROM" in IDs) & (barc in all_barc)] +
+    ## ...for all other sample specified in the METADATA
+    ["03_report/" + "non-PROMISE_samples" + "/" + IDs + "/" + RUNs + "-" + barc + "/"
+    for TPs,IDs,barc,RUNs in zip(TIMEPOINTS.values(), SAMPLES.values(), SAMPLES.keys(), METADATA['Run ID']) if (not "PROM" in IDs) & (barc in all_barc)])
+
+    ## requested files...
+    input_list = (
+    ## LOGS ##
+    ["{tmp}METADATA/ANALYSIS_PROGRESS_MANAGEMENT.csv"] +
+    ## RAW READS ##
+    ["{tmp}{barc_dir}read_base_counts.tsv"] + ## raw read statistics
+    ## BASECALL ##
+    ["{tmp}{barc_dir}01_basecalling-nanoplot-NanoPlot-report.html", ## general QC: all reads, including calibtation strads, intentional downsampling
+    "{tmp}{barc_dir}01_basecalling-nanoplot-NanoStats.txt", ## general QC: all reads, including calibtation strads, intentional downsampling
+    "{tmp}{barc_dir}01_basecalling-pycoqc-pycoQC_report.html", ## general QC: all reads, forced downsampling
+    "{tmp}{barc_dir}01_basecalling-pycoqc-pycoQC_report.json", ## general QC: all reads, forced downsampling
+    "{tmp}{barc_dir}01_basecalling-nanoqc-nanoQC.html", ## per base QC: all reads, forced downsampling
+    "{tmp}{barc_dir}01_basecalling-fastqc-stdin_fastqc.html"] + ## read QC: all passed reads
+    [x for x in
+    ["{tmp}{barc_dir}01_basecalling-nanocomp-NanoComp-report.html", ## barcode QC: per barcode
+    "{tmp}{barc_dir}01_basecalling-nanocomp-NanoStats.txt"] ## barcode QC: per barcode
+    if BAC_KIT] ) ## if BAC_KIT is not ""
+
+    ## expand for all barcodes
+    input_list = expand(input_list,
+    tmp = config["experiments"]["tmp"],
+    barc_dir = all_barc_dir )
+    ## return
+    return input_list
+
+rule only_basecall:
+    input:
+        input_only_basecall
     shell:
         "echo \"Sample name;File/Directory;Action;Date;Checksum;Who;Description\" > \"{input[0]}.temp\"; " ## store header in temporary output
         "grep -v \"Sample name;File/Directory;Action;Date;Checksum;Who;Description\" \"{input[0]}\"  | sort -n | uniq >> \"{input[0]}.temp\"; " ## store unique lines in temporary output
@@ -184,8 +240,8 @@ rule all_target:
 ## UPDATE REPORT ##
 #################
 
-## target rule for all output
-def input_all(wildcards):
+## target rule for updating all report lines in the log file
+def input_update_report(wildcards):
     from os import listdir
     ## get "pass" directory
     basecall_dir = checkpoints.basecall_raw.get(tmp=config["experiments"]["tmp"],run=RUNS[0]).output[0]
@@ -238,7 +294,7 @@ def input_all(wildcards):
 
 rule update_report:
     input:
-        input_all
+        input_update_report
     shell:
         "echo \"Sample name;File/Directory;Action;Date;Checksum;Who;Description\" > \"{input[0]}.temp\"; " ## store header in temporary output
         "grep -v \"Sample name;File/Directory;Action;Date;Checksum;Who;Description\" \"{input[0]}\"  | sort -n | uniq >> \"{input[0]}.temp\"; " ## store unique lines in temporary output
